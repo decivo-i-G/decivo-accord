@@ -1,0 +1,12 @@
+/** How a token is called in CSS (`--color-brand-700`), so other packages name it the same way. */
+export { cssVariableName } from '@decivo/accord-adapter-code'
+export * from './apply.js'
+export * from './check.js'
+export * from './claude-design.js'
+export * from './commands.js'
+export * from './detect.js'
+export * from './format.js'
+export * from './init.js'
+export * from './messages.js'
+export * from './report.js'
+export * from './surface-proposal.js'

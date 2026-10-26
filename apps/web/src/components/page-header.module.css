@@ -1,0 +1,81 @@
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-md) var(--spacing-lg);
+}
+
+.text {
+  flex: 1 1 calc(var(--size-inspector) + var(--spacing-3xl));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.tag {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* The dots alone (project pages) sit on their own line, as wide as they are. */
+.dots {
+  align-self: flex-start;
+}
+
+/* One size for every page title (the register's "Seitentitel"), on desktop and phones alike. */
+.title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--font-leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.lead {
+  max-width: var(--size-measure);
+  color: var(--color-ink-body);
+  font-size: var(--font-size-lg);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-md);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.compact {
+  align-items: center;
+}
+
+.compact .text {
+  flex: 1 1 auto;
+  gap: var(--spacing-xs);
+}
+
+.compact .tag {
+  margin-bottom: 0;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-xs) var(--spacing-md);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .lead {
+    font-size: var(--font-size-base);
+  }
+}

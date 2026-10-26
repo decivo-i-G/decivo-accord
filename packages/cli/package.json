@@ -1,0 +1,63 @@
+{
+  "name": "@decivo/accord-cli",
+  "version": "0.1.0",
+  "description": "accord: the command line for decivo Accord, the register for design decisions that people and agents check against.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "bin": {
+    "accord": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@decivo/accord-adapter-claude-design": "workspace:*",
+    "@decivo/accord-adapter-code": "workspace:*",
+    "@decivo/accord-adapter-figma": "workspace:*",
+    "@decivo/accord-adapter-pen": "workspace:*",
+    "@decivo/accord-checks": "workspace:*",
+    "@decivo/accord-core": "workspace:*",
+    "@decivo/accord-generators": "workspace:*",
+    "commander": "15.0.0",
+    "tinyglobby": "0.2.17",
+    "yaml": "2.9.1",
+    "zod": "4.6.6"
+  },
+  "devDependencies": {
+    "fflate": "0.8.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

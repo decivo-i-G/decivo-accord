@@ -1,0 +1,83 @@
+.form {
+  display: flex;
+  flex: none;
+}
+
+/* A switch like the ones in Figma's and Vercel's settings: the track alone, in a 44px square target. */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--size-target);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-xs);
+  margin-right: calc(var(--spacing-xs) * -1);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-ink-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* In a row: the label, then the track, as one 44px target that starts flush with the text above. */
+.labelled {
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-xs);
+  margin-right: 0;
+  margin-left: calc(var(--spacing-xs) * -1);
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+}
+
+.label {
+  text-align: left;
+}
+
+.switch:hover {
+  background: var(--color-surface-subtle);
+}
+
+.switch[aria-checked="true"] {
+  color: var(--color-ink);
+}
+
+.track {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: calc(var(--size-icon-md) * 2);
+  height: var(--size-icon-md);
+  border-radius: var(--radius-pill);
+  border: var(--stroke-default) solid var(--color-border-control);
+  background: var(--color-surface-subtle);
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.thumb {
+  position: absolute;
+  top: var(--spacing-xxs);
+  left: var(--spacing-xxs);
+  width: calc(var(--size-icon-md) - var(--spacing-xs) - var(--stroke-strong));
+  height: calc(var(--size-icon-md) - var(--spacing-xs) - var(--stroke-strong));
+  border-radius: var(--radius-pill);
+  background: var(--color-ink-muted);
+  transition:
+    transform var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
+}
+
+.switch[aria-checked="true"] .track {
+  background: var(--color-brand-700);
+  border-color: var(--color-brand-700);
+}
+
+.switch[aria-checked="true"] .thumb {
+  background: var(--color-on-brand);
+  transform: translateX(var(--size-icon-md));
+}

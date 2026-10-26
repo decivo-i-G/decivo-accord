@@ -1,0 +1,15 @@
+{
+  "color": {
+    "brand": {
+      "$type": "color",
+      "$value": { "colorSpace": "srgb", "components": [0.2902, 0.4824, 0.6039], "alpha": 1, "hex": "#4A7B9A" },
+      "$extensions": { "com.figma.variableId": "VariableID:1:2", "com.figma.scopes": ["ALL_SCOPES"] }
+    },
+    "text": {
+      "$type": "color",
+      "$value": { "colorSpace": "srgb", "components": [0.0863, 0.1333, 0.1686], "alpha": 1, "hex": "#16222B" }
+    },
+    "on-brand": { "$type": "color", "$value": "{color.text}" }
+  },
+  "radius": { "md": { "$type": "number", "$value": 8 } }
+}

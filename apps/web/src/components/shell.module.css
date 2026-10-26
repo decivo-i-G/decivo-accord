@@ -1,0 +1,879 @@
+/*
+ * App frame. Breakpoint 768px (media queries cannot read custom properties): above it the sidebar
+ * is docked; at or below it the sections move into a bottom tab bar and the sidebar into a drawer.
+ */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--size-sidebar) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+/* --- Sidebar --- */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-ms);
+  background: var(--color-surface-sidebar);
+  border-right: var(--stroke-default) solid var(--color-border-default);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-ms);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--color-ink);
+}
+
+.brandText {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  line-height: var(--font-leading-tight);
+}
+
+.brandWord {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-light);
+}
+
+.product {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Project switcher, with the gear for the project settings (Verbindungen) next to it */
+
+.switcherRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.switcher {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.settings {
+  flex: none;
+}
+
+.settings[aria-current="page"] {
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+}
+
+.switcherButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-height: calc(var(--size-target) + var(--spacing-sm));
+  padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.switcherButton:hover {
+  border-color: var(--color-border-strong);
+}
+
+.switcherButton[aria-expanded="true"] {
+  border-color: var(--color-brand-700);
+}
+
+.switcherText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+/*
+ * One line, so the sidebar never jumps between projects: the owner muted, the repository strong, an
+ * ellipsis where it does not fit (the whole name is the title, and the popover lists it).
+ */
+.switcherName {
+  display: flex;
+  min-width: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-snug);
+}
+
+.projectName {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* The owner gives way first ("boundl…/boundless"): the repository is the name people look for. */
+.projectOwner,
+.projectRepo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.projectOwner {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--color-ink-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.projectRepo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.projectOwner {
+  flex: 0 100 auto;
+  color: var(--color-ink-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.projectRepo {
+  flex: none;
+  max-width: 100%;
+  color: var(--color-ink);
+}
+
+.switcherMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+.switcherMeta svg {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+}
+
+.switcherChevron {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  left: 0;
+  right: 0;
+  z-index: var(--layer-drawer);
+  padding: var(--spacing-xs);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  box-shadow: var(--shadow-lg);
+}
+
+.popover[hidden] {
+  display: none;
+}
+
+.popoverTitle {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.popoverList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.popoverItem,
+.popoverFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  text-decoration: none;
+}
+
+.popoverItem:hover,
+.popoverFooter:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.popoverItem[aria-current="true"] {
+  font-weight: var(--font-weight-semibold);
+}
+
+.popoverName {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.popoverCheck {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-brand-800);
+}
+
+.popoverFooter {
+  margin-top: var(--spacing-xs);
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  color: var(--color-brand-800);
+}
+
+.popoverFilter {
+  display: block;
+  padding: 0 var(--spacing-xs) var(--spacing-xs);
+}
+
+.popoverInput {
+  width: 100%;
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  border: var(--stroke-default) solid var(--color-border-control);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  font-size: var(--font-size-md);
+}
+
+.popoverInput::placeholder {
+  color: var(--color-ink-muted);
+  opacity: 1;
+}
+
+.popoverEmpty {
+  padding: var(--spacing-sm);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Sections */
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  border-radius: var(--radius-md);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
+}
+
+.link svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.link[aria-current="page"] {
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.linkLabel {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A sentence-case label above a sidebar list (the projects on the project list). */
+.navTitle {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* The one count in the navigation: open decisions */
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: calc(var(--spacing-md) + var(--spacing-xs));
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-700);
+  color: var(--color-on-brand);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-normal);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Footer of the sidebar: the DE/EN switch and the theme button (moon/sun), both one tap away. */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-top: auto;
+  padding-top: var(--spacing-ms);
+  border-top: var(--stroke-default) solid var(--color-border-default);
+}
+
+.theme {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+}
+
+.themeForm {
+  display: contents;
+}
+
+/* A long press opens the menu; the phone's own callout and text selection stay out of the way. */
+.themeToggle {
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Moon in light ("switch to dark"), sun in dark ("switch to light"); System follows the OS. */
+.theme .whenDark {
+  display: none;
+}
+
+:global(:root[data-theme="dark"]) .theme .whenLight {
+  display: none;
+}
+
+:global(:root[data-theme="dark"]) .theme .whenDark {
+  display: inline-flex;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root[data-theme="system"]) .theme .whenLight {
+    display: none;
+  }
+
+  :global(:root[data-theme="system"]) .theme .whenDark {
+    display: inline-flex;
+  }
+}
+
+/* The menu with Light, Dark and System (long press or right click on the theme button). */
+.themeMenu {
+  top: auto;
+  bottom: calc(100% + var(--spacing-xs));
+  left: auto;
+  right: 0;
+  width: calc(var(--size-sidebar) - var(--spacing-lg));
+}
+
+/* In the phone's top bar the menu opens downwards. */
+.themeTop .themeMenu {
+  top: calc(100% + var(--spacing-xs));
+  bottom: auto;
+}
+
+.themeMenu .popoverItem {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.themeMenu .popoverItem svg:first-child {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.themeMenu .popoverItem[aria-pressed="true"] {
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.themeMenu .popoverItem[aria-pressed="true"] svg:first-child {
+  color: var(--color-brand-800);
+}
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* DE/EN */
+
+.language {
+  margin: 0;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xxs);
+  padding: var(--spacing-xxs);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: var(--size-target);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  border: var(--stroke-default) solid transparent;
+  border-radius: calc(var(--radius-md) - var(--spacing-xxs));
+  background: transparent;
+  color: var(--color-ink-muted);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  position: relative;
+}
+
+.segment svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.segment:hover {
+  color: var(--color-ink);
+}
+
+/* Pressed: filled, bold and edged, so the state never rests on one weak cue (WCAG 1.4.11). */
+.segment[aria-pressed="true"] {
+  border-color: var(--color-border-control);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* --- Top bar and canvas --- */
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--layer-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: var(--size-topbar);
+  padding: 0 var(--spacing-lg);
+  background: var(--color-surface-page);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.topbar > nav,
+.topSpacer {
+  flex: 1;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-left: auto;
+}
+
+.menuButton,
+.topTheme {
+  display: none;
+}
+
+/* Phones: the menu icon and the project's name open the drawer with all projects and the settings. */
+.menuIcon {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.menuName {
+  display: flex;
+  min-width: 0;
+}
+
+/* The owner gives way first ("bound…/boundless"); the repository's name stays whole. */
+.menuOwner {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuRepo {
+  flex: none;
+  white-space: nowrap;
+}
+
+.main {
+  flex: 1;
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-3xl);
+}
+
+.main:focus {
+  outline: none;
+}
+
+.mainFlush {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mainFlush:focus {
+  outline: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  max-width: var(--size-content);
+  margin: 0 auto;
+}
+
+/* --- Drawer (phones) --- */
+
+.drawer {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(var(--size-drawer), calc(100vw - var(--size-target)));
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-right: var(--stroke-default) solid var(--color-border-default);
+  background: var(--color-surface-sidebar);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
+  transition:
+    transform var(--duration-slow) var(--easing-enter),
+    overlay var(--duration-slow) allow-discrete,
+    display var(--duration-slow) allow-discrete;
+}
+
+.drawer:not([open]) {
+  transform: translateX(-100%);
+}
+
+@starting-style {
+  .drawer[open] {
+    transform: translateX(-100%);
+  }
+}
+
+.drawer::backdrop {
+  background: var(--color-overlay);
+}
+
+.drawerBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-height: 100%;
+  padding: var(--spacing-ms);
+  padding-bottom: calc(var(--spacing-ms) + env(safe-area-inset-bottom));
+}
+
+.drawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding-left: var(--spacing-sm);
+}
+
+.drawerTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--font-leading-tight);
+}
+
+.drawerLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  text-decoration: none;
+}
+
+.drawerLink svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  color: var(--color-ink-muted);
+}
+
+.drawerLink:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.drawerLink[aria-current="page"] {
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* --- Tab bar (phones) --- */
+
+.tabbar {
+  display: none;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xxs);
+  min-height: var(--size-tabbar);
+  padding: var(--spacing-xs) var(--spacing-xxs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+}
+
+.tab:hover {
+  color: var(--color-ink);
+}
+
+/* The current tab: brand ink and a heavier label, no pill. */
+.tab[aria-current] {
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tabIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--size-target) + var(--spacing-md));
+  height: var(--size-control-sm);
+}
+
+.tabIcon svg {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.tabCount {
+  position: absolute;
+  top: var(--spacing-xxs);
+  left: calc(50% + var(--spacing-sm));
+}
+
+/* Labels wrap (hyphenated in German) rather than being cut off on narrow phones. */
+.tabLabel {
+  max-width: 100%;
+  line-height: var(--font-leading-tight);
+  text-align: center;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 var(--spacing-sm);
+    gap: var(--spacing-xs);
+    background: var(--color-surface-sidebar);
+  }
+
+  .topTheme {
+    display: flex;
+    flex: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: calc(var(--size-target) * 5);
+    min-height: var(--size-target);
+    padding: 0 var(--spacing-ms) 0 var(--spacing-sm);
+    border: var(--stroke-default) solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-card);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+  }
+
+  /* On the project list the button is the menu icon alone. */
+  .menuButtonIcon {
+    flex: none;
+    justify-content: center;
+    width: var(--size-target);
+    padding: 0;
+  }
+
+  .menuButton:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  .menuButton[aria-expanded="true"] {
+    border-color: var(--color-brand-700);
+  }
+
+  /* On the connections, which live in the menu, the button is tinted like the desktop gear. */
+  .menuButton[data-current] {
+    border-color: var(--color-brand-100);
+    background: var(--color-brand-50);
+    color: var(--color-brand-800);
+  }
+
+  .main {
+    padding: var(--spacing-lg) var(--spacing-md) calc(var(--size-tabbar) + var(--spacing-xl));
+  }
+
+  .mainFlush {
+    padding-bottom: calc(var(--size-tabbar) + env(safe-area-inset-bottom));
+  }
+
+  .tabbar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--layer-sticky);
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--color-surface-sidebar);
+    border-top: var(--stroke-default) solid var(--color-border-default);
+  }
+}
+
+/* Phones: while a field in the details has focus (on-screen keyboard), the tab bar steps aside. */
+@media (max-width: 768px) {
+  :global(html:has([data-inspector] :is(input, textarea):focus)) .tabbar {
+    display: none;
+  }
+}
+
+/* Short viewports (phone in landscape, 200 % zoom): the bars scroll with the page instead of sticking. */
+@media (max-height: 500px) {
+  .topbar {
+    position: static;
+  }
+
+  .tabbar {
+    position: static;
+  }
+}
+
+/*
+ * Forced colours (Windows contrast themes) drop the tint and the weight that mark where you are, so
+ * the current section, tab, setting and pressed segment get an outline in the system's highlight.
+ */
+@media (forced-colors: active) {
+  .link[aria-current],
+  .tab[aria-current],
+  .settings[aria-current],
+  .drawerLink[aria-current],
+  .menuButton[data-current],
+  .popoverItem[aria-current],
+  .popoverItem[aria-pressed="true"],
+  .segment[aria-pressed="true"] {
+    outline: var(--stroke-strong) solid Highlight;
+    outline-offset: calc(var(--stroke-strong) * -1);
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "color": {
+    "$type": "color",
+    "brand": {
+      "$root": {
+        "$value": { "colorSpace": "srgb", "components": [0.2824, 0.4784, 0.5961], "hex": "#487a98" },
+        "$extensions": { "de.decivo.accord": { "ids": { "css": "--brand-blue" } } }
+      },
+      "700": {
+        "$value": { "colorSpace": "srgb", "components": [0.2353, 0.4, 0.5059], "hex": "#3c6681" },
+        "$extensions": { "de.decivo.accord": { "ids": { "css": "--brand-700" } } }
+      }
+    },
+    "text": {
+      "primary": { "$value": { "colorSpace": "srgb", "components": [0.0863, 0.1333, 0.1686], "hex": "#16222b" } }
+    }
+  },
+  "spacing": {
+    "$type": "dimension",
+    "lg": { "$value": { "value": 24, "unit": "px" } },
+    "xl": { "$value": { "value": 32, "unit": "px" } }
+  },
+  "radius": {
+    "$type": "dimension",
+    "md": { "$value": { "value": 8, "unit": "px" } }
+  },
+  "font": {
+    "hero": {
+      "$type": "dimension",
+      "$value": { "value": 3.5, "unit": "rem" },
+      "$extensions": { "de.decivo.accord": { "ids": { "css": "--hero-size" } } }
+    }
+  }
+}

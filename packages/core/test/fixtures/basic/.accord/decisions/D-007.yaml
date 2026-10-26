@@ -1,0 +1,9 @@
+id: D-007
+rule: Keine harten Farbwerte in Komponenten
+why: Nur so greifen Änderungen am Register überall, und Agenten erfinden keine eigenen Farben.
+scope: ['code:src/components/**']
+level: must
+owner: register
+checks:
+  - type: deterministic
+    rule: { kind: no_raw_values, types: [color] }

@@ -1,0 +1,163 @@
+{
+  "schema": "accord.report/1",
+  "accord_version": "9.9.9",
+  "commit": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "branch": "feat/landing",
+  "default_branch": "main",
+  "source": "action",
+  "generated_at": "2026-10-20T10:00:00.000Z",
+  "report": {
+    "generatedAt": "2026-10-20T10:00:00.000Z",
+    "register": {
+      "tokens": 40,
+      "components": 6,
+      "decisions": 3
+    },
+    "health": {
+      "score": 81
+    },
+    "code": {
+      "tokensCovered": 30,
+      "tokensInSync": 27,
+      "drift": [
+        {
+          "path": "color.brand.700",
+          "kind": "value",
+          "origin": "design",
+          "owner": "design",
+          "breaking": false,
+          "reason": "value differs",
+          "register": "#3c6681",
+          "surface": "#3d6782"
+        },
+        {
+          "path": "space.4",
+          "kind": "removed",
+          "origin": "code",
+          "owner": "register",
+          "breaking": true,
+          "reason": "missing in code"
+        }
+      ],
+      "missing": [
+        "radius.lg",
+        "shadow.sm"
+      ],
+      "hardValues": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 4,
+          "column": 7,
+          "raw": "#487a98",
+          "kind": "color",
+          "replacement": "color.brand"
+        },
+        {
+          "file": "src/app/card.tsx",
+          "line": 12,
+          "column": 2,
+          "raw": "13px",
+          "kind": "dimension",
+          "near": {
+            "path": "space.3",
+            "distance": 1
+          }
+        }
+      ],
+      "hardValueSummary": {
+        "total": 3,
+        "exact": 1,
+        "near": 1,
+        "none": 1,
+        "files": 3
+      },
+      "inlineOnly": {
+        "total": 2,
+        "files": [
+          {
+            "file": "emails/welcome.tsx",
+            "count": 2
+          }
+        ]
+      },
+      "allowed": {
+        "total": 1,
+        "reasons": [
+          {
+            "reason": "third-party widget",
+            "count": 1
+          }
+        ]
+      },
+      "adoption": {
+        "tokenUses": 40,
+        "hardColours": 2,
+        "rate": 0.95
+      },
+      "filesScanned": 9
+    }
+  },
+  "proposals": [
+    {
+      "id": "P-20261020-landing",
+      "source": "claude-design",
+      "title": "Landing (Claude Design)",
+      "route": "owner",
+      "decider": "design",
+      "breaking": false,
+      "colors": [
+        {
+          "token": "color.brand.700",
+          "before": "#3c6681",
+          "after": "#3d6782",
+          "count": 3
+        },
+        {
+          "after": "#ff00aa",
+          "count": 3
+        }
+      ],
+      "rules": [
+        {
+          "id": "brand-colour",
+          "rule": "Brand colour only from the register",
+          "why": "Two nearly identical blues look like a mistake."
+        },
+        {
+          "id": "no-pink",
+          "rule": "No pink",
+          "why": "Pink is not part of the brand."
+        }
+      ],
+      "recommendation": {
+        "option": "reset",
+        "reason": "Two nearly identical blues look like a mistake. Pink is not part of the brand."
+      }
+    },
+    {
+      "id": "P-20261020-pricing",
+      "source": "claude-design",
+      "title": "Pricing (Claude Design)",
+      "route": "owner",
+      "decider": "code",
+      "breaking": false,
+      "colors": [
+        {
+          "after": "#123456",
+          "count": 3
+        }
+      ],
+      "rules": [
+        {
+          "id": "brand-colour",
+          "rule": "Brand colour only from the register",
+          "why": "Two nearly identical blues look like a mistake."
+        }
+      ],
+      "recommendation": {
+        "option": "ask",
+        "reason": "Two nearly identical blues look like a mistake."
+      }
+    }
+  ]
+}

@@ -1,0 +1,453 @@
+/*
+ * Overview (Überblick), the project start: the state in one sentence, the one next step, at most
+ * three short items and one line per surface. The score lives behind "Details". Lists and white space,
+ * no cards, no big numbers.
+ */
+
+/* --- The state and the one next step ---------------------------------------------------------------- */
+
+/* The page header and the sentence belong together: less room than between the sections below. */
+.now {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  max-width: var(--size-measure);
+  margin-top: calc(var(--spacing-md) - var(--spacing-xl));
+}
+
+.sentence {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-light);
+  line-height: var(--font-leading-snug);
+  color: var(--color-ink);
+}
+
+.caution {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  color: var(--color-ink-body);
+}
+
+.caution svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  margin-top: var(--spacing-xs);
+  color: var(--color-warning-ink);
+}
+
+.caution code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.step {
+  margin-top: var(--spacing-xs);
+}
+
+.stepTask {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.stepTitle {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.stepCopy {
+  display: flex;
+}
+
+.broken {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  color: var(--color-ink-body);
+}
+
+/* --- Blocks: the short items and the surfaces -------------------------------------------------------- */
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: var(--size-measure);
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.blockTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+}
+
+.items,
+.surfaces {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+/* --- A short item: a task that opens to one sentence how --------------------------------------------- */
+
+.task {
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: var(--size-icon-sm) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-ms);
+  min-height: calc(var(--size-target) + var(--spacing-sm));
+  padding: var(--spacing-xs) 0;
+  color: var(--color-ink-body);
+  cursor: pointer;
+  list-style: none;
+}
+
+.item::-webkit-details-marker {
+  display: none;
+}
+
+.item > svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.itemTitle {
+  min-width: 0;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+/* The same worded action on every item: "So geht's", brand ink like a link. */
+.taskOpen {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-800);
+  white-space: nowrap;
+}
+
+.taskOpen svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.item:hover .taskOpen {
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xxs);
+}
+
+.task[open] .taskChevron {
+  transform: rotate(180deg);
+}
+
+.taskBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: 0 0 var(--spacing-md) calc(var(--size-icon-sm) + var(--spacing-ms));
+  font-size: var(--font-size-md);
+  color: var(--color-ink-body);
+}
+
+.taskBody > p {
+  max-width: var(--size-measure);
+  overflow-wrap: anywhere;
+}
+
+/* The tokens a task names: each one a link to the token in the register. */
+.taskTokens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tokenLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+  color: var(--color-brand-800);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border-strong);
+  text-underline-offset: var(--spacing-xxs);
+}
+
+.tokenLink:hover {
+  text-decoration-color: currentColor;
+}
+
+.tokenLink code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.tokenMore {
+  color: var(--color-ink-muted);
+}
+
+/* "Für Entwickler": the command last, below a small label. */
+.dev {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-self: stretch;
+}
+
+.devLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+/* --- The surfaces: one line each, and the whole line is the link ------------------------------------- */
+
+/* The lines share one set of columns (subgrid), so the states line up under each other. */
+.surfaces {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: var(--spacing-xl);
+}
+
+.surfaceItem {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.surface {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  min-height: calc(var(--size-target) + var(--spacing-sm));
+  padding: var(--spacing-xs) 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.surfaceName {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-ms);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+}
+
+.surfaceName svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.surfaceState {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.surfaceState svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.surfaceChevron {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.surface:hover .surfaceName {
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xxs);
+}
+
+.surface:hover .surfaceChevron {
+  color: var(--color-brand-800);
+}
+
+.waiting {
+  color: var(--color-ink);
+}
+
+.inSync {
+  color: var(--color-success-ink);
+}
+
+.quiet {
+  color: var(--color-ink-muted);
+}
+
+/* A quiet link in a task: brand ink, no button frame, still a 44px target. */
+.quietLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-800);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.quietLink:hover {
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xxs);
+}
+
+/* --- Details: the score and how it is computed ------------------------------------------------------ */
+
+.details {
+  max-width: var(--size-measure);
+  font-size: var(--font-size-md);
+}
+
+.details > summary {
+  color: var(--color-brand-800);
+}
+
+.detailsBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  color: var(--color-ink-body);
+}
+
+.score {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+}
+
+.moved {
+  display: grid;
+  gap: var(--spacing-xs);
+  margin: 0;
+}
+
+.moved > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--spacing-xs) var(--spacing-md);
+  padding: var(--spacing-xs) 0;
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.moved dd {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.movedValue {
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.movedPoints {
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.detailsTitle {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+}
+
+.stamp {
+  margin-top: var(--spacing-sm);
+  color: var(--color-ink-muted);
+}
+
+@media (max-width: 640px) {
+  .sentence {
+    font-size: var(--font-size-xl);
+  }
+
+  /* Phones: the name on the first row, the state under it, the chevron at the end. */
+  .surfaces {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .surface {
+    grid-template-areas:
+      "name chevron"
+      "state chevron";
+    row-gap: 0;
+  }
+
+  .surfaceName {
+    grid-area: name;
+  }
+
+  .surfaceState {
+    grid-area: state;
+    padding-left: calc(var(--size-icon-sm) + var(--spacing-ms));
+    font-size: var(--font-size-md);
+  }
+
+  .surfaceChevron {
+    grid-area: chevron;
+  }
+
+  .taskBody {
+    padding-left: 0;
+  }
+}
+
+/* An item that is a link (code files waiting in the inbox): the same row, without an underline. */
+.itemLink {
+  text-decoration: none;
+}
+
+.itemLink:hover .taskOpen {
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xxs);
+}
+
+/* The one file's path under the item's words, in mono like every path. */
+.itemPath {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+  overflow-wrap: anywhere;
+}

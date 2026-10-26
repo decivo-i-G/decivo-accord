@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --brand-blue: #487a98;
+  --brand-700: #3c6681;
+  --text-primary: #16222b;
+  --spacing-lg: 1.5rem;
+  --legacy-teal: #2a9d8f;
+  --hero-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.dark {
+  --text-primary: #f5f7f9;
+}
+
+@theme inline {
+  --color-brand: var(--brand-blue);
+  --color-primary: var(--brand-700, #000);
+}
+
+.hero-glow {
+  box-shadow: 0 0 40px rgba(72, 122, 152, 0.3);
+  /* accord-ignore */
+  color: #ff0000;
+}

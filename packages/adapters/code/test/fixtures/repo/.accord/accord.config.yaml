@@ -1,0 +1,8 @@
+version: 1
+surfaces:
+  code:
+    css: [src/app/globals.css]
+    allow:
+      - reason: Fremdmarke im Logo
+        files: [src/components/Hero.tsx]
+        values: ['#16222B']

@@ -1,0 +1,8 @@
+/* Acme Shop – design tokens as the product uses them today. */
+:root {
+  --brand: #3c6681;
+  --surface: #f5f7f9;
+  --text: #16222b;
+  --radius-card: 12px;
+  --space-4: 16px;
+}

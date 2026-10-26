@@ -1,0 +1,81 @@
+.dots {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.md {
+  gap: calc(var(--spacing-xs) + var(--spacing-xxs));
+}
+
+.dot {
+  display: block;
+  flex: none;
+  width: var(--size-dot);
+  height: var(--size-dot);
+  border-radius: var(--radius-pill);
+}
+
+.md .dot {
+  width: var(--size-dot-lg);
+  height: var(--size-dot-lg);
+}
+
+.dot[data-dot="1"] {
+  background: var(--color-dot-1);
+}
+
+.dot[data-dot="2"] {
+  background: var(--color-dot-2);
+}
+
+.dot[data-dot="3"] {
+  background: var(--color-dot-3);
+}
+
+.dot[data-dot="4"] {
+  background: var(--color-dot-4);
+}
+
+.step {
+  width: var(--size-dot-lg);
+  height: var(--size-dot-lg);
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-sm) + var(--spacing-xxs));
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* The one authored motion: the dots fill in from left to right, with an exponential ease-out. */
+.loading .dot {
+  animation: fill var(--duration-slow) var(--easing-enter) infinite alternate both;
+}
+
+.loading .dot[data-dot="2"] {
+  animation-delay: var(--duration-fast);
+}
+
+.loading .dot[data-dot="3"] {
+  animation-delay: var(--duration-normal);
+}
+
+.loading .dot[data-dot="4"] {
+  animation-delay: var(--duration-slow);
+}
+
+@keyframes fill {
+  from {
+    opacity: 0.25;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

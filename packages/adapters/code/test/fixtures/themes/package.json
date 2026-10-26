@@ -1,0 +1,1 @@
+{ "name": "themes-app", "private": true, "workspaces": ["packages/*"] }

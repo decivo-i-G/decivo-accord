@@ -1,0 +1,14 @@
+{
+  "Light": {
+    "Color": {
+      "Brand": { "value": "#487a98", "type": "color" },
+      "Border": { "value": "rgba(0, 0, 0, 0.1)", "type": "color" }
+    }
+  },
+  "Dark": {
+    "Color": {
+      "Brand": { "value": "#5b8fb0", "type": "color" },
+      "Border": { "value": "{Color.Brand}", "type": "color" }
+    }
+  }
+}

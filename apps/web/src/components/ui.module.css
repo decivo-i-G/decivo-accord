@@ -1,0 +1,109 @@
+/* Shared page building blocks that are not components of their own (yet). */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-ms);
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-light);
+}
+
+.sectionHead > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sectionHead p {
+  margin-top: var(--spacing-xs);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+.small {
+  font-size: var(--font-size-sm);
+}
+
+.withIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.withIcon svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  color: var(--color-ink-muted);
+}
+
+/* A filter that is on: what it shows, and a click removes it (register lists, the decisions inbox). */
+.activeFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-brand-700);
+  border-radius: var(--radius-md);
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.activeFilter svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.details > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  list-style: none;
+  min-height: var(--size-target);
+  margin: calc(var(--spacing-sm) * -1) 0;
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.details[open] > summary {
+  margin-bottom: var(--spacing-xs);
+}
+
+.details p + p {
+  margin-top: var(--spacing-sm);
+}
+
+.details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.details > summary svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.details[open] > summary svg {
+  transform: rotate(90deg);
+}

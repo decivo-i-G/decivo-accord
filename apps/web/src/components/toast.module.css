@@ -1,0 +1,135 @@
+/*
+ * Bottom left of the canvas, next to the sidebar: never over the inspector's decision buttons, so a
+ * confirmation does not block the next decision.
+ */
+.region {
+  position: fixed;
+  left: calc(var(--size-sidebar) + var(--spacing-lg));
+  bottom: var(--spacing-lg);
+  z-index: var(--layer-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: min(calc(var(--size-inspector) + var(--spacing-xxl)), calc(100vw - var(--spacing-xl)));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) var(--spacing-md);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-md);
+  pointer-events: auto;
+}
+
+.icon {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.success .icon {
+  color: var(--color-success-ink);
+}
+
+.warning .icon {
+  color: var(--color-warning-ink);
+}
+
+.danger .icon {
+  color: var(--color-danger-ink);
+}
+
+.info .icon {
+  color: var(--color-info-ink);
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-sm) 0;
+}
+
+.action,
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.action {
+  padding: 0 var(--spacing-ms);
+  color: var(--color-brand-800);
+}
+
+.close {
+  width: var(--size-target);
+}
+
+.action svg,
+.close svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.action:hover,
+.close:hover {
+  background: var(--color-surface-hover);
+}
+
+/*
+ * Without room for the inspector next to the list (it becomes a page with its buttons at the bottom),
+ * confirmations sit at the bottom right, just above the decision buttons (whose height the inspector
+ * measures into --inspector-footer): never over the title that has just received focus (WCAG 2.4.11)
+ * and never over the next decision's buttons.
+ */
+@media (max-width: 1135px) {
+  .region {
+    bottom: calc(var(--inspector-footer, 0px) + var(--spacing-sm));
+    left: auto;
+    right: var(--spacing-lg);
+    align-items: flex-end;
+  }
+}
+
+/* Phones: above the tab bar too. */
+@media (max-width: 768px) {
+  .region {
+    bottom: calc(
+      var(--size-tabbar) +
+      env(safe-area-inset-bottom) +
+      var(--inspector-footer, 0px) +
+      var(--spacing-sm)
+    );
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: auto;
+  }
+}
+
+/* Short viewports: nothing sticks (see panel.module.css), so the bottom edge is free. */
+@media (max-height: 500px) {
+  .region {
+    bottom: var(--spacing-sm);
+  }
+}

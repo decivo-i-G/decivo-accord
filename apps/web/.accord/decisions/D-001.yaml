@@ -1,0 +1,10 @@
+id: D-001
+rule: Keine fest eingetragenen Farben in der Oberfläche
+why: Nur so greifen Änderungen am Register überall, und Accord lebt vor, was es von Kunden verlangt.
+scope: ["code:src/**/*.{ts,tsx,css}"]
+level: must
+owner: register
+fix_hint: Die CSS-Variable des Tokens verwenden, z. B. var(--color-brand-700).
+checks:
+  - type: deterministic
+    rule: { kind: no_raw_values, types: [color] }

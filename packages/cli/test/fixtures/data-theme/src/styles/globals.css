@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "./theme/light.css";
+@import "./theme/dark.css";
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+}

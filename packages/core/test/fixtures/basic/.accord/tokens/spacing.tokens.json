@@ -1,0 +1,6 @@
+{
+  "spacing": {
+    "$type": "dimension",
+    "lg": { "$value": { "value": 24, "unit": "px" } }
+  }
+}

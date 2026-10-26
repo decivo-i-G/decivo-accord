@@ -1,0 +1,58 @@
+{
+  "name": "@decivo/accord-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for decivo Accord: tokens, component contracts, decisions with their reasons, and check_change for coding agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "bin": {
+    "accord-mcp": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@decivo/accord-adapter-code": "workspace:*",
+    "@decivo/accord-cli": "workspace:*",
+    "@decivo/accord-core": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "picomatch": "4.0.7",
+    "zod": "4.6.6"
+  },
+  "devDependencies": {
+    "@types/picomatch": "4.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

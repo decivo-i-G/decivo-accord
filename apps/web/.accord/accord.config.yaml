@@ -1,0 +1,31 @@
+# decivo Accord – Register der Accord-Web-App selbst (Accord nutzt sich selbst).
+version: 1
+# Sprache der Texte im Register (Regeln, Warum, Beschreibungen).
+language: de
+name: decivo Accord
+
+surfaces:
+  code:
+    include: ["src/**/*.{ts,tsx,css}"]
+    exclude: ["**/*.test.*", "src/app/tokens.css"]
+    css: ["src/app/tokens.css"]
+    outputs:
+      - { format: css, path: src/app/tokens.css }
+
+ownership:
+  default: register
+  rules:
+    - { match: tokens.color.**, owner: design }
+    - { match: tokens.font.**, owner: design }
+    - { match: tokens.radius.**, owner: design }
+    - { match: tokens.spacing.**, owner: design }
+    - { match: tokens.stroke.**, owner: design }
+    - { match: tokens.shadow.**, owner: design }
+    - { match: tokens.duration.**, owner: design }
+    - { match: tokens.easing.**, owner: design }
+    - { match: tokens.size.**, owner: code }
+    - { match: tokens.layer.**, owner: code }
+
+outputs:
+  design_md: .accord/generated/DESIGN.md
+  agents_md: AGENTS.md

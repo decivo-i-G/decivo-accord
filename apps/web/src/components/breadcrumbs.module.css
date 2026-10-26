@@ -1,0 +1,111 @@
+.crumbs {
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-md);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+/* Earlier crumbs shrink before the current page does, and every crumb ends in an ellipsis. */
+.item:not(:last-child) {
+  flex: 0 1 auto;
+}
+
+.item:last-child {
+  flex: 1 1 0;
+}
+
+.sep {
+  flex: none;
+  color: var(--color-ink-muted);
+}
+
+.link {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink-muted);
+  line-height: var(--size-target);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link:hover {
+  color: var(--color-ink);
+  background: var(--color-surface-hover);
+}
+
+.current {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 var(--spacing-xs);
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A level without a page of its own ("Einstellungen"): quiet like a link, but not one. */
+.plain {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 var(--spacing-xs);
+  color: var(--color-ink-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A token path, in the mono face like everywhere else it appears. */
+.link.code,
+.current.code {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-medium);
+}
+
+/*
+ * Phones: the project switcher in the top bar names the project, so the path starts at the section
+ * and shows its last two levels. The first visible crumb has no separator in front.
+ */
+@media (max-width: 768px) {
+  .desktopOnly {
+    visibility: hidden;
+  }
+
+  .project,
+  .item:not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+
+  .item:nth-last-child(2) .sep,
+  .project + .item:last-child .sep {
+    display: none;
+  }
+}
+
+/* Narrow phones (and 400 % zoom): only the current page, so nothing runs into the buttons. */
+@media (max-width: 400px) {
+  .item:not(:last-child) {
+    display: none;
+  }
+
+  .item:last-child .sep {
+    display: none;
+  }
+}

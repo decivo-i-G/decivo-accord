@@ -1,0 +1,338 @@
+/* Trigger in the top bar: a quiet search field look with the shortcut, like Linear's and Vercel's. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: none;
+  min-height: var(--size-target);
+  min-width: calc(var(--size-sidebar) - var(--spacing-3xl));
+  padding: 0 var(--spacing-sm) 0 var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.trigger:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-ink);
+}
+
+.trigger svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.triggerLabel {
+  flex: 1;
+  text-align: left;
+}
+
+.triggerKeys {
+  display: inline-flex;
+  gap: var(--spacing-xxs);
+}
+
+/* --- Dialog --- */
+
+.dialog {
+  width: min(var(--size-palette), calc(100vw - var(--spacing-md) * 2));
+  max-width: none;
+  max-height: min(var(--size-palette-height), calc(100dvh - var(--spacing-3xl) * 2));
+  margin: var(--spacing-3xl) auto auto;
+  padding: 0;
+  overflow: hidden;
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
+}
+
+.dialog[open] {
+  display: flex;
+}
+
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) var(--spacing-md);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.headIcon {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  color: var(--color-ink-muted);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: calc(var(--size-target) + var(--spacing-xs));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: var(--font-size-lg);
+}
+
+.input::placeholder {
+  color: var(--color-ink-muted);
+  opacity: 1;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+/* The input is the only focus in the dialog; its row shows it instead of an outline. */
+.head:focus-within {
+  box-shadow: inset 0 calc(var(--stroke-strong) * -1) 0 var(--color-focus);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--size-target);
+  height: var(--size-target);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.close svg {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-sm);
+}
+
+.list:empty {
+  display: none;
+}
+
+.groupLabel {
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-ms);
+  min-height: var(--size-target);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  text-decoration: none;
+  scroll-margin: var(--spacing-xl) 0 var(--spacing-sm);
+}
+
+.option:hover {
+  color: var(--color-ink);
+}
+
+.option[aria-selected="true"] {
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+}
+
+.optionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-muted);
+}
+
+.optionIcon svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionLabel,
+.optionDetail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionLabel {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Token paths are values: mono, as in the register. */
+.optionLabel.mono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+.optionDetail {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* A token's alias: the interface's arrow icon and the target path in mono, as in the register. */
+.aliasArrow {
+  display: inline-block;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  margin-right: var(--spacing-xxs);
+  vertical-align: text-bottom;
+}
+
+.alias {
+  font-family: var(--font-mono);
+}
+
+.badge {
+  flex: none;
+  padding: 0 var(--spacing-sm);
+  border: var(--stroke-default) solid var(--color-warning-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-surface);
+  color: var(--color-warning-ink);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.enter {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+  visibility: hidden;
+}
+
+.option[aria-selected="true"] .enter {
+  visibility: visible;
+}
+
+.empty {
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-md);
+  text-align: center;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-md);
+  border-top: var(--stroke-default) solid var(--color-border-default);
+  background: var(--color-surface-sidebar);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+.hints {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .trigger {
+    min-width: 0;
+    width: var(--size-target);
+    padding: 0;
+    justify-content: center;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .trigger svg {
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+  }
+
+  .triggerLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .triggerKeys,
+  .hints {
+    display: none;
+  }
+
+  .dialog {
+    margin-top: var(--spacing-sm);
+    max-height: calc(100dvh - var(--spacing-md));
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hints,
+  .triggerKeys {
+    display: none;
+  }
+}

@@ -1,0 +1,18 @@
+version: 1
+name: Beispiel
+surfaces:
+  code:
+    css: [src/app/globals.css]
+  claude_design:
+    enabled: true
+ownership:
+  default: register
+  rules:
+    - match: tokens.color.**
+      owner: design
+    - match: tokens.spacing.**
+      owner: design
+    - match: components.*.props.**
+      owner: code
+    - match: components.*.variants.**
+      owner: design

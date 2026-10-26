@@ -1,0 +1,64 @@
+/*
+ * Checkerboard under the colour so transparency is visible, as in Figma's fill picker. The colour is
+ * the content being decided, so Windows contrast themes must not repaint it (forced-color-adjust).
+ */
+.swatch {
+  forced-color-adjust: none;
+  --checker: var(--color-neutral-200);
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--size-swatch);
+  height: var(--size-swatch);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(var(--swatch), var(--swatch)),
+    repeating-conic-gradient(var(--checker) 0 25%, var(--color-neutral-0) 0 50%) 0 0 / var(--spacing-sm)
+    var(--spacing-sm);
+  box-shadow: inset 0 0 0 var(--stroke-default) var(--color-swatch-frame);
+  vertical-align: middle;
+}
+
+.sm {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  border-radius: var(--radius-sm);
+}
+
+/* Chips in a dense grid (a handoff's many new colours). */
+.xs {
+  width: calc(var(--size-icon-md) + var(--spacing-xs));
+  height: calc(var(--size-icon-md) + var(--spacing-xs));
+  border-radius: var(--radius-sm);
+}
+
+.lg {
+  width: 100%;
+  height: calc(var(--size-swatch) + var(--spacing-md));
+  border-radius: var(--radius-md);
+}
+
+.withLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-ink-muted);
+}

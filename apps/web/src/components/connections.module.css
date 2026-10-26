@@ -1,0 +1,532 @@
+/*
+ * Connections (project settings): one row per surface. Name, whether it is connected, what Accord
+ * reads, a labelled switch in the row's text where there is something to switch, and at most one step.
+ * Paths, patterns and commands fold away behind one "For developers" below the rows. Hairlines
+ * between rows, no cards (decivo v6).
+ */
+
+.list {
+  display: grid;
+  grid-template-columns: calc(var(--size-sidebar) * 0.75) minmax(0, 1fr);
+  column-gap: var(--spacing-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.row {
+  display: grid;
+  grid-column: 1 / -1;
+  /* The rows share one set of columns, so names and states line up under each other. */
+  grid-template-columns: subgrid;
+  grid-template-areas: "name body";
+  position: relative;
+  isolation: isolate;
+  align-items: start;
+  row-gap: var(--spacing-xs);
+  padding: var(--spacing-md) 0;
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+  scroll-margin-top: calc(var(--size-topbar) + var(--spacing-md));
+}
+
+/*
+ * After a jump from the overview (#figma), the row is tinted like a selected row, so the eye finds it.
+ * `data-target` covers the client-side jump, where `:target` stays unset.
+ */
+.row:target::before,
+.row[data-target]::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--spacing-ms) * -1);
+  z-index: -1;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-50);
+}
+
+/* Focus lands on the heading after the jump; the tint already marks the row, so no ring on a click. */
+.name:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.name {
+  grid-area: name;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-ms);
+  min-height: var(--size-target);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-snug);
+  color: var(--color-ink);
+}
+
+.name svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  color: var(--color-ink-muted);
+}
+
+.body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  padding-top: var(--spacing-ms);
+}
+
+/* The switch in the row's text, flush with it: label, then track. */
+.switchRow {
+  display: flex;
+  margin-top: var(--spacing-xxs);
+}
+
+/*
+ * Two text sizes in a row's body: the state at md semibold, everything under it at sm (the sentence
+ * and the hint muted, the step in ink, a path in mono).
+ */
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-snug);
+}
+
+.state svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+/* Only the icon carries the colour; the words stay in ink and carry the meaning. */
+.inSync,
+.problem,
+.differs {
+  color: var(--color-ink);
+}
+
+.inSync svg {
+  color: var(--color-success-ink);
+}
+
+/* Connected, but not in sync: the filled dot in link blue; the sentence below says where. */
+.differs svg {
+  color: var(--color-brand-800);
+}
+
+.problem svg {
+  color: var(--color-warning-ink);
+}
+
+.quiet {
+  color: var(--color-ink-body);
+}
+
+.quiet svg {
+  color: var(--color-ink-muted);
+}
+
+.sub {
+  max-width: var(--size-measure);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-leading-normal);
+  color: var(--color-ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Where it differs links to the first decision from that surface: an ordinary link in the sentence. */
+.subLink {
+  font-weight: var(--font-weight-medium);
+}
+
+.step {
+  max-width: var(--size-measure);
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-leading-normal);
+  color: var(--color-ink);
+}
+
+/* How to add a file: one sentence, the path to copy, and when Accord will see it. */
+.addFile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* The path copies itself on click, like a value in Figma Dev Mode: mono path, copy icon, 44px target. */
+.copyPath {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  max-width: 100%;
+  min-height: var(--size-target);
+  margin-left: calc(var(--spacing-xs) * -1);
+  padding: 0 var(--spacing-xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: copy;
+}
+
+.copyPath svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-brand-800);
+}
+
+.copyPath:hover,
+.copyPath:focus-visible {
+  background: var(--color-surface-hover);
+}
+
+.copyPathText {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.later {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+.stepAction {
+  margin-top: var(--spacing-xs);
+}
+
+/* --- For developers: one disclosure below the rows, one section per surface inside ----------------- */
+
+.dev {
+  min-width: 0;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-md);
+}
+
+/* The summary holds the h2, styled as the quiet link it was. */
+.devTitle {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--font-leading-snug);
+  color: inherit;
+}
+
+.devAll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  max-width: var(--size-content);
+  padding-top: var(--spacing-md);
+}
+
+.devSection {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.devSection + .devSection {
+  padding-top: var(--spacing-xl);
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.devName {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-snug);
+  color: var(--color-ink);
+}
+
+.devName svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.dev > summary,
+.more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  list-style: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-800);
+}
+
+.dev > summary::-webkit-details-marker,
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dev > summary svg,
+.more > summary svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.dev[open] > summary svg,
+.more[open] > summary svg {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dev > summary svg,
+  .more > summary svg {
+    transition: none;
+  }
+}
+
+.devBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-sm) 0 var(--spacing-md);
+  color: var(--color-ink-body);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* One sentence with paths in it: running text, not a flex column that would put each path on a line. */
+.note {
+  min-width: 0;
+  max-width: var(--size-measure);
+  overflow-wrap: anywhere;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+.files {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--stroke-default) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.file {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-ms);
+  min-width: 0;
+}
+
+.file + .file {
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.fileIcon {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  margin-top: var(--spacing-xxs);
+  color: var(--color-ink-muted);
+}
+
+.fileText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  min-width: 0;
+}
+
+.path {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.fileMeta {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+.fileProblem {
+  font-size: var(--font-size-sm);
+  color: var(--color-warning-ink);
+  overflow-wrap: anywhere;
+}
+
+.fileProblem code {
+  font-family: var(--font-mono);
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  margin: 0;
+}
+
+.groups dt {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+}
+
+.groups dd {
+  margin: 0;
+}
+
+.handoffs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  color: var(--color-ink);
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.settings > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--spacing-ms);
+  padding: var(--spacing-sm) 0;
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.settings dt {
+  color: var(--color-ink-muted);
+}
+
+.settings dd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xxs);
+  margin: 0;
+  min-width: 0;
+  color: var(--color-ink);
+}
+
+.settingNote {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+.globs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.glob {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.commands {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commands li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+.more[open] > summary {
+  margin-bottom: var(--spacing-xs);
+}
+
+/*
+ * A path or folder inside a sentence: mono, like every path on this page, and in one piece
+ * ("figma/design-system.fig" never breaks at its hyphen). Narrow phones may break it anywhere.
+ */
+.inlinePath {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .inlinePath {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Phones: the name on its own line, the state, the switch and the step full width below. */
+@media (max-width: 720px) {
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row {
+    grid-template-areas:
+      "name"
+      "body";
+  }
+
+  .body {
+    padding-top: 0;
+  }
+
+  .settings > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-xxs);
+  }
+}

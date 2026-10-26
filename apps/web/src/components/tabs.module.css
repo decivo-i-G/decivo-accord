@@ -1,0 +1,133 @@
+.list {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.underline {
+  gap: var(--spacing-md);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--easing-standard);
+}
+
+.tab svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.tab:hover {
+  color: var(--color-ink);
+}
+
+.underline .tab[aria-current="page"] {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+}
+
+.underline .tab[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--stroke-default) * -1);
+  height: var(--stroke-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-700);
+}
+
+/* Segmented: a quiet track with a white thumb, like Figma's and macOS's segmented controls. */
+.segmented {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  padding: var(--spacing-xxs);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  border: var(--stroke-default) solid var(--color-border-default);
+}
+
+.segmented .tab {
+  padding: 0 var(--spacing-ms);
+  border: var(--stroke-default) solid transparent;
+  border-radius: calc(var(--radius-md) - var(--spacing-xxs));
+  font-size: var(--font-size-sm);
+}
+
+/* The selected segment has a visible edge, not only a lighter fill (WCAG 1.4.11). */
+.segmented .tab[aria-current="page"] {
+  border-color: var(--color-border-control);
+  background: var(--color-surface-card);
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+/*
+ * Phones: section tabs drop their icons and wrap onto a second line when they still do not fit, so
+ * no tab hides behind an edge without a sign that the strip scrolls.
+ */
+@media (max-width: 480px) {
+  .underline {
+    flex-wrap: wrap;
+    gap: 0 var(--spacing-ms);
+    overflow-x: visible;
+  }
+
+  .underline .tab svg {
+    display: none;
+  }
+}
+
+/*
+ * Narrow screens: a segmented filter wraps inside its track rather than scrolling invisibly, so every
+ * segment stays in view (WCAG 1.4.10) and reachable with one tap.
+ */
+@media (max-width: 640px) {
+  .segmented {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+/* A filter that scrolls sideways on phones: one line, the track as wide as the column. */
+@media (max-width: 640px) {
+  .scrollNav {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .segmented.scroll {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-padding-inline: var(--spacing-xs);
+  }
+}
+
+/* Forced colours drop the underline bar and the selected segment's fill: an outline marks the tab. */
+@media (forced-colors: active) {
+  .tab[aria-current="page"] {
+    outline: var(--stroke-strong) solid Highlight;
+    outline-offset: calc(var(--stroke-strong) * -1);
+  }
+}

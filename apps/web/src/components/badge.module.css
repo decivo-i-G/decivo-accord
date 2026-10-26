@@ -1,0 +1,160 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  max-width: 100%;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border: var(--stroke-default) solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-snug);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.chip svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  margin-left: calc(var(--spacing-xxs) * -1);
+}
+
+.neutral {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-default);
+  color: var(--color-ink-muted);
+}
+
+.brand {
+  background: var(--color-brand-50);
+  border-color: var(--color-brand-100);
+  color: var(--color-brand-800);
+}
+
+.success {
+  background: var(--color-success-surface);
+  border-color: var(--color-success-border);
+  color: var(--color-success-ink);
+}
+
+.warning {
+  background: var(--color-warning-surface);
+  border-color: var(--color-warning-border);
+  color: var(--color-warning-ink);
+}
+
+.danger {
+  background: var(--color-danger-surface);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger-ink);
+}
+
+.info {
+  background: var(--color-info-surface);
+  border-color: var(--color-info-border);
+  color: var(--color-info-ink);
+}
+
+/* Solid: for the one chip that must stand out (e.g. "high"). The status ink becomes the fill. */
+.solid.success {
+  background: var(--color-success-ink);
+  color: var(--color-on-status);
+}
+
+.solid.warning {
+  background: var(--color-warning-ink);
+  color: var(--color-on-status);
+}
+
+.solid.danger {
+  background: var(--color-danger-ink);
+  color: var(--color-on-status);
+}
+
+.solid.info {
+  background: var(--color-info-ink);
+  color: var(--color-on-status);
+}
+
+/*
+ * Dark: a status ink is light there, so a filled chip would be the one bright patch on the screen. It
+ * keeps its weight with the status surface and a border in the status ink instead.
+ */
+:global(:root[data-theme="dark"]) .solid.success {
+  background: var(--color-success-surface);
+  border-color: var(--color-success-ink);
+  color: var(--color-success-ink);
+}
+
+:global(:root[data-theme="dark"]) .solid.warning {
+  background: var(--color-warning-surface);
+  border-color: var(--color-warning-ink);
+  color: var(--color-warning-ink);
+}
+
+:global(:root[data-theme="dark"]) .solid.danger {
+  background: var(--color-danger-surface);
+  border-color: var(--color-danger-ink);
+  color: var(--color-danger-ink);
+}
+
+:global(:root[data-theme="dark"]) .solid.info {
+  background: var(--color-info-surface);
+  border-color: var(--color-info-ink);
+  color: var(--color-info-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root[data-theme="system"]) .solid.success {
+    background: var(--color-success-surface);
+    border-color: var(--color-success-ink);
+    color: var(--color-success-ink);
+  }
+
+  :global(:root[data-theme="system"]) .solid.warning {
+    background: var(--color-warning-surface);
+    border-color: var(--color-warning-ink);
+    color: var(--color-warning-ink);
+  }
+
+  :global(:root[data-theme="system"]) .solid.danger {
+    background: var(--color-danger-surface);
+    border-color: var(--color-danger-ink);
+    color: var(--color-danger-ink);
+  }
+
+  :global(:root[data-theme="system"]) .solid.info {
+    background: var(--color-info-surface);
+    border-color: var(--color-info-ink);
+    color: var(--color-info-ink);
+  }
+}
+
+.solid.neutral {
+  background: var(--color-ink);
+  color: var(--color-surface-card);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--spacing-md) + var(--spacing-xs));
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-normal);
+  font-variant-numeric: tabular-nums;
+}
+
+.countNeutral {
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-muted);
+}
+
+.countBrand {
+  background: var(--color-brand-700);
+  color: var(--color-on-brand);
+}

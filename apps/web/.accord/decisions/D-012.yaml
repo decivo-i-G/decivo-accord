@@ -1,0 +1,9 @@
+id: D-012
+rule: Text mit mindestens 4,5:1 Kontrast
+why: WCAG AA. Die Oberfläche wird auch unterwegs auf dem Handy gelesen.
+scope: [tokens.color.ink.**]
+level: must
+owner: design
+checks:
+  - type: deterministic
+    rule: { kind: min_contrast, ratio: 4.5, foreground: tokens.color.ink.**, background: tokens.color.surface.** }

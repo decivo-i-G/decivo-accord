@@ -1,0 +1,68 @@
+# .github/workflows/accord-apply.yml
+# Ein Review-Werkzeug oder ein Mensch startet diesen Workflow per workflow_dispatch mit einer Entscheidung als
+# accord.resolution/1, nachdem ein Mensch über einen Vorschlag entschieden hat. Wer ihn startet, braucht dafür nur
+# das Recht, Workflows zu starten (Actions: write), keine Schreibrechte am Code.
+# Der Workflow übernimmt die Entscheidung auf einem eigenen Branch und öffnet einen Pull Request, nie direkt in main.
+name: Accord apply
+on:
+  workflow_dispatch:
+    inputs:
+      resolution:
+        description: Entscheidung als JSON (accord.resolution/1)
+        required: true
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: accord-apply
+  cancel-in-progress: false
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    env:
+      # "source" baut Accord aus dem Repo, solange es nicht auf npm ist; sonst eine Version von @decivo/accord-cli
+      ACCORD_VERSION: ${{ vars.ACCORD_VERSION || 'source' }}
+      REGISTER: .accord
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Accord bereitstellen
+        run: |
+          if [ "$ACCORD_VERSION" = "source" ]; then
+            git clone --depth 1 https://github.com/decivo-i-G/decivo-accord "$RUNNER_TEMP/accord"
+            (cd "$RUNNER_TEMP/accord" && pnpm install --frozen-lockfile --filter "@decivo/accord-cli..." && pnpm turbo run build --filter "@decivo/accord-cli...")
+            echo "ACCORD_BIN=node $RUNNER_TEMP/accord/packages/cli/dist/bin.js" >> "$GITHUB_ENV"
+          else
+            echo "ACCORD_BIN=npx --yes @decivo/accord-cli@$ACCORD_VERSION" >> "$GITHUB_ENV"
+          fi
+      - name: Entscheidung übernehmen
+        env:
+          # Über die Umgebung, nie direkt ins Skript: die Eingabe ist Text von außen.
+          RESOLUTION: ${{ inputs.resolution }}
+        run: |
+          printf '%s' "$RESOLUTION" > "$RUNNER_TEMP/resolution.json"
+          git config user.name "decivo Accord"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          $ACCORD_BIN --register "$REGISTER" apply --resolution "$RUNNER_TEMP/resolution.json" --branch
+      # Ein Pull Request, den GITHUB_TOKEN öffnet, startet keine weiteren Workflows. Deshalb wird hier vor dem Push geprüft.
+      - name: Erzeugte Dateien prüfen
+        run: $ACCORD_BIN --register "$REGISTER" export --check
+      - name: Pull Request öffnen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          branch="$(git branch --show-current)"
+          git push -u origin "$branch"
+          proposal="$(jq -r .proposal "$RUNNER_TEMP/resolution.json")"
+          option="$(jq -r .option "$RUNNER_TEMP/resolution.json")"
+          by="$(jq -r .by "$RUNNER_TEMP/resolution.json")"
+          ref="$(jq -r '.ref // ""' "$RUNNER_TEMP/resolution.json")"
+          body="$(printf 'Entscheidung **%s** zu `%s`, getroffen von %s%s.\n\n%s\n\nErzeugt von decivo Accord (`accord apply`). Nach dem Merge meldet der nächste Lauf von `accord report` den Vorschlag als entschieden.' \
+            "$option" "$proposal" "$by" "${ref:+ ($ref)}" "$(git log -1 --format=%b)")"
+          gh pr create --base "$BASE" --head "$branch" --title "$(git log -1 --format=%s)" --body "$body"

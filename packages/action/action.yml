@@ -1,0 +1,76 @@
+name: decivo Accord check
+description: Prüft geänderte UI-Dateien eines Pull Requests gegen das Design-System-Register (.accord/) und markiert Verstöße mit Ersatzvorschlag.
+author: decivo
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  register:
+    description: Register-Verzeichnis relativ zu root
+    default: .accord
+  root:
+    description: Verzeichnis mit dem Register (relativ zur Repository-Wurzel)
+    default: .
+  version:
+    description: '"source" baut Accord aus diesem Action-Repo (Standard, solange nicht auf npm); sonst eine Version von @decivo/accord-cli'
+    default: source
+  node-version:
+    description: Node.js-Version
+    default: '22'
+  report-url:
+    description: Optional. https-Adresse, an die Accord nach jedem Lauf den Bericht (accord.report/1) per POST schickt. Leer heißt, es wird nichts gesendet.
+    default: ''
+  report-token:
+    description: Optional. Token für die Bericht-Adresse, gesendet als "Authorization Bearer". Als Secret übergeben.
+    default: ''
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Accord bereitstellen
+      shell: bash
+      env:
+        ACCORD_VERSION: ${{ inputs.version }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        if [ "$ACCORD_VERSION" = "source" ]; then
+          repo="$(cd "$ACTION_PATH/../.." && pwd)"
+          corepack enable
+          (cd "$repo" && pnpm install --frozen-lockfile --filter "@decivo/accord-cli..." && pnpm turbo run build --filter "@decivo/accord-cli...")
+          echo "ACCORD_BIN=node $repo/packages/cli/dist/bin.js" >> "$GITHUB_ENV"
+        else
+          echo "ACCORD_BIN=npx --yes @decivo/accord-cli@$ACCORD_VERSION" >> "$GITHUB_ENV"
+        fi
+    - name: Diff des Pull Requests
+      shell: bash
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        ROOT: ${{ inputs.root }}
+      run: |
+        base="$BASE_SHA"
+        if [ -z "$base" ]; then base="$(git rev-parse HEAD~1)"; fi
+        git fetch --no-tags --depth=1 origin "$base" || true
+        # Paths in the diff are relative to root, so the check sees the same paths as locally.
+        git diff --unified=0 --relative="${ROOT#./}" "$base"...HEAD -- "$ROOT" > "$RUNNER_TEMP/accord.diff" || git diff --unified=0 "$base"...HEAD > "$RUNNER_TEMP/accord.diff"
+    - name: Accord check
+      shell: bash
+      working-directory: ${{ inputs.root }}
+      env:
+        REGISTER: ${{ inputs.register }}
+      run: $ACCORD_BIN --register "$REGISTER" check --diff "$RUNNER_TEMP/accord.diff" --format github
+    # Only with a URL, and also after a red check: the receiver should see the state either way.
+    # Only metadata is sent, never source lines. URL and token go through the environment, never the command line.
+    - name: Bericht senden
+      if: ${{ always() && inputs.report-url != '' }}
+      shell: bash
+      working-directory: ${{ inputs.root }}
+      env:
+        REGISTER: ${{ inputs.register }}
+        ACCORD_REPORT_URL: ${{ inputs.report-url }}
+        ACCORD_REPORT_TOKEN: ${{ inputs.report-token }}
+        COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        BRANCH: ${{ github.head_ref || github.ref_name }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      run: $ACCORD_BIN --register "$REGISTER" report --source action --commit "$COMMIT" --branch "$BRANCH" --default-branch "$DEFAULT_BRANCH"

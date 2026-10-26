@@ -1,0 +1,1740 @@
+/*
+ * Register: tokens like Figma's variables table, components like an assets panel, rules as a plain
+ * list. Values of the customer's register arrive as --pv-* custom properties.
+ */
+
+.tabs {
+  margin-top: calc(var(--spacing-sm) * -1);
+}
+
+.fine {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-leading-normal);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+/* --- List toolbar: search, filter chips, result count ------------------------------------------- */
+
+.listArea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-ms);
+}
+
+.search {
+  flex: 1 1 calc(var(--size-sidebar) + var(--spacing-xl));
+  min-width: 0;
+}
+
+.filterCount {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.results {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* --- Tables (tokens, components) --------------------------------------------------------------- */
+
+/* An open table on white, like decivo's own tables: hairlines only, no card around it. */
+.tableCard {
+  background: var(--color-surface-page);
+}
+
+.tableCard[hidden] {
+  display: none;
+}
+
+.tokenTable,
+.componentTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--font-size-md);
+}
+
+.tokenTable thead th,
+.componentTable thead th {
+  position: sticky;
+  top: var(--size-topbar);
+  z-index: var(--layer-sticky);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface-page);
+  border-top: var(--stroke-default) solid var(--color-border-default);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/*
+ * Fixed layout: the columns keep their width while a search narrows the rows, and long values end
+ * in an ellipsis (full text in the title and the inspector) instead of breaking mid-hex.
+ */
+.tokenTable {
+  table-layout: fixed;
+}
+
+/*
+ * Names get the most room (the name is what you scan, as in Figma's variables panel); the values
+ * (one column per Figma mode, sharing the middle) take what is left after the variable to copy.
+ */
+.tokenTable .colName {
+  width: 48%;
+}
+
+.tokenTable .colVar {
+  width: 34%;
+}
+
+.tokenTable[data-modes] .colName {
+  width: 34%;
+}
+
+.tokenTable[data-modes] .colVar {
+  width: 26%;
+}
+
+/*
+ * The tree: each level starts where its parent's label starts (chevron plus gap), so a leaf's swatch
+ * sits under its family's name and a family's chevron under its group's name. Header cells and row
+ * cells both start at the cell padding (`--tree-start`); the toggles add it once more inside.
+ */
+.tokenTable {
+  --tree-start: var(--spacing-md);
+  --tree-step: calc(var(--size-icon-sm) + var(--spacing-sm));
+}
+
+.tokenTable .row[data-depth="1"] .nameCell {
+  padding-inline-start: calc(var(--tree-start) * 2 + var(--tree-step));
+}
+
+.tokenTable .row[data-depth="2"] .nameCell {
+  padding-inline-start: calc(var(--tree-start) * 2 + var(--tree-step) * 2);
+}
+
+/* "nur in Figma" under the mode's name: the column says where its values live. */
+.modeNote {
+  color: var(--color-ink-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+/* Filter by type: one quiet segmented control next to the search, shown only when there is a choice. */
+.typeFilter {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.typeOption {
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-control);
+  border-radius: 0;
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.typeOption + .typeOption {
+  margin-inline-start: calc(var(--stroke-default) * -1);
+}
+
+.typeOption:first-of-type {
+  border-start-start-radius: var(--radius-md);
+  border-end-start-radius: var(--radius-md);
+}
+
+.typeOption:last-of-type {
+  border-start-end-radius: var(--radius-md);
+  border-end-end-radius: var(--radius-md);
+}
+
+.typeOption:hover {
+  background: var(--color-surface-hover);
+}
+
+.typeOption[aria-pressed="true"] {
+  position: relative;
+  border-color: var(--color-brand-700);
+  background: var(--color-brand-50);
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.typeOption:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
+.modeValue {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* A mode that keeps the main value says so quietly ("wie Light"). */
+.sameMode {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.modeHead {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.tokenTable thead th {
+  height: var(--size-control-sm);
+  padding-block: 0;
+}
+
+.tokenTable td,
+.tokenTable tbody th,
+.componentTable td,
+.componentTable tbody th {
+  padding: 0 var(--spacing-md);
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+  text-align: left;
+  vertical-align: middle;
+  font-weight: var(--font-weight-regular);
+}
+
+.componentTable td,
+.componentTable tbody th {
+  padding-block: var(--spacing-sm);
+}
+
+.tokenTable tbody:last-child tr:last-child > *,
+.componentTable tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+/*
+ * Group header: a full-width disclosure, like a collection in Figma's variables panel. Only the group
+ * header sticks below the column header (family headers scroll with their rows), so at most two bars
+ * of chrome stay on screen and never stack into a wall.
+ */
+.groupRow > th {
+  position: sticky;
+  top: calc(var(--size-topbar) + var(--size-control-sm));
+  z-index: var(--layer-sticky);
+  padding: 0;
+  border-top: var(--stroke-default) solid var(--color-border-default);
+  background: var(--color-surface-page);
+}
+
+/* The first group sits right under the header's hairline. */
+.group:first-of-type .groupRow > th {
+  border-top: 0;
+}
+
+.groupRow,
+.familyRow {
+  scroll-margin-top: calc(var(--size-topbar) + var(--size-control-sm));
+}
+
+.familyRow {
+  scroll-margin-top: calc(var(--size-topbar) + var(--size-control-sm) + var(--size-target));
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding-right: var(--spacing-md);
+}
+
+.groupToggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-md) 0 var(--tree-start);
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.groupToggle:hover,
+.familyToggle:hover {
+  background: var(--color-surface-hover);
+}
+
+.groupToggle:focus-visible,
+.familyToggle:focus-visible {
+  outline-offset: calc(var(--stroke-strong) * -1);
+}
+
+.chevron {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.groupToggle[aria-expanded="true"] .chevron,
+.familyToggle[aria-expanded="true"] .chevron {
+  transform: rotate(90deg);
+}
+
+/* IBM Plex Mono is loaded in 400 and 500 only: a heavier mono would be a synthesised bold. */
+.groupName {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.familyRow > th {
+  padding: 0;
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+  background: var(--color-surface-card);
+}
+
+.familyToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-md) 0 calc(var(--tree-start) + var(--tree-step));
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Short viewports (landscape phone, 200 % zoom): the top bar scrolls away, so nothing sticks. */
+@media (max-height: 500px) {
+  .tokenTable thead th,
+  .componentTable thead th,
+  .groupRow > th {
+    position: static;
+  }
+}
+
+.familyName {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* A translated family label ("Semantisch") is a word of the interface, not a token name. */
+.familyLabel {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Token and component rows: the name link covers the whole row. */
+.row {
+  position: relative;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.row:hover {
+  background: var(--color-surface-sidebar);
+}
+
+.row[data-current] {
+  background: var(--color-brand-50);
+}
+
+.row:has(.rowLink:focus-visible) {
+  outline: var(--stroke-strong) solid var(--color-focus);
+  outline-offset: calc(var(--stroke-strong) * -1);
+}
+
+.rowLink {
+  min-width: 0;
+  color: var(--color-ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+/* The name always keeps room: an ellipsis before it pushes the value aside. */
+.tokenTable .rowLink {
+  flex: 0 1 auto;
+  min-width: var(--size-target);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A search hit: always the strong ink on the tint, also inside muted text (4.5:1 in both schemes). */
+.match {
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-100);
+  color: var(--color-ink);
+}
+
+.rowLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.rowLink:focus-visible {
+  outline: none;
+}
+
+.row:hover .rowLink {
+  text-decoration: underline;
+}
+
+/* Selection is the tint plus a stronger name, never a bar at the edge. */
+.row[data-current] .rowLink {
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Token names are mono, loaded up to 500: the selected one is medium, never a synthesised bold. */
+.tokenTable .row[data-current] .rowLink {
+  font-weight: var(--font-weight-medium);
+}
+
+.nameCell {
+  min-width: 0;
+}
+
+.row {
+  scroll-margin-top: calc(var(--size-topbar) + var(--size-control-sm) + var(--size-target));
+}
+
+.nameInner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+.nameText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tokenLine {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* The value under the name: only on narrow screens, where the value column gives way. */
+.nameValue {
+  display: none;
+}
+
+.typeIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-ink-muted);
+}
+
+.typeIcon svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.deprecated {
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-warning-surface);
+  color: var(--color-warning-ink);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.valueCell {
+  min-width: 0;
+}
+
+.value,
+.variable {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  display: block;
+}
+
+.variable {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Controls inside a row sit above the row link. */
+.aliasLink,
+.copyVar,
+.openMark {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The CSS variable copies itself on click, like a code value in Figma Dev Mode: the whole cell is the
+ * target (44px), with a quiet copy icon so the action is visible without hovering.
+ */
+.copyVar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  min-width: 0;
+  justify-content: space-between;
+  min-height: var(--size-target);
+  margin: calc(var(--spacing-sm) * -1) 0;
+  padding: 0 var(--spacing-xs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-ink-muted);
+  font: inherit;
+  text-align: left;
+  cursor: copy;
+}
+
+.copyVar svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.copyVar:hover,
+.copyVar:focus-visible {
+  background: var(--color-surface-hover);
+}
+
+.copyVar:hover .variable,
+.copyVar:focus-visible .variable {
+  color: var(--color-ink);
+}
+
+/* In the inspector the variable is a value among others: as wide as its text, icon right after it. */
+.copyVarInline {
+  justify-content: flex-start;
+  width: auto;
+  max-width: 100%;
+  margin: calc(var(--spacing-ms) * -1) 0;
+}
+
+.copyVarInline .variable {
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+}
+
+/*
+ * An open decision on the token: the inbox icon after the name, quiet ink (the logo dots stay the
+ * logo's). Its words are in the row link's name and in the tooltip.
+ */
+.openMark {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-ink-muted);
+}
+
+.openMark svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+/* An active type or status filter (set from the inspector): one chip that removes itself. */
+.alias {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  max-width: 100%;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-50);
+  border: var(--stroke-default) solid var(--color-brand-100);
+  color: var(--color-brand-800);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.aliasArrow {
+  flex: none;
+  width: var(--font-size-xs);
+  height: var(--font-size-xs);
+}
+
+.aliasSwatch {
+  --checker: var(--color-neutral-200);
+  flex: none;
+  width: var(--spacing-ms);
+  height: var(--spacing-ms);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(var(--pv-color), var(--pv-color)),
+    repeating-conic-gradient(var(--checker) 0 25%, var(--color-neutral-0) 0 50%) 0 0 / var(--spacing-xs)
+    var(--spacing-xs);
+  box-shadow: inset 0 0 0 var(--stroke-default) var(--color-swatch-frame);
+}
+
+.aliasName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The link is the 44px target; the chip inside keeps its quiet look. */
+.aliasLink {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: var(--size-target);
+  vertical-align: middle;
+  text-decoration: none;
+}
+
+.aliasLink:focus-visible {
+  outline: none;
+}
+
+.aliasLink:focus-visible .alias {
+  outline: var(--stroke-strong) solid var(--color-focus);
+  outline-offset: var(--stroke-default);
+}
+
+.aliasLink:hover .alias {
+  border-color: var(--color-brand-700);
+  color: var(--color-brand-800);
+}
+
+/* Owner: icon plus word, neutral; the word says who decides. */
+.owner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.owner svg {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
+  color: var(--color-ink-muted);
+}
+
+.owner[data-owner="design"] svg {
+  color: var(--color-brand-800);
+}
+
+/* --- Value previews ---------------------------------------------------------------------------- */
+
+.preview {
+  --checker: var(--color-neutral-200);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--size-control-sm);
+  height: var(--size-icon-md);
+  color: var(--color-ink);
+}
+
+/* In the table every preview takes the same width, so the values line up. */
+.preview > .pvColor,
+.preview > .pvRadius,
+.preview > .pvEasing {
+  flex: none;
+  width: var(--size-icon-md);
+}
+
+.previewLg {
+  justify-content: center;
+  width: 100%;
+  height: calc(var(--size-swatch) * 2);
+  padding: var(--spacing-md);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sidebar);
+}
+
+.previewLg > .pvColor,
+.previewLg > .pvEasing {
+  width: 100%;
+}
+
+.previewLg[data-kind="length"],
+.previewLg[data-kind="duration"] {
+  justify-content: flex-start;
+}
+
+.previewLg[data-kind="color"] {
+  padding: 0;
+  border: 0;
+}
+
+.pvColor {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(var(--pv-color), var(--pv-color)),
+    repeating-conic-gradient(var(--checker) 0 25%, var(--color-neutral-0) 0 50%) 0 0 / var(--spacing-sm)
+    var(--spacing-sm);
+  box-shadow: inset 0 0 0 var(--stroke-default) var(--color-swatch-frame);
+}
+
+.previewLg .pvColor {
+  border-radius: var(--radius-md);
+}
+
+.pvRadius {
+  width: 100%;
+  height: 100%;
+  /* Only the top and left edges are drawn: one corner, the way Figma's radius field pictures it. */
+  border-width: var(--stroke-strong) 0 0 var(--stroke-strong);
+  border-style: solid;
+  border-color: var(--color-brand-700);
+  border-top-left-radius: min(var(--pv-radius), 100%);
+  background: var(--color-brand-50);
+}
+
+.previewLg .pvRadius {
+  /* Zoomed twice: a 12px corner reads as 24px, so 12 and 16 are told apart at a glance. */
+  flex: none;
+  width: 100%;
+  height: calc(var(--size-swatch) * 2);
+  margin-left: 30%;
+  border-top-left-radius: min(calc(var(--pv-radius) * 2), calc(var(--size-swatch) * 2));
+}
+
+.previewLg[data-kind="radius"] {
+  overflow: hidden;
+  align-items: flex-start;
+  padding-bottom: 0;
+}
+
+/* A ruler: the bar is as long as the value (capped), with a tick at each end. */
+.pvLength {
+  position: relative;
+  display: block;
+  width: min(var(--pv-length), 100%);
+  min-width: var(--stroke-strong);
+  height: var(--spacing-ms);
+}
+
+.pvLength::before,
+.pvLength::after,
+.pvRule {
+  content: "";
+  position: absolute;
+  background: var(--color-brand-700);
+}
+
+.pvLength::before,
+.pvLength::after {
+  top: 0;
+  bottom: 0;
+  width: var(--stroke-strong);
+}
+
+.pvLength::before {
+  left: 0;
+}
+
+.pvLength::after {
+  right: 0;
+}
+
+.pvRule {
+  inset: calc(50% - var(--stroke-default)) 0 auto;
+  height: var(--stroke-strong);
+}
+
+.previewLg .pvLength {
+  height: var(--spacing-lg);
+}
+
+.pvText {
+  font-family: var(--pv-font, var(--font-ui));
+  font-size: min(var(--pv-size, var(--font-size-md)), var(--font-size-xl));
+  font-weight: var(--pv-weight, var(--font-weight-regular));
+  line-height: var(--font-leading-tight);
+  white-space: nowrap;
+}
+
+.previewLg .pvText {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: min(var(--pv-size, var(--font-size-3xl)), var(--font-size-4xl));
+  text-overflow: ellipsis;
+}
+
+.pvDuration {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--spacing-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-border-default);
+  overflow: hidden;
+}
+
+.pvDuration::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--pv-ratio) * 100%);
+  background: var(--color-brand-700);
+}
+
+.pvEasing {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--color-brand-700);
+  stroke-width: var(--stroke-strong);
+  stroke-linecap: round;
+}
+
+.pvEasingGuide {
+  stroke: var(--color-border-strong);
+  stroke-width: var(--stroke-default);
+  stroke-dasharray: var(--spacing-xxs) var(--spacing-xxs);
+}
+
+.pvShadow {
+  width: 75%;
+  height: 75%;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  box-shadow: var(--pv-shadow);
+}
+
+.previewLg .pvShadow {
+  width: calc(var(--size-swatch) * 2);
+  height: var(--size-swatch);
+  border-radius: var(--radius-md);
+}
+
+/*
+ * A colour strip with a hairline around it and around each step, so near-white steps on white (and
+ * near-black ones in dark) keep their place instead of leaving holes. The outline paints above the
+ * steps; an inset shadow on the strip would sit under them.
+ */
+.ramp {
+  display: inline-flex;
+  vertical-align: middle;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  outline: var(--stroke-default) solid var(--color-swatch-frame);
+  outline-offset: calc(var(--stroke-default) * -1);
+}
+
+.rampStep {
+  width: var(--spacing-ms);
+  height: var(--spacing-ms);
+  background: var(--pv-color);
+  box-shadow: inset 0 0 0 var(--stroke-default) var(--color-border-subtle);
+}
+
+/* --- Components -------------------------------------------------------------------------------- */
+
+.componentName {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  min-width: 0;
+}
+
+.nameLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-control-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.componentMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xxs) var(--spacing-sm);
+  min-width: 0;
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+.componentFile {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.componentFigma {
+  display: inline-flex;
+}
+
+.componentFigma svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-sm);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-sidebar);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: var(--font-leading-normal);
+}
+
+/* --- Inspector parts --------------------------------------------------------------------------- */
+
+/* "Details": configuration and lookups behind one quiet disclosure, closed by default. */
+.more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  list-style: none;
+  color: var(--color-brand-800);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more > summary svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.more[open] > summary svg {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .more > summary svg {
+    transition: none;
+  }
+}
+
+.moreBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-sm);
+}
+
+/* Figma's modes side by side: one column per mode, name above its value. */
+.modePair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin: 0;
+}
+
+.modeCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.modeName {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.modeName .fine {
+  font-weight: var(--font-weight-regular);
+}
+
+.modeCell dd {
+  margin: 0;
+}
+
+.modeCell code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-sm);
+}
+
+.metaLine {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.heroValue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.heroCode {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.description {
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+}
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chainSelf,
+.chainValue {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.chainValue {
+  color: var(--color-ink-muted);
+}
+
+/* Token chips are 44px targets drawn 32px tall, so their rows need no extra gap. */
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * A token link as a chip: the link itself is the 44px target, the chip's frame (32px) is drawn behind
+ * its text, so rows of chips stay compact.
+ */
+.tokenChip {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-sm);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+}
+
+.tokenChip::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: calc((var(--size-target) - var(--size-control-sm)) / 2) 0;
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+}
+
+.tokenChip:hover {
+  color: var(--color-brand-800);
+}
+
+.tokenChip:hover::before {
+  border-color: var(--color-brand-700);
+}
+
+.ownerBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-md);
+}
+
+.ownerHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+  color: var(--color-brand-800);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.explain {
+  display: block;
+  padding: var(--spacing-sm) var(--spacing-ms);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  font-size: var(--font-size-xs);
+  line-height: var(--font-leading-normal);
+  overflow-wrap: anywhere;
+}
+
+.miniList,
+.surfaceList,
+.fileList,
+.checkList,
+.layers {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Decisions in the inspector: a list with hairlines between items, no boxes inside the panel. */
+.miniDecision {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  padding-block: var(--spacing-ms);
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}
+
+.miniDecision:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.miniDecision:last-child {
+  padding-bottom: 0;
+}
+
+.miniLink {
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--size-target);
+  min-height: var(--size-target);
+  margin-block: calc((var(--size-target) - var(--font-size-md) * 1.5) / -2);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.miniWhy {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.surfaceList {
+  gap: var(--spacing-xs);
+}
+
+.surfaceRow {
+  display: grid;
+  grid-template-columns: calc(var(--size-target) * 2.75) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  font-size: var(--font-size-md);
+}
+
+.surfaceRow code {
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.surfaceName {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-ink-muted);
+}
+
+.surfaceName svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.mappingValue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xxs);
+}
+
+.codeUse {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-md);
+}
+
+.fileList {
+  gap: var(--spacing-xxs);
+  width: 100%;
+}
+
+.fileList li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+.fileList code {
+  overflow-wrap: anywhere;
+}
+
+.hardRaw {
+  color: var(--color-warning-ink);
+}
+
+.variantList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  margin: 0;
+}
+
+.variantAxis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.variantAxis dt {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.variantAxis dd {
+  margin: 0;
+}
+
+.propsWrap {
+  overflow-x: auto;
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.propsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.propsTable th,
+.propsTable td {
+  padding: var(--spacing-sm) var(--spacing-ms);
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+  text-align: left;
+  vertical-align: top;
+  font-weight: var(--font-weight-regular);
+}
+
+.propsTable thead th {
+  background: var(--color-surface-sidebar);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.propsTable tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.propsTable code {
+  font-size: var(--font-size-xs);
+  overflow-wrap: break-word;
+}
+
+.propsTable tbody th code {
+  white-space: nowrap;
+}
+
+.propType {
+  color: var(--color-brand-800);
+}
+
+.required {
+  display: block;
+  color: var(--color-warning-ink);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* The anatomy is an indented list like Figma's layers panel, no box inside the inspector. */
+.layer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+.layer[data-depth="1"] {
+  padding-left: var(--spacing-lg);
+}
+
+.layer svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+}
+
+.layer .fine {
+  margin-left: auto;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+}
+
+.ownerFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+  margin: 0;
+}
+
+.ownerFields > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xxs);
+}
+
+.ownerFields dt {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.ownerFields dd {
+  margin: 0;
+}
+
+/* Open proposals on a token: tool, what changes, a link to decide. */
+.openList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.openItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xxs);
+  font-size: var(--font-size-md);
+}
+
+.openChange {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.openLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.scopeList .fine {
+  display: block;
+}
+
+.scopeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- Rules ------------------------------------------------------------------------------------- */
+
+/*
+ * Rules are a list with hairlines, one line each: the name, then one quiet meta line. The chosen one
+ * is tinted; why, fix and the rule code live in the inspector.
+ */
+.ruleList {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--size-content);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-default);
+}
+
+.ruleRow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-ms) var(--spacing-sm);
+  border-bottom: var(--stroke-default) solid var(--color-border-subtle);
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.ruleRow:hover {
+  background: var(--color-surface-sidebar);
+}
+
+.ruleRow[data-current] {
+  background: var(--color-brand-50);
+}
+
+.ruleRow:has(.ruleLink:focus-visible) {
+  outline: var(--stroke-strong) solid var(--color-focus);
+  outline-offset: calc(var(--stroke-strong) * -1);
+}
+
+.ruleLink {
+  color: var(--color-ink);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--font-leading-snug);
+  text-decoration: none;
+}
+
+.ruleLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.ruleLink:focus-visible {
+  outline: none;
+}
+
+.ruleRow:hover .ruleLink {
+  text-decoration: underline;
+}
+
+.ruleRow[data-current] .ruleLink {
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.ruleMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-ms);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The why is the point of a decision: a larger sentence in the heading face, no rule beside it. */
+.whyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-light);
+  line-height: var(--font-leading-normal);
+}
+
+.whyLabel {
+  color: var(--color-ink-muted);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+.scope {
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+  color: var(--color-ink);
+  font-size: var(--font-size-xs);
+  overflow-wrap: anywhere;
+}
+
+.checkList {
+  gap: var(--spacing-xs);
+  padding-left: var(--spacing-ml);
+  list-style: disc;
+  font-size: var(--font-size-md);
+}
+
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.example {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.example pre {
+  width: 100%;
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-ms);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* "For agents": kept, but quiet. */
+.agents {
+  max-width: var(--size-measure);
+}
+
+.agentsLabel {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.agentsCode {
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-size: var(--font-size-xs);
+  line-height: var(--font-leading-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* --- Narrow: fewer columns, the inspector holds the rest ---------------------------------------- */
+
+@container (max-width: 720px) {
+  /* The variable keeps its column as the copy icon alone: copying stays one tap on a phone. */
+  .tokenTable .colName,
+  .tokenTable[data-modes] .colName {
+    width: auto;
+  }
+
+  .tokenTable thead th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /*
+   * Only the register's own mode stays; the others are in the inspector, side by side. Columns fold to
+   * zero width instead of `display: none`, so the group rows' colspan keeps matching the columns.
+   */
+  .tokenTable .colMode {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    visibility: hidden;
+    white-space: nowrap;
+  }
+
+  .tokenTable .colValue:not(.colMode) {
+    width: 32%;
+  }
+
+  .tokenTable .colVar,
+  .tokenTable[data-modes] .colVar {
+    width: calc(var(--size-target) + var(--spacing-md) * 2);
+  }
+
+  .colVarText,
+  .copyVar:not(.copyVarInline) .variable {
+    position: absolute;
+    width: var(--stroke-default);
+    height: var(--stroke-default);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .copyVar:not(.copyVarInline) {
+    justify-content: center;
+  }
+}
+
+/*
+ * Phone: the name is the key, so it gets the full width and may wrap; the value moves under it in
+ * muted mono and the value column goes away. The copy button stays on the right.
+ */
+@container (max-width: 560px) {
+  .tokenTable {
+    --tree-start: var(--spacing-ms);
+  }
+
+  .tokenTable td,
+  .tokenTable tbody th,
+  .componentTable td,
+  .componentTable tbody th {
+    padding-inline: var(--spacing-ms);
+  }
+
+  .tokenTable .colValue:not(.colMode),
+  .tokenTable .colMode,
+  .tokenTable .valueCell {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    visibility: hidden;
+    white-space: nowrap;
+  }
+
+  .tokenTable .nameCell {
+    padding-block: var(--spacing-xs);
+  }
+
+  .tokenTable .rowLink {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .nameValue {
+    display: block;
+    overflow: hidden;
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* A quiet action written as a link (one click that changes something, never the screen's primary). */
+.actionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-brand-800);
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xxs);
+  cursor: pointer;
+}
+
+.actionLink svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.actionLink:disabled {
+  color: var(--color-ink-muted);
+  cursor: progress;
+}
+
+/* Component table: variant axes and the number of props, aligned and quiet. */
+.componentTable .colAxes {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.componentTable .colNumber {
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.componentTable thead .colNumber {
+  text-align: right;
+}
+
+@container (max-width: 560px) {
+  .componentTable .colAxes,
+  .componentTable .colNumber {
+    display: none;
+  }
+}

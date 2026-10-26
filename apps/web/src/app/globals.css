@@ -1,0 +1,268 @@
+@import "./tokens.css";
+
+/*
+ * Appearance (decivo v6): Light is the default and white. Dark is a choice in the settings
+ * (Light / Dark / System), stored in the `theme` cookie and set on <html data-theme> by the server,
+ * so the first paint is right. The register has no modes yet: the dark values are their own tokens
+ * (color.dark.*, shadow.dark.*) and are mapped onto the light names here, with var() only.
+ * Components use the light names and follow. The neutral scale swaps like Radix's gray scale:
+ * neutral.0 is always "the surface furthest forward", neutral.900 always "the strongest text".
+ * The contrast of every pair in both schemes is checked by src/lib/contrast.test.ts.
+ */
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-neutral-0: var(--color-dark-neutral-0);
+  --color-neutral-25: var(--color-dark-neutral-25);
+  --color-neutral-50: var(--color-dark-neutral-50);
+  --color-neutral-100: var(--color-dark-neutral-100);
+  --color-neutral-150: var(--color-dark-neutral-150);
+  --color-neutral-200: var(--color-dark-neutral-200);
+  --color-neutral-300: var(--color-dark-neutral-300);
+  --color-neutral-400: var(--color-dark-neutral-400);
+  --color-neutral-500: var(--color-dark-neutral-500);
+  --color-neutral-600: var(--color-dark-neutral-600);
+  --color-neutral-700: var(--color-dark-neutral-700);
+  --color-neutral-800: var(--color-dark-neutral-800);
+  --color-neutral-900: var(--color-dark-neutral-900);
+  --color-brand-50: var(--color-dark-brand-50);
+  --color-brand-100: var(--color-dark-brand-100);
+  --color-brand-700: var(--color-dark-brand-700);
+  --color-brand-800: var(--color-dark-brand-800);
+  --color-ink: var(--color-dark-ink);
+  --color-ink-body: var(--color-dark-ink-body);
+  --color-ink-muted: var(--color-dark-ink-muted);
+  --color-border-subtle: var(--color-dark-border-subtle);
+  --color-border-default: var(--color-dark-border-default);
+  --color-border-strong: var(--color-dark-border-strong);
+  --color-swatch-frame: var(--color-dark-swatch-frame);
+  --color-success-ink: var(--color-dark-success-ink);
+  --color-success-surface: var(--color-dark-success-surface);
+  --color-success-border: var(--color-dark-success-border);
+  --color-warning-ink: var(--color-dark-warning-ink);
+  --color-warning-surface: var(--color-dark-warning-surface);
+  --color-warning-border: var(--color-dark-warning-border);
+  --color-danger-ink: var(--color-dark-danger-ink);
+  --color-danger-surface: var(--color-dark-danger-surface);
+  --color-danger-border: var(--color-dark-danger-border);
+  --color-info-ink: var(--color-dark-info-ink);
+  --color-info-surface: var(--color-dark-info-surface);
+  --color-info-border: var(--color-dark-info-border);
+  --color-focus: var(--color-dark-focus);
+  --color-overlay: var(--color-dark-overlay);
+  --color-on-brand: var(--color-dark-on-brand);
+  --color-primary-hover: var(--color-dark-primary-hover);
+  --color-dot-4: var(--color-dark-dot-4);
+  --shadow-lg: var(--shadow-dark-lg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    color-scheme: dark;
+    --color-neutral-0: var(--color-dark-neutral-0);
+    --color-neutral-25: var(--color-dark-neutral-25);
+    --color-neutral-50: var(--color-dark-neutral-50);
+    --color-neutral-100: var(--color-dark-neutral-100);
+    --color-neutral-150: var(--color-dark-neutral-150);
+    --color-neutral-200: var(--color-dark-neutral-200);
+    --color-neutral-300: var(--color-dark-neutral-300);
+    --color-neutral-400: var(--color-dark-neutral-400);
+    --color-neutral-500: var(--color-dark-neutral-500);
+    --color-neutral-600: var(--color-dark-neutral-600);
+    --color-neutral-700: var(--color-dark-neutral-700);
+    --color-neutral-800: var(--color-dark-neutral-800);
+    --color-neutral-900: var(--color-dark-neutral-900);
+    --color-brand-50: var(--color-dark-brand-50);
+    --color-brand-100: var(--color-dark-brand-100);
+    --color-brand-700: var(--color-dark-brand-700);
+    --color-brand-800: var(--color-dark-brand-800);
+    --color-ink: var(--color-dark-ink);
+    --color-ink-body: var(--color-dark-ink-body);
+    --color-ink-muted: var(--color-dark-ink-muted);
+    --color-border-subtle: var(--color-dark-border-subtle);
+    --color-border-default: var(--color-dark-border-default);
+    --color-border-strong: var(--color-dark-border-strong);
+    --color-swatch-frame: var(--color-dark-swatch-frame);
+    --color-success-ink: var(--color-dark-success-ink);
+    --color-success-surface: var(--color-dark-success-surface);
+    --color-success-border: var(--color-dark-success-border);
+    --color-warning-ink: var(--color-dark-warning-ink);
+    --color-warning-surface: var(--color-dark-warning-surface);
+    --color-warning-border: var(--color-dark-warning-border);
+    --color-danger-ink: var(--color-dark-danger-ink);
+    --color-danger-surface: var(--color-dark-danger-surface);
+    --color-danger-border: var(--color-dark-danger-border);
+    --color-info-ink: var(--color-dark-info-ink);
+    --color-info-surface: var(--color-dark-info-surface);
+    --color-info-border: var(--color-dark-info-border);
+    --color-focus: var(--color-dark-focus);
+    --color-overlay: var(--color-dark-overlay);
+    --color-on-brand: var(--color-dark-on-brand);
+    --color-primary-hover: var(--color-dark-primary-hover);
+    --color-dot-4: var(--color-dark-dot-4);
+    --shadow-lg: var(--shadow-dark-lg);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Browser surfaces carry the design too: scrollbars and the caret follow the theme. */
+  scrollbar-color: var(--color-neutral-500) transparent;
+  accent-color: var(--color-brand-700);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-surface-page);
+  color: var(--color-ink-body);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  line-height: var(--font-leading-normal);
+  caret-color: var(--color-brand-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--color-ink);
+  line-height: var(--font-leading-tight);
+}
+
+/* Bold is IBM Plex Sans 600, a loaded weight: the browser default 700 would be synthesised. */
+strong,
+b {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Numbers line up in tables and counts. */
+table,
+data,
+time {
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  width: var(--spacing-ms);
+  height: var(--spacing-ms);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-500);
+  border: var(--spacing-xs) solid transparent;
+  border-radius: var(--radius-pill);
+  background-clip: padding-box;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-brand-800);
+  text-decoration-thickness: var(--stroke-default);
+  text-underline-offset: 0.25em;
+}
+
+a:hover {
+  color: var(--color-ink);
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: var(--stroke-strong) solid var(--color-focus);
+  outline-offset: var(--stroke-strong);
+}
+
+::selection {
+  background: var(--color-selection);
+  color: var(--color-ink);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  left: var(--spacing-md);
+  top: var(--spacing-sm);
+  z-index: var(--layer-tooltip);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  border: var(--stroke-default) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-weight: var(--font-weight-semibold);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* The sticky top bar (and on phones the fixed tab bar) never hide what keyboard focus scrolls to. */
+html {
+  scroll-padding-top: calc(var(--size-topbar) + var(--spacing-sm));
+}
+
+@media (max-width: 768px) {
+  html {
+    scroll-padding-bottom: calc(var(--size-tabbar) + env(safe-area-inset-bottom) + var(--spacing-md));
+  }
+}
+
+/* A modal drawer is open: the page behind it does not scroll. */
+:root:has(dialog[open]) {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component transition */
+    transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component animation */
+    animation: none !important;
+  }
+}

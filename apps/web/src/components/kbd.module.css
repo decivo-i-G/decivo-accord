@@ -1,0 +1,30 @@
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: calc(var(--spacing-md) + var(--spacing-xs));
+  padding: 0 var(--spacing-xs);
+  border: var(--stroke-default) solid var(--color-border-strong);
+  border-bottom-width: var(--stroke-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-card);
+  color: var(--color-ink-muted);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-normal);
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hideOnTouch {
+    display: none;
+  }
+}

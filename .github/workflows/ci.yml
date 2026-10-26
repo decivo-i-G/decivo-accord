@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      # Accord checks its own interface: generated tokens are current, no hard-coded colours.
+      - run: node packages/cli/dist/bin.js --root apps/web export --check
+      - run: node ../../packages/cli/dist/bin.js check $(git ls-files 'src/*.ts' 'src/*.tsx' 'src/*.css')
+        working-directory: apps/web

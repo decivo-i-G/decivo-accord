@@ -1,0 +1,14 @@
+/* The code step with its note under it: what the click writes, and that it can be undone. */
+.withNote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.note {
+  max-width: var(--size-measure);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-leading-normal);
+  color: var(--color-ink-muted);
+}

@@ -1,0 +1,22 @@
+# .github/workflows/accord.yml
+name: Accord
+on:
+  pull_request:
+  push:
+    branches: [main] # damit ein Empfänger des Berichts auch den Hauptbranch sieht
+jobs:
+  accord:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+      - uses: decivo-i-G/decivo-accord/packages/action@main
+        # optional: den Bericht nach jedem Lauf per POST an eine eigene https-Adresse senden (accord.report/1,
+        # nie Quellcode-Zeilen, siehe docs/report-format.md). Ohne Adresse wird nichts gesendet.
+        # with:
+        #   report-url: ${{ vars.ACCORD_REPORT_URL }}
+        #   report-token: ${{ secrets.ACCORD_REPORT_TOKEN }}

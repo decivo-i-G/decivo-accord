@@ -1,0 +1,10 @@
+id: D-004
+rule: Markenfarben nur aus der brand-Skala
+why: Ein konsistentes Blau macht decivo wiedererkennbar. Ohne Regel entstehen bei jedem Entwurf neue Zwischentöne.
+scope: [tokens.color.**]
+level: must
+owner: design
+checks:
+  - type: deterministic
+    question: Führt die Änderung eine Farbe außerhalb der brand-Skala ein?
+    rule: { kind: value_in_scale, scale: tokens.color.** }

@@ -1,0 +1,54 @@
+.command {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  min-height: var(--size-target);
+  padding-left: var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.prompt {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink-muted);
+  user-select: none;
+}
+
+.command code {
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-xs) 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  min-width: 0;
+  padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-ms);
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.snippet pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+  /* Wraps on a phone instead of hiding the end of a line; the copy button copies the exact lines. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-leading-normal);
+  color: var(--color-ink);
+}

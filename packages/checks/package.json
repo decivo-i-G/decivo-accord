@@ -1,0 +1,53 @@
+{
+  "name": "@decivo/accord-checks",
+  "version": "0.1.0",
+  "description": "Check layer for decivo Accord: deterministic rules, a provider interface for model checks, and routing of proposals.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/checks"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0",
+    "@decivo/accord-core": "workspace:*",
+    "picomatch": "4.0.7",
+    "zod": "4.6.6"
+  },
+  "devDependencies": {
+    "@types/picomatch": "4.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

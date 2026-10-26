@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+}

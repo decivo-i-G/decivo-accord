@@ -1,0 +1,349 @@
+/* --- Project list (home) ---------------------------------------------------------------------------- */
+
+/* The rows share one set of columns (subgrid), so names, states and surfaces line up across projects. */
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-default);
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  gap: var(--spacing-md) var(--spacing-xl);
+  /* Name, sentence and action share one baseline: the action's 44px target reaches above the line. */
+  align-items: first baseline;
+  padding: var(--spacing-lg) var(--spacing-sm);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.row:hover {
+  background: var(--color-surface-subtle);
+}
+
+.row:has(.link:focus-visible) {
+  outline: var(--stroke-strong) solid var(--color-focus);
+  outline-offset: calc(var(--stroke-strong) * -1);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-light);
+  overflow-wrap: anywhere;
+}
+
+.link {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+/* The whole row is the link's target area. */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.link:hover {
+  color: var(--color-ink);
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.meta svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.sentence {
+  color: var(--color-ink);
+  font-size: var(--font-size-base);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+/* The surfaces that feed the project and when anything last happened: one quiet line under the sentence. */
+.feeds {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-md);
+  color: var(--color-ink-muted);
+  font-size: var(--font-size-sm);
+}
+
+.surfaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-ms);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.surfaces li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.surfaces svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.on {
+  color: var(--color-ink-body);
+}
+
+.off {
+  color: var(--color-ink-muted);
+}
+
+.when {
+  font-variant-numeric: tabular-nums;
+}
+
+.muted code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* The command can be copied: above the row's link. */
+.raised {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--spacing-xs);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+/* The register's colours, like the thumbnail of a file in Figma's file browser. */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xxs);
+  margin-top: var(--spacing-xs);
+}
+
+/* Hover names the token and its value, like a swatch in Figma's library panel. */
+.swatchTip {
+  display: inline-flex;
+}
+
+.go {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: var(--size-target);
+  text-decoration: none;
+  color: var(--color-brand-800);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.go:hover {
+  color: var(--color-brand-800);
+  text-decoration: underline;
+  text-underline-offset: var(--spacing-xs);
+}
+
+.go svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+/* Under the list, closed by default: how another repository gets here (configuration, not a task). */
+.dev {
+  margin-top: var(--spacing-xs);
+}
+
+.add {
+  max-width: var(--size-measure);
+  margin-top: var(--spacing-xs);
+  color: var(--color-ink-body);
+  font-size: var(--font-size-md);
+}
+
+.add code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row {
+    gap: var(--spacing-ms);
+    padding: var(--spacing-ml) 0;
+  }
+
+  .side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* --- Onboarding (no project yet) ------------------------------------------------------------------- */
+
+.onboarding {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: var(--size-measure);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.onboardingTitle {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-light);
+}
+
+.onboardingLead {
+  color: var(--color-ink-body);
+}
+
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-ms);
+  margin-top: var(--spacing-sm);
+}
+
+.flowTools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flowTools svg,
+.flowTarget svg,
+.flowArrow {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.flowTools li,
+.flowTarget {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+}
+
+.flowTarget {
+  color: var(--color-brand-800);
+  font-weight: var(--font-weight-semibold);
+}
+
+.flowArrow {
+  color: var(--color-ink-muted);
+}
+
+.stepsTitle {
+  margin-top: var(--spacing-lg);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-light);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-default);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-ms);
+  padding: var(--spacing-ml) 0;
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.stepMarker {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: calc(var(--font-size-base) * 1.5);
+}
+
+.stepBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.stepBody h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.stepBody p {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-md);
+}

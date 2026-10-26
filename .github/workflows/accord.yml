@@ -1,0 +1,14 @@
+# Accord prüft die eigene Oberfläche mit der eigenen Action (Quellmodus).
+name: Accord
+on: pull_request
+jobs:
+  accord:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v6
+      - uses: ./packages/action
+        with:
+          root: apps/web

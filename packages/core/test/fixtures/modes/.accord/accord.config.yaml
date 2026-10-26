@@ -1,0 +1,7 @@
+version: 1
+name: Shop
+ownership:
+  default: register
+  rules:
+    - { match: tokens.color.**, owner: design }
+    - { match: tokens.radius.**, owner: design }

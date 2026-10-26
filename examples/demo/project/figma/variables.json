@@ -1,0 +1,175 @@
+{
+  "status": 200,
+  "error": false,
+  "meta": {
+    "variableCollections": {
+      "c:prim": {
+        "id": "c:prim",
+        "name": "Primitives",
+        "defaultModeId": "m:value",
+        "modes": [
+          {
+            "modeId": "m:value",
+            "name": "Value"
+          }
+        ]
+      },
+      "c:theme": {
+        "id": "c:theme",
+        "name": "Theme",
+        "defaultModeId": "m:light",
+        "modes": [
+          {
+            "modeId": "m:light",
+            "name": "Light"
+          },
+          {
+            "modeId": "m:dark",
+            "name": "Dark"
+          }
+        ]
+      }
+    },
+    "variables": {
+      "v:blue600": {
+        "id": "v:blue600",
+        "name": "Blue/600",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": {
+            "r": 0.2353,
+            "g": 0.4,
+            "b": 0.5059,
+            "a": 1
+          }
+        }
+      },
+      "v:blue700": {
+        "id": "v:blue700",
+        "name": "Blue/700",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": {
+            "r": 0.1843,
+            "g": 0.3529,
+            "b": 0.4549,
+            "a": 1
+          }
+        }
+      },
+      "v:gray50": {
+        "id": "v:gray50",
+        "name": "Gray/50",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": {
+            "r": 0.9608,
+            "g": 0.9686,
+            "b": 0.9765,
+            "a": 1
+          }
+        }
+      },
+      "v:gray900": {
+        "id": "v:gray900",
+        "name": "Gray/900",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": {
+            "r": 0.0863,
+            "g": 0.1333,
+            "b": 0.1686,
+            "a": 1
+          }
+        }
+      },
+      "v:radius": {
+        "id": "v:radius",
+        "name": "Radius/Card",
+        "resolvedType": "FLOAT",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": 12
+        },
+        "scopes": ["CORNER_RADIUS"],
+        "codeSyntax": {
+          "WEB": "var(--radius-card)"
+        }
+      },
+      "v:space4": {
+        "id": "v:space4",
+        "name": "Spacing/4",
+        "resolvedType": "FLOAT",
+        "variableCollectionId": "c:prim",
+        "valuesByMode": {
+          "m:value": 16
+        },
+        "scopes": ["GAP"],
+        "codeSyntax": {
+          "WEB": "var(--space-4)"
+        }
+      },
+      "v:brand": {
+        "id": "v:brand",
+        "name": "Color/Brand",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:theme",
+        "valuesByMode": {
+          "m:light": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:blue600"
+          },
+          "m:dark": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:blue700"
+          }
+        },
+        "codeSyntax": {
+          "WEB": "var(--brand)"
+        }
+      },
+      "v:surface": {
+        "id": "v:surface",
+        "name": "Color/Surface",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:theme",
+        "valuesByMode": {
+          "m:light": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:gray50"
+          },
+          "m:dark": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:gray900"
+          }
+        },
+        "codeSyntax": {
+          "WEB": "var(--surface)"
+        }
+      },
+      "v:text": {
+        "id": "v:text",
+        "name": "Color/Text",
+        "resolvedType": "COLOR",
+        "variableCollectionId": "c:theme",
+        "valuesByMode": {
+          "m:light": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:gray900"
+          },
+          "m:dark": {
+            "type": "VARIABLE_ALIAS",
+            "id": "v:gray50"
+          }
+        },
+        "codeSyntax": {
+          "WEB": "var(--text)"
+        }
+      }
+    }
+  }
+}

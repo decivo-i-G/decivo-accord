@@ -1,0 +1,43 @@
+{
+  "name": "@decivo/accord-web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "decivo Accord – Web-App (Überblick, Entscheidungen, Register).",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "tokens": "node ../../packages/cli/dist/bin.js --root . export",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@decivo/accord-adapter-figma": "workspace:*",
+    "@decivo/accord-adapter-pen": "workspace:*",
+    "@decivo/accord-checks": "workspace:*",
+    "@decivo/accord-cli": "workspace:*",
+    "@decivo/accord-core": "workspace:*",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/merriweather": "5.3.0",
+    "better-auth": "1.7.7",
+    "drizzle-orm": "0.45.4",
+    "lucide-react": "1.52.0",
+    "next": "16.4.1",
+    "next-intl": "4.14.9",
+    "postgres": "3.4.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "yaml": "2.9.1",
+    "zod": "4.6.6"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.9",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "drizzle-kit": "0.31.11",
+    "fflate": "0.8.3"
+  }
+}

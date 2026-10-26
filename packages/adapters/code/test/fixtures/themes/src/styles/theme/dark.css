@@ -1,0 +1,8 @@
+/* Imports the entry again: a cycle the reader has to survive. */
+@import "../globals.css";
+
+[data-theme='dark'] {
+  --color-bg: #0b1120;
+  --color-fg: #f9fafb;
+  --color-accent: #60a5fa;
+}

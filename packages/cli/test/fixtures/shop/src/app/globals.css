@@ -1,0 +1,11 @@
+:root {
+  --brand-blue: #487a98;
+  --brand-700: #3c6681;
+  --ink: #16222b;
+  --border: rgba(0, 0, 0, 0.1);
+  --radius: 0.5rem;
+}
+@theme inline {
+  --color-primary: var(--brand-700);
+  --color-border: var(--border);
+}

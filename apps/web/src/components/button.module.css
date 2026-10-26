@@ -1,0 +1,155 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: var(--size-target);
+  padding: 0 var(--spacing-md);
+  border: var(--stroke-default) solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-leading-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
+}
+
+.button svg {
+  flex: none;
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.full {
+  width: 100%;
+}
+
+.primary {
+  background: var(--color-brand-700);
+  color: var(--color-on-brand);
+}
+
+.primary:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-on-brand);
+}
+
+.secondary {
+  background: var(--color-surface-card);
+  border-color: var(--color-border-strong);
+  color: var(--color-ink);
+}
+
+.secondary:hover {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-border-control);
+  color: var(--color-ink);
+}
+
+.quiet {
+  background: transparent;
+  color: var(--color-ink);
+  font-weight: var(--font-weight-medium);
+}
+
+.quiet:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.danger {
+  background: var(--color-surface-card);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger-ink);
+}
+
+.danger:hover {
+  background: var(--color-danger-surface);
+  border-color: var(--color-danger-ink);
+  color: var(--color-danger-ink);
+}
+
+/* --- IconButton --- */
+
+.icon {
+  padding: 0;
+  width: var(--size-target);
+}
+
+.icon svg {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
+/* Tooltip: the visible twin of the button's accessible name, shown on hover and keyboard focus. */
+.tip {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  left: 50%;
+  z-index: var(--layer-tooltip);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-ink);
+  color: var(--color-surface-card);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity var(--duration-fast) var(--easing-standard);
+}
+
+.tipStart .tip {
+  left: 0;
+  transform: none;
+}
+
+.tipEnd .tip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.tipAbove .tip {
+  top: auto;
+  bottom: calc(100% + var(--spacing-xs));
+}
+
+/* The tooltip fades in where it is; it does not slide. */
+.icon:hover .tip,
+.icon:focus-visible .tip {
+  opacity: 1;
+  transition-delay: var(--duration-normal);
+}
+
+/* While a button's menu is open, its tooltips would only cover the menu. */
+:global([data-menu-open]) .tip,
+.icon[aria-expanded="true"] .tip {
+  display: none;
+}
+
+@media (hover: none) {
+  .tip {
+    display: none;
+  }
+}
+
+/* Escape dismissed the tooltips (WCAG 1.4.13); they return when focus or the pointer moves on. */
+:global(html[data-tips-off]) .tip {
+  display: none;
+}

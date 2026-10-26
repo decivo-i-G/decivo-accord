@@ -1,0 +1,62 @@
+{
+  "color": {
+    "background": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0392,
+          0.0392,
+          0.0392
+        ],
+        "hex": "#0a0a0a"
+      }
+    },
+    "foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9804,
+          0.9804,
+          0.9804
+        ],
+        "hex": "#fafafa"
+      }
+    },
+    "primary": {
+      "$value": "{color.neutral.50}"
+    },
+    "primary-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0902,
+          0.0902,
+          0.0902
+        ],
+        "hex": "#171717"
+      }
+    },
+    "muted": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.149,
+          0.149,
+          0.149
+        ],
+        "hex": "#262626"
+      }
+    },
+    "muted-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6392,
+          0.6392,
+          0.6392
+        ],
+        "hex": "#a3a3a3"
+      }
+    }
+  }
+}

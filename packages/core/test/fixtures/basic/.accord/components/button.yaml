@@ -1,0 +1,10 @@
+name: Button
+anatomy: [root, icon, label]
+variants:
+  variant: [primary, secondary, ghost]
+props:
+  disabled: { type: boolean, default: false }
+states: [default, hover, focus-visible, disabled]
+tokens: [color.brand.700, spacing.lg]
+mappings:
+  code: { path: src/components/ui/button.tsx, export: Button }

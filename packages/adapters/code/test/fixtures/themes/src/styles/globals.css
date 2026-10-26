@@ -1,0 +1,11 @@
+/* The app's entry stylesheet: the theme lives in imported files. */
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+@import "./theme/light.css";
+@import url("./theme/dark.css") layer(theme);
+@import "@acme/tokens/spacing.css";
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+}

@@ -1,0 +1,54 @@
+{
+  "name": "@decivo/accord-adapter-code",
+  "version": "0.1.0",
+  "description": "Code surface for decivo Accord: reads CSS custom properties, Tailwind v4 themes and hard-coded values.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/adapters/code"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babel/parser": "8.0.7",
+    "@decivo/accord-core": "workspace:*",
+    "postcss": "8.5.29",
+    "postcss-value-parser": "4.2.0",
+    "tinyglobby": "0.2.17"
+  },
+  "devDependencies": {
+    "@babel/types": "8.0.6"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

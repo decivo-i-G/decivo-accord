@@ -1,0 +1,80 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: var(--spacing-ms);
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--size-target);
+  padding: 0 calc(var(--size-target) + var(--spacing-xs)) 0
+    calc(var(--spacing-ms) + var(--size-icon-sm) + var(--spacing-sm));
+  border: var(--stroke-default) solid var(--color-border-control);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-size: var(--font-size-md);
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.input::placeholder {
+  color: var(--color-ink-muted);
+  opacity: 1;
+}
+
+.input:hover {
+  border-color: var(--color-ink-muted);
+}
+
+.input:focus-visible {
+  outline-offset: 0;
+  border-color: var(--color-focus);
+}
+
+/* The browser's own clear button would duplicate ours. */
+.input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.end {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* The clear button fills the field's end as a full 44px target; its hover tint stays inside the field's border. */
+.clear {
+  background-clip: padding-box;
+}
+
+.kbd {
+  margin-right: var(--spacing-sm);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .kbd {
+    display: none;
+  }
+}

@@ -1,0 +1,7 @@
+/* The design tokens, imported by app/globals.css. */
+:root {
+  --brand: #3c6681;
+  --surface: #f5f7f9;
+  --ink: #16222b;
+  --radius: 0.5rem;
+}

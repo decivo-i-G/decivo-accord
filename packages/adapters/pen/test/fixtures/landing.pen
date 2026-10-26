@@ -1,0 +1,30 @@
+// Pencil (pen.dev) document, as documented: variables with theme-dependent values, nodes referencing them.
+{
+  "version": "2.6",
+  "themes": { "mode": ["light", "dark"] },
+  "variables": {
+    "color.brand.$root": { "type": "color", "value": "#4a7b9a" },
+    "color.text": {
+      "type": "color",
+      "value": [
+        { "value": "#16222b" },
+        { "value": "#f5f7f9", "theme": { "mode": "dark" } }
+      ]
+    },
+    "primary": { "type": "color", "value": "$color.brand.$root" },
+    "radius-md": { "type": "number", "value": 8 },
+    "hero-glow": { "type": "color", "value": "#2a9d8f" },
+  },
+  "children": [
+    {
+      "id": "hero",
+      "type": "frame",
+      "fill": "$color.text",
+      "children": [
+        { "id": "cta", "type": "rectangle", "fill": "#ff00aa", "cornerRadius": "$radius-md" },
+        { "id": "badge", "type": "rectangle", "fill": "#FF00AA" },
+        { "id": "title", "type": "text", "content": "Hallo", "fill": "$primary" }
+      ]
+    }
+  ]
+}

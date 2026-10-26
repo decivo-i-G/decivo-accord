@@ -1,0 +1,1117 @@
+{
+  "app": {
+    "brand": "decivo",
+    "product": "Accord",
+    "tagline": "The register for design decisions that Figma, Claude Design, Pencil and code check against.",
+    "skip": "Skip to content",
+    "example": "Sample data"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "overview": "Overview",
+    "decisions": "Decisions",
+    "register": "Register",
+    "connections": "Connections",
+    "repository": "Repository",
+    "language": "Language",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Projects",
+    "lead": "Every repository has a register. Whatever Figma, Pencil, Claude Design or code change in it comes to you as a decision.",
+    "listLabel": "Projects",
+    "branch": "Branch {branch}",
+    "broken": "Accord could not read this project.",
+    "brokenHint": "Is there a register yet? Run this once in the repository:",
+    "onboarding": {
+      "title": "No project connected yet",
+      "lead": "decivo Accord is the register for design decisions: one truth in the repository that Figma, Pencil, Claude Design, code and agents check against.",
+      "stepsTitle": "Your first project in three steps",
+      "step1": {
+        "title": "Create the register",
+        "text": "Run this in your design system's repository. Accord reads tokens, stylesheets and the UI kit and creates the .accord/ folder."
+      },
+      "step2": {
+        "title": "Add the project",
+        "text": "In apps/web/.env.local, add the repository to ACCORD_PROJECTS (template: .env.example). root is the path to the repository."
+      },
+      "step3": {
+        "title": "Restart the web app",
+        "text": "The project then shows up here, with its overview and the open decisions."
+      },
+      "copy": "Copy command",
+      "copyEnv": "Copy entry",
+      "root": "/path/to/repository",
+      "flow": "Surfaces",
+      "flowTarget": "Register in the repository"
+    },
+    "size": "{tokens, plural, one {# token} other {# tokens}}{components, plural, =0 {} one {, # component} other {, # components}}",
+    "add": "To add another repository, list it in <code>ACCORD_PROJECTS</code> in <code>apps/web/.env.local</code> and restart the web app.",
+    "dev": "For developers: add a project",
+    "go": {
+      "decisions": "Decide",
+      "review": "Review",
+      "connect": "Set up",
+      "overview": "Open"
+    },
+    "surfaces": "Surfaces",
+    "connected": "connected",
+    "notConnected": "not connected",
+    "lastChange": "Last change {when}"
+  },
+  "placeholder": {
+    "soon": "This screen follows in the next step."
+  },
+  "health": {
+    "generatedAt": "As of {date}",
+    "moved": {
+      "tokenSync": "Tokens in sync in code",
+      "hardValues": "Fixed colours in code",
+      "tokenSyncValue": "{a} of {b}",
+      "hardValuesValue": "{count, plural, =0 {none} other {#}} in {files, plural, one {# checked file} other {# checked files}}",
+      "waiting": "{count, plural, one {# token waits} other {# tokens wait}} for code to follow a decision. Until then {count, plural, one {it counts} other {they count}} as in sync: deciding never costs points.",
+      "points": "{points} of 50 points"
+    },
+    "scoreParts": "There are 50 points each for tokens whose code value matches the register and for code without fixed colours.",
+    "excluded": "Not counted: {list}.",
+    "surfaces": {
+      "title": "Surfaces",
+      "code": "Code",
+      "figma": "Figma",
+      "pen": "Pencil",
+      "claude-design": "Claude Design"
+    },
+    "state": {
+      "connected": "Connected",
+      "noFiles": "No files",
+      "foundOff": "Found, not switched on",
+      "off": "Not connected"
+    },
+    "next": {
+      "done": "All in sync. Nothing to do.",
+      "codeProposals": "Switch {count, plural, one {# file} other {# files}} to tokens",
+      "proposals": "{tool, select, figma {Make {count, plural, one {# decision} other {# decisions}} from Figma} pen {Make {count, plural, one {# decision} other {# decisions}} from Pencil} code {Make {count, plural, one {# decision} other {# decisions}} from code} other {Decide {count, plural, one {# handoff} other {# handoffs}}}}",
+      "propose": "Submit the changes from {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}} as a proposal. This runs in the repository:",
+      "behind": "The register is ahead of {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}}. Update the variables there, then check again:",
+      "unreadable": "A file could not be read. The reason is shown by:",
+      "drift": "Tokens in code differ from the register. The details are shown by:",
+      "hardValues": "Replace fixed values in code with tokens. The places are shown by:",
+      "noFiles": "No code file found. Adjust <mono>surfaces.code.include</mono> in <mono>.accord/accord.config.yaml</mono>, then:",
+      "follow": "Bring decided values into code. What is still missing is shown by:"
+    },
+    "setup": {
+      "code": "Set up code:",
+      "figma": "Then check:",
+      "pen": "Then check:",
+      "claude-design": "Read a handoff:"
+    },
+    "severity": {
+      "high": "Urgent",
+      "medium": "Important",
+      "low": "Later"
+    },
+    "cause": {
+      "proposal": "Decision open",
+      "drift": "Drift",
+      "deleted": "Deleted",
+      "conflict": "Conflict",
+      "surfaceChange": "Changed in the tool",
+      "behind": "Register ahead",
+      "firstSync": "First sync",
+      "hardValues": "Fixed values",
+      "unmapped": "Variable without token",
+      "missing": "Missing in code",
+      "literals": "Fixed values",
+      "unreadable": "Unreadable",
+      "noFiles": "No files",
+      "follow": "Waiting for code"
+    },
+    "finding": {
+      "driftTitle": "{path} differs",
+      "driftValues": "Register: {register}. Code: {code}.",
+      "driftOther": "{reason}",
+      "hardTitle": "{count, plural, one {# fixed value} other {# fixed values}} in {file}",
+      "hardWithReplacement": "{exact, plural, one {# value has} other {# values have}} a matching token (e.g. {replacements}), {near, plural, =0 {none is} one {# is} other {# are}} close.",
+      "hardNoToken": "None of the values matches a token; {near, plural, =0 {none is} one {# is} other {# are}} close.",
+      "unmappedTitle": "{count, plural, one {# colour} other {# colours}} in code without a token",
+      "unmappedText": "Colours in code the register does not know, e.g. {examples}.",
+      "missingTitle": "{count, plural, one {# token is} other {# tokens are}} missing in code",
+      "missingText": "In the register, but code has no CSS variable for them, e.g. {examples}.",
+      "deletedTitle": "{count, plural, one {# token} other {# tokens}} deleted in {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}}",
+      "deletedText": "A person always decides deletions: {tokens}.",
+      "conflictTitle": "{count, plural, one {# token} other {# tokens}} changed on both sides",
+      "conflictText": "The register and {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}} changed the same thing differently: {tokens}.",
+      "surfaceChangeTitle": "{count, plural, one {# change} other {# changes}} in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} not submitted yet",
+      "surfaceChangeText": "Not submitted yet: {tokens}.",
+      "firstSyncTitle": "{count, plural, one {# difference} other {# differences}} to {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}}, direction unknown",
+      "firstSyncText": "No sync yet. Submitted as a proposal, you decide per token: {tokens}.",
+      "behindTitle": "{tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}} is behind the register",
+      "behindText": "{count, plural, one {# token was} other {# tokens were}} changed in the register: {tokens}.",
+      "unreadableTitle": "{count, plural, one {# file} other {# files}} from {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}} unreadable",
+      "unreadableText": "{error}",
+      "toolUnmappedTitle": "{count, plural, one {# variable} other {# variables}} in {tool, select, figma {Figma} pen {Pencil} code {Code} other {Claude Design}} without a token",
+      "toolUnmappedText": "The register does not know them yet, e.g. {examples}.",
+      "literalsTitle": "{count, plural, one {# fixed value} other {# fixed values}} in Pencil files",
+      "literalsText": "Colours and sizes without a variable. They belong to a variable from the register.",
+      "noFilesTitle": "No code file scanned",
+      "noFilesText": "The pattern <mono>{patterns}</mono> under <mono>surfaces.code.include</mono> matches no file. Point it at the folders with your code in <mono>{file}</mono>, then check with <mono>accord diff</mono>.",
+      "followTitle": "Update {path} in code",
+      "followText": "The decision is {register}, code still has {code}. This costs no points until code follows."
+    },
+    "scoreSentence": "{score} out of 100. {band, select, good {Code and design match the register.} fair {Almost everything matches the register.} poor {Code and design drift noticeably from the register.} other {Code and design drift clearly from the register.}}",
+    "scoreUnknown": "Not measurable yet. Accord has not checked a code file.",
+    "excludedInline": "{count, plural, one {# value} other {# values}} in e-mail, PDF and preview image code",
+    "excludedAllowed": "{count, plural, one {# justified exception} other {# justified exceptions}}"
+  },
+  "register": {
+    "title": "Register",
+    "tabs": {
+      "label": "Choose section",
+      "tokens": "Tokens",
+      "components": "Components",
+      "rules": "Rules",
+      "count": "{count, plural, one {# entry} other {# entries}}"
+    },
+    "detail": "Details",
+    "back": "Back to the list",
+    "owners": {
+      "design": "Design",
+      "code": "Code",
+      "register": "Register"
+    },
+    "ownerLabel": "Owner: {owner}",
+    "level": {
+      "must": "Must",
+      "should": "Should"
+    },
+    "types": {
+      "color": "Colour",
+      "dimension": "Dimension",
+      "fontFamily": "Font family",
+      "fontWeight": "Font weight",
+      "duration": "Duration",
+      "cubicBezier": "Easing",
+      "number": "Number",
+      "strokeStyle": "Stroke style",
+      "border": "Border",
+      "transition": "Transition",
+      "shadow": "Shadow",
+      "gradient": "Gradient",
+      "typography": "Typography"
+    },
+    "filter": {
+      "reset": "Reset filter",
+      "results": "{count, plural, =0 {No results} one {# result} other {# results}}",
+      "clearSearch": "Clear search",
+      "resetAll": "Clear search and filter",
+      "all": "All"
+    },
+    "tokens": {
+      "search": "Search tokens",
+      "placeholder": "Name, value or CSS variable",
+      "tableLabel": "Tokens by group",
+      "columns": {
+        "name": "Name",
+        "value": "Value",
+        "variable": "CSS variable"
+      },
+      "other": "Other",
+      "alias": "Alias of {target}",
+      "deprecated": "Deprecated",
+      "copyVariable": "Copy CSS variable",
+      "noResults": {
+        "title": "No token matches",
+        "text": "Search by name, hex value or CSS variable, or reset the filter."
+      },
+      "empty": {
+        "title": "No tokens in the register yet",
+        "text": "Tokens come from code with accord init, or from Figma, Pencil and Claude Design."
+      },
+      "open": "{count, plural, one {One decision open} other {# decisions open}}",
+      "semantic": "Semantic",
+      "modes": {
+        "same": "same as {mode}",
+        "onlyFigma": "Only in Figma. The register stores {main}.",
+        "headNote": "only in Figma",
+        "fromRegister": "A context of the register. Empty means: same as {main}.",
+        "names": {
+          "light": "Light",
+          "dark": "Dark",
+          "high-contrast": "High contrast"
+        }
+      },
+      "aliasValue": "Alias of {target}, {value}",
+      "suggest": "Did you mean {query}?",
+      "typeFilter": "Filter by type"
+    },
+    "token": {
+      "meta": "{type} · group {group}",
+      "sample": "Clarity before code",
+      "alpha": "Opacity {value}%",
+      "props": {
+        "value": "Value",
+        "resolved": "Resolved",
+        "type": "Type",
+        "variable": "CSS variable",
+        "file": "File",
+        "path": "Path"
+      },
+      "aliasTitle": "References",
+      "aliasText": "This token has no value of its own. It takes it through this chain:",
+      "aliasedBy": "{count, plural, one {One token points here} other {# tokens point here}}",
+      "ownerTitle": "Who decides",
+      "ownerSentence": {
+        "design": "Design decides the value. If code changes it, a decision waits for Design.",
+        "code": "Code decides the value. If a design surface changes it, a decision waits for Code.",
+        "register": "The register decides the value. Every change waits as a decision for a person."
+      },
+      "ownerReason": {
+        "fixed": "Fixed in the register.",
+        "token": "Set on the token itself ({file}).",
+        "group": "Set on the group “{group}” ({file}).",
+        "component": "Set in the contract: {pattern} ({file}).",
+        "rule": "Set by an ownership rule in accord.config.yaml for {target}.",
+        "default": "Default from accord.config.yaml."
+      },
+      "ownerFixed": "Names, additions and deletions always belong to the register and always need a person.",
+      "explain": "Where this rule comes from",
+      "rulesTitle": "Rules that apply",
+      "noRules": "No rule covers this token.",
+      "surfacesTitle": "Name on each surface",
+      "surfaces": {
+        "code": "Code",
+        "figma": "Figma",
+        "pen": "Pencil",
+        "claudeDesign": "Claude Design"
+      },
+      "surfacesDefault": "Figma, Pencil and Claude Design use the register name.",
+      "codeTitle": "In code",
+      "codeStatus": {
+        "used": "In use",
+        "unused": "Not used",
+        "missing": "Missing in code",
+        "drift": "Differs",
+        "defined": "Defined in CSS"
+      },
+      "code": {
+        "used": "{count, plural, one {# use} other {# uses}} of <code>{variable}</code> in the scanned code.",
+        "unused": "No use of <code>{variable}</code> found in the scanned code.",
+        "missing": "<code>{variable}</code> is not defined in the scanned code.",
+        "drift": "Code holds a different value than the register.",
+        "driftValues": "Register {register} · code {code}",
+        "hard": "{count, plural, one {One hard-coded value belongs} other {# hard-coded values belong}} on this token:",
+        "notScanned": "The code has not been scanned yet.",
+        "defined": "<code>{variable}</code> is defined in the CSS. Accord counts its uses once it checks your code.",
+        "notSet": "not set",
+        "notChecked": "Accord does not check {folders} yet."
+      },
+      "componentsTitle": "In component contracts",
+      "deprecated": "This token is deprecated.",
+      "deprecatedWhy": "Deprecated: {reason}",
+      "description": "Description",
+      "openTitle": "{count, plural, one {Open decision} other {Open decisions}}",
+      "openFrom": "From {tool}",
+      "openKind": {
+        "change": "New value {after}, now {before}.",
+        "new": "New token with {after}.",
+        "remove": "Delete the token."
+      },
+      "openLink": "View decision",
+      "tools": {
+        "figma": "Figma",
+        "pen": "Pencil",
+        "claudeDesign": "Claude Design",
+        "code": "Code"
+      },
+      "ruleVia": "Applies to {target}",
+      "ruleNamed": "Named on the token",
+      "modesTitle": "Modes",
+      "ownerSourceTitle": "Where the owner rule comes from",
+      "modesNote": {
+        "differs": "{other} exists only in Figma. The register stores {main}.",
+        "same": "{other} is the same as {main} in Figma. The register stores {main}."
+      },
+      "modesNoteRegister": {
+        "differs": "{other} is kept in the register, as its own value or through an alias.",
+        "same": "{other} has no value of its own in the register and is the same as {main}."
+      }
+    },
+    "tokenOverview": {
+      "title": "All tokens",
+      "text": "Select a token to see its value, owner and use. Clicking a CSS variable copies it.",
+      "open": "{count, plural, one {One token waits} other {# tokens wait}} for a decision"
+    },
+    "components": {
+      "search": "Search components",
+      "placeholder": "Name, variant or prop",
+      "tableLabel": "Component contracts",
+      "columns": {
+        "name": "Component",
+        "code": "Code",
+        "variants": "Variants",
+        "props": "Props"
+      },
+      "status": {
+        "draft": "Draft",
+        "stable": "Stable",
+        "deprecated": "Deprecated"
+      },
+      "code": {
+        "inSync": "File found",
+        "missing": "File missing",
+        "noMapping": "Not mapped"
+      },
+      "noResults": {
+        "title": "No component matches",
+        "text": "Search by name, variant or prop, or reset the filter."
+      },
+      "empty": {
+        "title": "No components yet",
+        "text": "This repository has no component contracts yet.",
+        "how": "How to add contracts",
+        "howText": "Accord found no UI kit in this repository. accord init creates contracts when a components.json (shadcn/ui) points to your components. You can also write single contracts as YAML in .accord/components."
+      },
+      "draftNote": "{count, plural, one {One component is not released yet} other {# components are not released yet}}. A person releases a component in its YAML file.",
+      "allDraft": "{count, plural, one {One component, not released yet} other {# components, none released yet}}. A person releases a component in its YAML file.",
+      "figma": "Mapped in Figma",
+      "axis": "{axis} {count}"
+    },
+    "component": {
+      "meta": "Component · {status}",
+      "variantsTitle": "Variants",
+      "variantsEmpty": "The contract sets no variants.",
+      "propsTitle": "Props",
+      "propsEmpty": "The contract sets no props.",
+      "propColumns": {
+        "name": "Prop",
+        "type": "Type",
+        "default": "Default"
+      },
+      "required": "Required",
+      "statesTitle": "States",
+      "slotsTitle": "Slots",
+      "slot": {
+        "required": "required",
+        "optional": "optional"
+      },
+      "anatomyTitle": "Anatomy",
+      "a11yTitle": "Accessibility",
+      "a11y": {
+        "role": "Role",
+        "minTarget": "Target",
+        "minTargetValue": "at least {value} px",
+        "notes": "Note"
+      },
+      "mappingTitle": "Mapping",
+      "mapping": {
+        "file": "File",
+        "export": "Export",
+        "story": "Story",
+        "found": "File found in the repository",
+        "missing": "File missing in the repository",
+        "none": "Not mapped",
+        "notConnected": "not connected",
+        "openFigma": "Open in Figma"
+      },
+      "ownersTitle": "Who decides",
+      "fields": {
+        "variants": "Variants",
+        "props": "Props",
+        "states": "States",
+        "slots": "Slots"
+      },
+      "tokensTitle": "Tokens in the contract",
+      "deprecated": "This component is deprecated.",
+      "noDefault": "none",
+      "draftHint": "Draft means: not released yet. A person releases it in <code>{file}</code>.",
+      "contractFile": "Contract"
+    },
+    "componentOverview": {
+      "title": "All components",
+      "text": "Select a component to see its variants, props and how it maps to code."
+    },
+    "rules": {
+      "listLabel": "Rules",
+      "why": "Why",
+      "fix": "How to fix",
+      "owner": "Owner",
+      "scope": "Applies to",
+      "scopeLine": "Applies to {scope}",
+      "covers": "{count, plural, =0 {Covers no token} one {Covers # token} other {Covers # tokens}}",
+      "levelHint": {
+        "must": "Violations stop the commit",
+        "should": "Violations are hints"
+      },
+      "checksTitle": "How Accord checks",
+      "check": {
+        "value_in_scale": "Values must come from {scale}.",
+        "no_raw_values": "No hard-coded values in code ({types}).",
+        "min_contrast": "Contrast of at least {ratio}:1 between {foreground} and {background}.",
+        "model": "Question to a model: {question}"
+      },
+      "examplesTitle": "Examples",
+      "good": "Do",
+      "bad": "Don’t",
+      "coversTitle": "Covered tokens",
+      "moreTokens": "{count, plural, one {and # more} other {and # more}}",
+      "supersedes": "Supersedes {ids}",
+      "file": "File",
+      "open": "Details on {id}",
+      "empty": {
+        "title": "No rules yet",
+        "text": "Rules live as YAML in .accord/decisions and always carry a why."
+      },
+      "scopeLabel": {
+        "allTokens": "all tokens",
+        "allComponents": "all components",
+        "tokenGroup": "tokens in the group {group}",
+        "codeDir": "all code files under {dir}",
+        "allCode": "all code files",
+        "raw": "{pattern}"
+      },
+      "pattern": "Pattern",
+      "scaleLabel": {
+        "allTokens": "the register's tokens",
+        "tokenGroup": "the token group {group}",
+        "raw": "{pattern}"
+      },
+      "developers": "For developers",
+      "id": "Rule"
+    },
+    "ruleOverview": {
+      "title": "All rules",
+      "text": "Choose a rule to see its reason, its check and the tokens it covers."
+    },
+    "agents": {
+      "title": "For developers",
+      "lead": "Agents read the same rules, with their why, through the Accord MCP and check themselves with check_change before every commit.",
+      "example": "Real call in this repository",
+      "clean": "No violations found in code.",
+      "generated": "DESIGN.md and AGENTS.md are regenerated on every adoption.",
+      "proposals": "See open decisions"
+    },
+    "keys": {
+      "move": "Next or previous entry",
+      "copy": "Copy the chosen token’s CSS variable",
+      "close": "Close the selection",
+      "esc": "Esc",
+      "toggleHint": "Single keys (J, K, C, and / for search) only act while focus is in the list or the details."
+    }
+  },
+  "proposals": {
+    "heading": "Decisions",
+    "detail": "Decision details",
+    "group": {
+      "needsYou": "Needs you",
+      "auto": "Safe to adopt",
+      "code": "To fix in code",
+      "decided": "Decided"
+    },
+    "groupHint": {
+      "needsYou": "A person decides these: rules, deletions, conflicts.",
+      "auto": "From the owner, no rule broken.",
+      "code": "Hard-coded colours and sizes in code. Engineering or an agent switches them to tokens.",
+      "decided": "Adopted, kept or ignored."
+    },
+    "groupCount": "{count, plural, one {# decision} other {# decisions}}",
+    "groupCountFiles": "{count, plural, one {# file} other {# files}}",
+    "inboxZero": {
+      "title": "All decided",
+      "text": "New changes from {tools} show up here.",
+      "none": "Nothing to decide yet. As soon as Figma, Pencil or Claude Design change something, it shows up here.",
+      "noSurfaceTitle": "No surface connected yet",
+      "noSurface": "Decisions appear when Accord compares a Figma or Pencil file, or a draft from Claude Design, with the register.",
+      "connect": "Go to Connections",
+      "overview": "Go to the overview",
+      "code": "{count, plural, one {# file} other {# files}} with hard-coded values still {count, plural, one {waits} other {wait}} in code. Engineering takes care of {count, plural, one {it} other {them}}."
+    },
+    "unreadable": "{count, plural, one {One decision file} other {# decision files}} could not be read and {count, plural, one {is} other {are}} missing from the list: {files}",
+    "tool": {
+      "figma": "Figma",
+      "pen": "Pencil",
+      "claude-design": "Claude Design",
+      "code": "Code"
+    },
+    "title": {
+      "change": "{token} changed",
+      "new": "{token} new",
+      "remove": "{token} deleted in {tool, select, figma {Figma} pen {Pencil} other {the surface}}",
+      "many": "{count} changes from {tool, select, figma {Figma} pen {Pencil} other {a tool}}",
+      "handoff": "Draft “{name}”",
+      "code": "Switch {file} to tokens"
+    },
+    "summary": {
+      "change": "{before} to {after}",
+      "new": "New: {after}",
+      "remove": "{before}",
+      "many": "{tokens}",
+      "handoffBoth": "{fresh, plural, one {# new colour} other {# new colours}}, {near} close {near, plural, one {match} other {matches}}",
+      "handoffNew": "{fresh, plural, one {# new colour} other {# new colours}}",
+      "handoffNear": "{near} close {near, plural, one {match} other {matches}}",
+      "handoffRegister": "Register colours only",
+      "code": "{count, plural, one {# hard-coded value} other {# hard-coded values}}, {tokens, select, none {no matching token} other {replace with {tokens}}}",
+      "to": "changed to"
+    },
+    "why": {
+      "default": "A person decides.",
+      "must_violation": "{value} breaks the rule “{rule}”. {who, select, design {Design} code {Engineering} register {The design system team} other {A person}} decides.",
+      "breaking": "The change breaks existing uses. A person always decides that: {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}}.",
+      "deletion": "{tool, select, figma {Figma} pen {Pencil} other {The surface}} deleted {at}. A person always decides deletions, here {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}}.",
+      "conflict": "The register and {tool, select, figma {Figma} pen {Pencil} other {the surface}} both changed {at}. {who, select, design {Design} code {Engineering} register {The design system team} other {A person}} decides which value holds.",
+      "not_owner": "{at} belongs to {owner, select, design {Design} code {Engineering} register {the register} other {someone else}}, but the change comes from {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {code}}. So the owner decides.",
+      "register_owned": "Names and new entries belong to the register. The design system team decides about {at}.",
+      "drift_addition": "{tool, select, figma {Figma} pen {Pencil} other {The surface}} added {at}. {who, select, design {Design} code {Engineering} register {The design system team} other {A person}} decides whether it goes into the register.",
+      "should_violation": "The change departs from the recommendation “{rule}”. It goes to {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}} with an explanation.",
+      "low_confidence": "Accord is not confident enough about a check. A person takes a look.",
+      "unanswered": "A check is still open. A person takes a look.",
+      "drift_reset": "{tool, select, figma {Figma} pen {Pencil} other {The surface}} drifted from the register and will be reset.",
+      "safe": "{owner, select, design {Design} code {Engineering} register {The design system team} other {The owner}} changed {at} in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} and owns it. No rule is broken, so you can adopt without weighing it.",
+      "nothing_to_do": "Nothing to do: register and surface agree.",
+      "code": "{file} contains hard-coded values and so breaks the rule “{rule}”. Engineering or an agent switches them to tokens.",
+      "newShade": "{value} is a new shade. Under the rule “{rule}”, new colours are {who, select, design {Design} code {Engineering} register {the design system team} other {a person}}’s call.",
+      "newShades": "The draft brings {count, plural, one {one new shade} other {# new shades}}. Under the rule “{rule}”, new colours are {who, select, design {Design} code {Engineering} register {the design system team} other {a person}}’s call.",
+      "newShadesSplit": "The draft brings {count, plural, one {one new colour} other {# new colours}} ({shades, plural, one {one shade} other {# shades}}, {alpha, plural, one {one transparency} other {# transparencies}}). Under the rule “{rule}”, new colours are {who, select, design {Design} code {Engineering} register {the design system team} other {a person}}’s call."
+    },
+    "whyTitle": "Why you decide",
+    "whyDecided": "Reason",
+    "owner": "Owner: {owner, select, design {Design} code {Code} register {Register} other {unknown}}",
+    "state": {
+      "needsYou": "Needs you",
+      "auto": "Safe",
+      "code": "In code",
+      "adopt": "Adopted",
+      "reset": "Kept",
+      "reject": "Ignored"
+    },
+    "risk": {
+      "deletion": "Deletion",
+      "breaking": "Breaking change",
+      "conflict": "Conflict"
+    },
+    "change": {
+      "title": "Change",
+      "titleMany": "{count} changes",
+      "kind": {
+        "change": "Changed",
+        "new": "New",
+        "remove": "Deleted"
+      },
+      "before": "Register",
+      "after": "{tool, select, figma {Figma} pen {Pencil} other {Draft}}",
+      "notInRegister": "Not in the register yet",
+      "deleted": "Deleted",
+      "variable": "Variable in {tool, select, figma {Figma} pen {Pencil} other {the surface}}: {name}",
+      "conflict": "Also changed in the register since the last sync",
+      "unknownOrigin": "No last sync: Accord cannot tell who changed it first",
+      "sample": "Aa Bb 123",
+      "was": "Before",
+      "now": "Now in the register",
+      "nearest": "Similar in the register",
+      "scale": "{before} and {after} on the same scale",
+      "zoom": "Corner shown three times larger"
+    },
+    "colors": {
+      "near": "Close matches",
+      "new": "New colours",
+      "exact": "Already in the register",
+      "count": "{count, plural, one {# use} other {# uses}}",
+      "more": "Show {count} more",
+      "distance": "{level, select, low {barely visible} other {visible}}",
+      "distanceLabel": "Colour distance ΔE {value} (below 2.3 barely visible)",
+      "alpha": "{hex} · {alpha}",
+      "chip": "{value}, {count, plural, one {# use} other {# uses}}",
+      "hue": "{hue, select, gray {Greys} red {Red} orange {Orange} yellow {Yellow} green {Green} teal {Teal} blue {Blue} purple {Purple} pink {Pink} other {Other}}",
+      "newStrip": "The most used new colours",
+      "belongsTo": "matches",
+      "moreNew": "+{count}",
+      "moreNewLabel": "{count, plural, one {One more new colour} other {# more new colours}} under “Name them yourself”"
+    },
+    "rules": {
+      "level": "{level, select, must {must} should {should} other {{level}}}",
+      "nearest": "Closest: {token}"
+    },
+    "effect": {
+      "title": "What happens",
+      "files": "{count, plural, one {Show the file} other {Show the # files}}",
+      "blocked": "Cannot be adopted like this: {detail}. A rule only changes through its own decision.",
+      "local": "Local mode: the files are written straight into the project, without a branch.",
+      "option": "{label}: {effect}"
+    },
+    "fileKind": {
+      "register": "register",
+      "css": "CSS",
+      "changelog": "CHANGELOG",
+      "agents": "agent rules",
+      "proposal": "decision file",
+      "other": "other outputs"
+    },
+    "code": {
+      "title": "Fix in code",
+      "file": "File",
+      "count": "Hard-coded values",
+      "tokens": "Replace with",
+      "command": "Check it yourself",
+      "noTokens": "none fits",
+      "copyTask": "Copy task for an agent",
+      "task": "Switch {file} to tokens from the Accord register. Replace {count, plural, one {the hard-coded value} other {the # hard-coded values}} with {tokens, select, none {matching tokens} other {{tokens}}}. Check the change with check_change (accord check {file}) before committing and open a pull request."
+    },
+    "decided": {
+      "adopt": "Adopted by {by} on {at}.",
+      "reset": "Register value kept, decided by {by} on {at}.",
+      "reject": "Ignored by {by} on {at}.",
+      "unknown": "someone",
+      "unknownTime": "(date unknown)",
+      "because": "Decided because: {note}",
+      "resetHandoff": "Nothing adopted, decided by {by} on {at}."
+    },
+    "form": {
+      "by": "Deciding as",
+      "byHint": "From git config. Shows up in the history and the CHANGELOG.",
+      "byMissing": "Who decides? Enter a name.",
+      "note": "Note (optional)",
+      "notePlaceholder": "Why this way? Helps next time.",
+      "namesTitle": "Name them yourself",
+      "namesHint": "Give a token name to the colours that should go into the register. Only named colours are adopted, with the button below.",
+      "nameLabel": "Token name for {value}",
+      "namesMissing": "Give at least one colour a token name.",
+      "namesNone": "The draft brings no new colours. Near misses belong on their register value: reset.",
+      "namesMore": "Engineering adopts {count, plural, one {one more new colour} other {# more new colours}} with a resolution file.",
+      "adoptNamed": "{count, plural, one {Adopt # colour} other {Adopt # colours}}",
+      "forDevs": "For developers",
+      "namePlaceholder": "e.g. {name}"
+    },
+    "actions": {
+      "adopt": "Adopt",
+      "reject": "Ignore",
+      "adoptRisky": "Adopt …",
+      "confirm": "Change anyway",
+      "confirmDeletion": "Delete {tokens}",
+      "cancel": "Cancel",
+      "working": "Writing …",
+      "confirmDeletionText": "{tokens} will be deleted. {scanned, select, no {Accord scanned no code. Whatever uses the token will stop working.} other {{uses, plural, =0 {Nothing in the scanned code uses the token.} one {# place in code uses it and will stop working.} other {# places in code use it and will stop working.}}}} Delete anyway?",
+      "confirmBreakingText": "Existing uses will stop working. Change anyway?",
+      "blocked": "Adopt is locked because a rule would be broken.",
+      "recommended": "Recommended:",
+      "adoptValue": "Adopt {value}",
+      "adoptValueRisky": "Adopt {value} …",
+      "addToken": "Add {token}",
+      "keepValue": "Keep {value}",
+      "keepToken": "Keep {token}",
+      "deleteToken": "Delete {token} …",
+      "keepRegister": "Keep the register",
+      "keepRegisterValue": "Keep the register value",
+      "leaveOut": "Leave it out",
+      "more": "More",
+      "adoptNothing": "Adopt nothing"
+    },
+    "keys": {
+      "move": "Next or previous decision",
+      "adopt": "Adopt",
+      "reset": "Keep",
+      "reject": "Ignore (under “More”)",
+      "toggle": "Keyboard shortcuts",
+      "toggleHint": "Single keys (J, K, A, R, X, Enter, and / for search) only act while focus is in the list or the details.",
+      "open": "Keyboard shortcuts",
+      "title": "Keyboard shortcuts",
+      "search": "Search",
+      "help": "Open this overview",
+      "close": "Close",
+      "recommended": "The recommended action",
+      "enter": "Enter"
+    },
+    "toast": {
+      "adopt": "Adopted. Updated {kinds}.",
+      "adoptTokens": "{tokens} adopted. Updated {kinds}.",
+      "reset": "Register value kept. Change the value back in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
+      "reject": "Ignored. Nothing changed.",
+      "undo": "Undo",
+      "undone": "Undone. The decision is open again.",
+      "undoFailed": "This can no longer be undone.",
+      "resetHandoff": "Nothing adopted. Switch the close matches over in Claude Design.",
+      "keep": "Kept. {tokens} {count, plural, one {stays} other {stay}} in the register; undo the deletion in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself."
+    },
+    "error": {
+      "not_found": "This decision no longer exists. The list is up to date.",
+      "already_resolved": "Someone already decided this.",
+      "invalid_value": "A value does not fit the token type: {detail}",
+      "invalid_edit": "The register does not allow this change: {detail}",
+      "must_violation": "Adopting would break a rule: {detail}",
+      "needs_confirmation": "Please confirm the deletion or breaking change.",
+      "needs_names": "Give at least one colour a token name.",
+      "invalid_input": "The input is incomplete: {detail}",
+      "unknown": "That did not work. Please try again."
+    },
+    "back": "Back to decisions",
+    "impact": {
+      "title": "Impact",
+      "aliases": "{count, plural, one {Also changes the alias} other {Also changes the aliases}}",
+      "uses": "{uses, plural, =0 {Not used in code} one {In code: # place} other {In code: # places}}",
+      "notScanned": "No code scanned",
+      "contrast": "Contrast with {token}: now {before}, after {after}"
+    },
+    "recommend": {
+      "handoffNear": "{near, plural, one {# colour belongs on an existing token} other {# colours belong on existing tokens}}{fresh, plural, =0 {.} one {; the new colour only joins the register if you name it.} other {; the # new colours only join the register if you name them.}}",
+      "nearest": "The new shade from {tool, select, figma {Figma} pen {Pencil} other {the surface}} is almost {nearest}{nearestValue, select, none {} other { ({nearestValue})}}. A second, near-identical shade makes the palette unclear.",
+      "rule": "{value} breaks the rule “{rule}”.",
+      "drift": "{tool, select, figma {Figma} pen {Pencil} other {The surface}} differs from the register at {at}.",
+      "safe": "The change comes from the owner and breaks no rule.",
+      "handoffNew": "{fresh, plural, one {The new colour only joins} other {The # new colours only join}} the register if you name {fresh, plural, one {it} other {them}}.",
+      "handoffClean": "Every colour in the draft is already in the register.",
+      "deletion": "{scanned, select, yes {{uses, plural, =0 {Nothing in the checked code uses {tokens}.} one {# place in code still uses {tokens}.} other {# places in code still use {tokens}.}}} other {Accord has not checked any code that might use {tokens}.}} Delete only if {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}} agrees.",
+      "conflict": "The register and {tool, select, figma {Figma} pen {Pencil} other {the surface}} both changed {at}; the register value holds until {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}} decides otherwise.",
+      "breaking": "The change breaks existing uses; keep the register value unless {who, select, design {Design} code {Engineering} register {the design system team} other {the owner}} confirms it.",
+      "should": "The change departs from the recommendation “{rule}”.",
+      "clean": "No rule is broken and nothing is deleted.",
+      "nearestNew": "{value} is almost {nearest}{nearestValue, select, none {} other { ({nearestValue})}}. A second, near-identical shade makes the palette unclear."
+    },
+    "bulk": {
+      "adopt": "Adopt all safe ({count})",
+      "toast": "{count, plural, one {# change} other {# changes}} adopted. Updated {kinds}.",
+      "partial": "{done} of {count} adopted. The rest needs a look: {error}"
+    },
+    "details": "Details",
+    "source": "Source: {tool}",
+    "filter": {
+      "only": "Only {tool}",
+      "clear": "Remove filter",
+      "emptyTitle": "Nothing open from {tool}",
+      "emptyText": "New changes from {tool} show up here.",
+      "all": "Show all decisions"
+    },
+    "whyCode": "Why it is open",
+    "effectShort": {
+      "adopt": "{token}{aliases, select, none {} other {, and with it {aliases},}} becomes {after} in the register, CSS and CHANGELOG.",
+      "adoptNew": "{token} joins the register, CSS and CHANGELOG as {after}.",
+      "adoptMany": "{count, plural, one {The change goes} other {The # changes go}} into the register, CSS and CHANGELOG.",
+      "adoptDeletion": "{tokens} is deleted from the register and CSS, and the CHANGELOG records it. Accord asks once more first.",
+      "adoptWithDeletion": "The values from {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} go into the register, and {tokens} is deleted. Accord asks once more first.",
+      "adoptHandoff": "Only the colours you name under “Name them yourself” join the register as new tokens.",
+      "reset": "The register keeps {before}. You change {token} back in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
+      "leaveOut": "{token} stays out of the register. You remove it in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
+      "resetMany": "The register stays as it is. You change the values back in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
+      "keepDeleted": "{tokens} stays in the register. You undo the deletion in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
+      "resetHandoff": "The register and the draft stay as they are.{near, plural, =0 {} one { You switch the close match to its token in Claude Design.} other { You switch the # close matches to their tokens in Claude Design.}}",
+      "reject": "Nothing changes, and there is no task for {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}}. As long as the difference remains, the next sync reports it again.",
+      "rejectHandoff": "The draft is closed. Nothing changes, and there is no task for Claude Design.",
+      "adoptNamed": "{count, plural, one {The named colour joins} other {The # named colours join}} the register, CSS and CHANGELOG as new tokens."
+    }
+  },
+  "connections": {
+    "title": "Connections",
+    "name": {
+      "code": "Code",
+      "figma": "Figma",
+      "pen": "Pencil",
+      "claude_design": "Claude Design"
+    },
+    "how": {
+      "code": "Accord reads stylesheets, token files and the UI kit from the repository.",
+      "figma": "Accord reads Figma variables straight from the repository, no sign-in needed.",
+      "pen": "Accord reads Pencil files straight from the repository, no sign-in needed.",
+      "claude_design": "Accord checks every draft from Claude Design before it reaches the register."
+    },
+    "switch": {
+      "on": "{tool} is active. The overview and decisions now include {tool}.",
+      "off": "{tool} is off. Nothing was deleted.",
+      "undo": "Undo",
+      "failed": "That did not work. Is {file} writable?",
+      "enable": "Switch on {tool}",
+      "projectName": "Also check the design-system project from Claude Design",
+      "projectOnToast": "Accord now also checks the design-system project. Handoffs count as before.",
+      "projectOffToast": "Accord no longer checks the design-system project. Handoffs still count, nothing was deleted.",
+      "label": "Compare with the register"
+    },
+    "found": {
+      "title": "Found",
+      "more": "{count, plural, one {# more file} other {# more files}}",
+      "none": "Nothing found yet.",
+      "format": "{format, select, fig {Figma file (.fig)} dtcg {Variables export (DTCG)} tokens_studio {Tokens Studio} figma_rest {Figma REST export} figma_plugin {Plugin export} variables2json {variables2json} other {Unknown format}}",
+      "variables": "{count, plural, =0 {no variables} one {# variable} other {# variables}}",
+      "modes": "Modes: {modes}",
+      "themes": "Themes: {themes}",
+      "unreadable": "Not fully readable:",
+      "outside": "{count, plural, one {One more file is} other {# more files are}} outside the configured paths: {files}. For Accord to read them, add the path to {key} in {config}.",
+      "error": "Accord could not read the files:",
+      "handoffs": "{count, plural, one {# handoff} other {# handoffs}}, {open, plural, =0 {all decided} one {# open} other {# open}}",
+      "lastHandoff": "Latest: {name}",
+      "stylesheets": "Stylesheets with CSS variables",
+      "uiKit": "UI kit",
+      "tokens": "Token files",
+      "designMd": "DESIGN.md",
+      "storybook": "Storybook",
+      "present": "present"
+    },
+    "settings": {
+      "title": "Settings",
+      "include": "Looks in",
+      "defaultMode": "Figma mode used for the comparison",
+      "defaultModeAuto": "Light, else Default, else the file's first mode",
+      "modesFound": "In the files: {modes}",
+      "project": "Design-system project",
+      "projectNone": "Not linked (optional)",
+      "configHint": "Change in {file}",
+      "glob": {
+        "under": "all {exts} files under {root}/",
+        "anywhere": "all {exts} files in the repository",
+        "exact": "exactly this file",
+        "ext": "{ext}"
+      }
+    },
+    "commands": {
+      "title": "Commands",
+      "copy": "Copy command",
+      "path": "path",
+      "folder": "folder",
+      "bundle": "handoff.zip",
+      "figma": {
+        "status": "Compare Figma with the register",
+        "propose": "Submit changes from Figma as a decision",
+        "lock": "Record the sync once Figma and the register match"
+      },
+      "pen": {
+        "status": "Compare Pencil with the register",
+        "propose": "Submit changes from Pencil as a decision",
+        "lock": "Record the sync once Pencil and the register match"
+      },
+      "claude_design": {
+        "ingest": "Read a handoff in as a decision",
+        "status": "Compare the design-system project with the register",
+        "reset": "Set differences in the mirror back to register values",
+        "lock": "Record the sync, after /design-sync"
+      },
+      "code": {
+        "diff": "Drift report: register against code",
+        "check": "Check changed files against the rules",
+        "export": "Generate CSS, DESIGN.md and AGENTS.md from the register"
+      },
+      "configKey": "Change in <code>{file}</code> under <code>{key}</code>"
+    },
+    "add": {
+      "figma": "In Figma, export the variables as JSON, for example with the variables2json plugin, and put them into the repository as <code>figma/variables.json</code>.",
+      "pen": "In Pencil, save the file inside the repository, for example at this path:"
+    },
+    "step": {
+      "figmaFig": "In Figma, choose “Save local copy” in the File menu and put the file into the repository at this path:",
+      "later": "Accord picks it up the next time you open it."
+    },
+    "switchOn": "Accord found files. Switch on {tool} so the overview and decisions include them.",
+    "outside": "{count, plural, one {One file is} other {# files are}} outside the folders Accord looks in.",
+    "reason": {
+      "propose": "{tool} has changes that are not up for decision yet. They are submitted from the repository.",
+      "behind": "The register is ahead of {tool}. Update the variables in {tool}.",
+      "unreadable": "A file could not be read. The developer details say why.",
+      "drift": "Tokens in the code differ from the register.",
+      "hardValues": "Some colours are still typed into the code. With tokens they follow the register.",
+      "noFiles": "Accord finds no code file. Where it looks is in the developer details.",
+      "follow": "Decided values are not in the code yet."
+    },
+    "dev": {
+      "title": "For developers",
+      "register": "Register in",
+      "codeOutside": "Add the folders under <code>surfaces.code.include</code> in <code>{file}</code>, for example:",
+      "copyYaml": "Copy YAML for accord.config.yaml",
+      "outside": "{count, plural, one {This file is} other {These files are}} outside: {files}. Add the path to {key} in {config}.",
+      "mirror": "Sync the design-system project: run <code>/design-sync</code> in Claude Code, then compare.",
+      "project": "Also check the design-system project",
+      "handoffs": "Handoffs always arrive as decisions, even with this switch off. It also checks the design-system project from Claude Design.",
+      "figmaJson": "With a variables export"
+    },
+    "state": {
+      "off": "{tool, select, claude_design {No handoff yet} other {Not connected}}",
+      "foundOff": "Found, but switched off",
+      "noFiles": "{tool, select, code {No code file found} other {No file yet}}",
+      "waiting": "{count, plural, one {1 decision waiting} other {# decisions waiting}}",
+      "files": "{count, plural, one {# file with fixed colours and sizes} other {# files with fixed colours and sizes}}",
+      "differs": "{count, plural, =0 {Differs from the register} one {# value differs} other {# values differ}}",
+      "inSync": "In sync",
+      "unreadable": "File not readable",
+      "notChecked": "Accord does not check your code yet",
+      "connected": "Connected"
+    },
+    "include": "Check {folders}",
+    "connect": "Connect code",
+    "summary": {
+      "all": "All four surfaces are connected.",
+      "none": "No surface is connected yet.",
+      "some": "{connected} {count, plural, one {is} other {are}} connected, {missing} not yet."
+    },
+    "copyPath": "Copy path",
+    "codeOutsidePlain": "Your code is in folders Accord does not look in yet.",
+    "includeAll": "Check all code",
+    "includeNote": "Accord adds the folders to the settings. You can undo this.",
+    "compare": {
+      "inSync": "Matches the register, {sync}.",
+      "drift": "<link>{unit, select, files {Differs from the register in {count, plural, one {one file} other {# files}}} handoffs {{count, plural, one {One handoff differs} other {# handoffs differ}} from the register} other {Differs from the register{count, plural, =0 {} one { in one place} other { in # places}}}}</link>, {sync}.",
+      "when": {
+        "at": "last synced {when}",
+        "never": "never synced",
+        "live": "checked each time you open Accord",
+        "handoff": "the latest handoff arrived {when}"
+      },
+      "variables": "{variables}.",
+      "modes": "{variables}, modes {modes}, {mode} is compared."
+    },
+    "claudeDesign": {
+      "step": "In Claude Design, export the draft as a handoff and give this command to a developer:",
+      "copy": "Copy command",
+      "later": "Accord then shows the handoff as a decision."
+    }
+  },
+  "shell": {
+    "home": "decivo Accord, overview of all projects",
+    "sidebar": "Sidebar",
+    "projects": "Projects",
+    "switchProject": "Switch project",
+    "chooseProject": "Choose a project",
+    "allProjects": "All projects",
+    "current": "current",
+    "breadcrumbs": "Breadcrumb",
+    "tabbar": "Sections",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "languageName": {
+      "de": "Deutsch",
+      "en": "English"
+    },
+    "needsYou": "{count, plural, one {# decision open} other {# decisions open}}",
+    "theme": "Appearance",
+    "themeName": {
+      "system": "Match system",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "filterProjects": "Filter projects",
+    "noProjectMatch": "No project matches “{query}”.",
+    "search": "Search",
+    "searchShortcut": "Search ({keys})",
+    "themeToDark": "Switch to dark mode",
+    "themeToLight": "Switch to light mode",
+    "settings": "Project settings: Connections"
+  },
+  "ui": {
+    "copy": "Copy",
+    "copied": "Copied",
+    "copiedValue": "{value} copied",
+    "copyFailed": "Copying did not work. Select the value and copy it with Ctrl+C.",
+    "copyVariable": "Copy CSS variable",
+    "copyPath": "Copy token path",
+    "notifications": "Notifications",
+    "dismiss": "Dismiss notification",
+    "clearSearch": "Clear search",
+    "backToList": "Back to the list",
+    "details": "Details"
+  },
+  "palette": {
+    "title": "Search and jump",
+    "label": "Search tokens, components, rules or pages",
+    "placeholder": "What are you looking for? A token, a component, a rule",
+    "group": {
+      "pages": "Pages",
+      "proposals": "Decisions",
+      "tokens": "Tokens",
+      "components": "Components",
+      "decisions": "Rules",
+      "projects": "Projects",
+      "elsewhere": "In other projects",
+      "inProjects": "In your projects"
+    },
+    "results": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "empty": "Nothing found for “{query}”, not in the other projects either. Try part of a name, for example color or Button.",
+    "loading": "Loading …",
+    "error": "Search could not read this project. You can still find pages and projects.",
+    "hint": {
+      "move": "select",
+      "open": "open",
+      "close": "close"
+    },
+    "close": "Close search",
+    "allProjects": "All projects",
+    "project": "Project {name}",
+    "aliasOf": "points to"
+  },
+  "notFound": {
+    "tag": "Error 404",
+    "title": "This page isn't here",
+    "lead": "The link may be old or the project name misspelt. These projects are set up here:",
+    "none": "No project is set up here yet.",
+    "home": "Go to all projects",
+    "projects": "Projects set up here"
+  },
+  "overview": {
+    "title": "Overview",
+    "headline": {
+      "decisions": "{decisions, plural, one {One decision is} other {# decisions are}} waiting for you.",
+      "code": "All decided. Still open: {state}.",
+      "noCode": "{state}.",
+      "tasks": "All decided. {count, plural, one {One task is} other {# tasks are}} still open.",
+      "done": "All decided and in sync.",
+      "broken": "Accord cannot read this project right now."
+    },
+    "codeOutside": "Accord only looks for code in <include></include>, yours is in <found></found>.",
+    "brokenHint": "Is there a register yet? Run this once in the repository:",
+    "step": {
+      "decisions": "{count, plural, one {Open the decision} other {Open # decisions}}",
+      "review": "{files, plural, one {View the file} other {View the first file}}",
+      "register": "Open the register",
+      "connections": "Open connections",
+      "copy": "Copy command",
+      "copyPath": "Copy path",
+      "done": "View the register",
+      "overview": "Open the overview",
+      "including": "Adding folders",
+      "included": "Accord now checks {folders}: {files, plural, one {# file} other {# files}}.",
+      "includeFailed": "Accord could not change {file}.",
+      "devGuide": "Copy the steps for developers",
+      "undone": "Accord no longer checks {folders}.",
+      "undo": "Undo"
+    },
+    "surfacesTitle": "Surfaces",
+    "details": "Details",
+    "tasksTitle": "More tasks",
+    "forDevelopers": "For developers",
+    "task": {
+      "open": "How to",
+      "tokens": "Tokens concerned",
+      "moreTokens": "and {count} more",
+      "title": {
+        "drift": "Align {path} in code",
+        "deleted": "Restore {count, plural, one {{tokens}} other {# deleted tokens}} in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}",
+        "conflict": "Settle {count, plural, one {one token} other {# tokens}} with {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}",
+        "surfaceChange": "Submit {count, plural, one {one change} other {# changes}} from {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}",
+        "behind": "Bring {count, plural, one {{tokens}} other {# values}} in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} up to date with the register",
+        "revert": "Reset {count, plural, one {one value} other {# values}} in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}: {tokens}",
+        "firstSync": "Sync {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} for the first time",
+        "unreadable": "Check {count, plural, one {a file} other {# files}} from {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}",
+        "toolUnmapped": "Add {count, plural, one {one variable} other {# variables}} from {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} to the register",
+        "literals": "Bind fixed values in Pencil to variables",
+        "hardValues": "Replace fixed values in {file}",
+        "unmapped": "Add {count, plural, one {one colour} other {# colours}} from code to the register",
+        "missing": "Add CSS variables for {count, plural, one {one token} other {# tokens}}",
+        "noFiles": "Show Accord where your code is",
+        "follow": "Update {path} in code"
+      },
+      "how": {
+        "driftValues": "The register has {register}, code has {code}. Replace {code} with {register} in code.",
+        "driftOther": "{reason}",
+        "deletedText": "Deleted in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}, still in the register. Restore {count, plural, one {it} other {them}} there. If the deletion should stay, submit it with the command under “For developers” and decide it under Decisions.",
+        "conflictText": "The register and {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} changed the same thing differently. Submit the change with the command under “For developers”, then decide under Decisions which value counts.",
+        "surfaceChangeText": "Changed in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}, but not submitted yet. Submit {count, plural, one {it} other {them}} with the command under “For developers”, then decide under Decisions.",
+        "firstSyncText": "Accord does not know yet which side is newer. Submit the state with the command under “For developers”, then decide per token which value counts.",
+        "behindText": "{count, plural, one {One token was} other {# tokens were}} changed in the register. Copy the new values into {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}.",
+        "revertText": "{tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} shows {count, plural, one {this token} other {these tokens}} differently from the register, or deleted {count, plural, one {it} other {them}}. Restore the register's values in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}}. If a deletion should stay, submit it with the command under “For developers” and decide it under Decisions.",
+        "unreadableText": "Save the file again in {tool, select, figma {Figma} pen {Pencil} code {code} other {Claude Design}} and put it back into the repository. Accord reports: {error}",
+        "toolUnmappedText": "The register does not know {count, plural, one {it} other {them}} yet, e.g. {examples}. Submit {count, plural, one {it} other {them}} with the command under “For developers”, then decide under Decisions.",
+        "literalsText": "{count, plural, one {One value} other {# values}} in Pencil {count, plural, one {has} other {have}} no variable. Link them in Pencil to a variable from the register.",
+        "hardWithReplacement": "{exact, plural, one {One value already has} other {# values already have}} a matching token, e.g. {replacements}. Replace the values in code with these tokens.",
+        "hardNoToken": "None of the values matches a token exactly. Ask Design which token applies: a new colour is a decision for design.",
+        "unmappedText": "The register does not know them yet, e.g. {examples}. Replace them in code with matching tokens, or ask Design for new ones.",
+        "missingText": "These tokens are in the register, but code has no CSS variable for them. Copy the lines below into {file, select, none {your stylesheet} other {{file}}}.",
+        "noFilesText": "With the current pattern Accord finds no code file. Add the folders with your code.",
+        "followText": "The decision is {register}, code still has {code}. Replace {code} with {register} in code."
+      },
+      "view": "View",
+      "copyCss": "Copy CSS"
+    },
+    "itemsTitle": "Still open"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "@decivo/accord-adapter-figma",
+  "version": "0.1.0",
+  "description": "Figma surface for decivo Accord: reads variables from .fig files and common exports and compares them with the register.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/adapters/figma"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance",
+    "mcp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@decivo/accord-adapter-code": "workspace:*",
+    "@decivo/accord-core": "workspace:*",
+    "jsonc-parser": "3.3.1",
+    "tinyglobby": "0.2.17"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

@@ -1,0 +1,89 @@
+/*
+ * The inbox's keyboard shortcuts, out of the header: a quiet button under the list (or "?") opens a
+ * small modal sheet with the keys and the switch that turns them off.
+ */
+
+.trigger {
+  align-self: flex-start;
+  min-height: var(--size-target);
+  color: var(--color-ink-muted);
+}
+
+/*
+ * No keyboard on touch screens: the actions are buttons anyway. A narrow window with a mouse and a
+ * keyboard (a laptop at 200 % zoom) keeps the button, so the shortcuts stay findable and can be
+ * switched off.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .trigger {
+    display: none;
+  }
+}
+
+.dialog {
+  width: min(calc(var(--size-drawer) + var(--spacing-3xl)), calc(100vw - var(--spacing-md) * 2));
+  max-width: none;
+  margin: var(--spacing-3xl) auto auto;
+  padding: 0;
+  border: var(--stroke-default) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Focus moves to the close button inside; the sheet itself needs no ring. */
+.dialog:focus-visible {
+  outline: none;
+}
+
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-xs) var(--spacing-lg);
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-light);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  margin: 0;
+  padding: var(--spacing-lg);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: calc(var(--size-target) + var(--spacing-md)) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.keys {
+  display: inline-flex;
+  gap: var(--spacing-xs);
+}
+
+.text {
+  margin: 0;
+  color: var(--color-ink-body);
+  font-size: var(--font-size-md);
+}
+
+.foot {
+  display: flex;
+  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+  border-top: var(--stroke-default) solid var(--color-border-subtle);
+}

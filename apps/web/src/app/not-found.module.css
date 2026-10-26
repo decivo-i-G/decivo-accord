@@ -1,0 +1,55 @@
+/* The 404 page: the configured projects as a plain list with hairlines, no cards. */
+
+.list {
+  max-width: var(--size-measure);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--stroke-default) solid var(--color-border-default);
+}
+
+.list li {
+  border-bottom: var(--stroke-default) solid var(--color-border-default);
+}
+
+.link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-ms);
+  min-height: calc(var(--size-target) + var(--spacing-sm));
+  padding: var(--spacing-sm);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-ink);
+}
+
+.name {
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.branch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+.branch svg {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.arrow {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+  margin-left: auto;
+  color: var(--color-ink-muted);
+}

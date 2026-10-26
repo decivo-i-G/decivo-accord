@@ -1,0 +1,9 @@
+id: D-002
+rule: Farben nur aus dem Register
+why: Jede neue Farbe ist eine Entscheidung; sonst entstehen Zwischentöne.
+scope: [tokens.color.**]
+level: must
+owner: design
+checks:
+  - type: deterministic
+    rule: { kind: value_in_scale, scale: tokens.color.** }

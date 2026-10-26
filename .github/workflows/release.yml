@@ -1,0 +1,45 @@
+name: Release
+
+# Publishes the public packages to npm in lockstep.
+# - Push a tag vX.Y.Z (after `node scripts/set-version.mjs X.Y.Z` is merged): checks, then publishes.
+# - Run it by hand (workflow_dispatch): the same checks and a dry run of the publish, nothing is published.
+# Needs the secret NPM_TOKEN (an automation token for the @decivo scope).
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: Version matches the tag
+        if: github.event_name == 'push'
+        run: node scripts/set-version.mjs --check "${GITHUB_REF_NAME#v}"
+      - name: Release check (pack, install into an empty project, run offline)
+        run: node scripts/release-check.mjs
+      - name: Publish
+        run: pnpm -r publish --access public --no-git-checks ${{ github.event_name != 'push' && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
