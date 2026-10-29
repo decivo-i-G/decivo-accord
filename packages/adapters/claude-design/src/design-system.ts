@@ -74,18 +74,24 @@ export interface DesignSystemStatus {
 
 /**
  * Selector per context: `surfaces.claude_design.modes`, else the code's `surfaces.code.modes` (the project
- * usually copies the product's stylesheet), else detected for `dark`.
+ * usually copies the product's stylesheet), else detected for `dark`. A selector taken over from the code
+ * that the project does not use falls back to detection, so a project with its own `.dark` is still compared.
  */
 export function designModeSelectors(
   register: Register,
   variables: readonly CssVariable[],
 ): CodeModeSelector[] {
   const { surfaces } = register.config
-  const modes = surfaces.claude_design.modes ?? surfaces.code.modes
-  return codeModeSelectors(
-    { config: { surfaces: { ...surfaces, code: { ...surfaces.code, modes } } }, modes: register.modes },
-    variables,
-  )
+  const select = (modes: Record<string, string> | undefined) =>
+    codeModeSelectors(
+      { config: { surfaces: { ...surfaces, code: { ...surfaces.code, modes } } }, modes: register.modes },
+      variables,
+    )
+  if (surfaces.claude_design.modes) return select(surfaces.claude_design.modes)
+  const inherited = select(surfaces.code.modes)
+  if (!surfaces.code.modes) return inherited
+  const detected = select(undefined)
+  return inherited.map((s, i) => (s.found ? s : (detected[i] ?? s)))
 }
 
 /**
@@ -126,10 +132,17 @@ export interface ResetFile {
   changes: { variable: string; from?: string | undefined; to: string; context?: string | undefined }[]
 }
 
+/**
+ * Why a difference is left for a person: `no-block` (no block for the context), `alias` (the variable points
+ * to another one with `var()`; rewriting it would cut the link, e.g. to the dark value), `not-in-css` (only
+ * declared outside a stylesheet, e.g. in an HTML `<style>`), `unsupported` (not a changed value).
+ */
+export type ResetSkipReason = 'no-block' | 'alias' | 'not-in-css' | 'unsupported'
+
 export interface ResetPlan {
   files: ResetFile[]
-  /** Values that cannot be reset in place because the project has no block for their context. */
-  skipped: { path: string; context: string }[]
+  /** Differences the plan does not reset; `context` is '' for the default context. */
+  skipped: { path: string; context: string; reason: ResetSkipReason }[]
 }
 
 /**
@@ -144,14 +157,21 @@ export function resetPlan(
 ): ResetPlan {
   // Target values per context ('' is the default context), keyed by variable name.
   const targets = new Map<string, Map<string, { path: string; value: string }>>()
+  const skipped: ResetPlan['skipped'] = []
   for (const item of status.items) {
     const op = item.op
-    if (op.kind !== 'token.value_changed') continue
+    if (op.kind !== 'token.value_changed') {
+      skipped.push({ path: op.path.replace(/^tokens\./, ''), context: '', reason: 'unsupported' })
+      continue
+    }
     const context = op.context ? contextLabel(op.context) : ''
     const path = op.path.replace(/^tokens\./, '')
     const token = registerInContext(register, context || undefined).tokens.get(path)
     const value = token ? valueToCss(token) : undefined
-    if (!token || !value) continue
+    if (!token || !value) {
+      skipped.push({ path, context, reason: 'unsupported' })
+      continue
+    }
     const forContext = targets.get(context) ?? new Map()
     forContext.set(designVariableName(token), { path, value })
     targets.set(context, forContext)
@@ -172,6 +192,7 @@ export function resetPlan(
       changes: [] as ResetFile['changes'],
     }))
   const done = new Set<string>()
+  const aliased = new Set<string>()
   for (const sheet of sheets) {
     sheet.root.walkDecls(/^--/, (decl) => {
       const context = contextOfScope(scopeOf(decl.parent as Container))
@@ -179,6 +200,12 @@ export function resetPlan(
       if (context === undefined || !target) return
       done.add(`${context}|${decl.prop}`)
       if (decl.value.trim() === target.value) return
+      // `--color-background: var(--bg)` gets its value per context through `--bg`; a fixed value here would
+      // also replace the dark one. The variable it points to may be shared, so a person decides.
+      if (/\bvar\(/i.test(decl.value)) {
+        aliased.add(`${context}|${decl.prop}`)
+        return
+      }
       sheet.changes.push({
         variable: decl.prop,
         from: decl.value.trim(),
@@ -190,14 +217,21 @@ export function resetPlan(
   }
 
   // Context values the project falls back for: add them to the context's first block.
-  const skipped: ResetPlan['skipped'] = []
   for (const [context, forContext] of targets) {
-    if (!context) continue
     for (const [variable, target] of forContext) {
-      if (done.has(`${context}|${variable}`)) continue
+      const key = `${context}|${variable}`
+      if (aliased.has(key)) {
+        skipped.push({ path: target.path, context, reason: 'alias' })
+        continue
+      }
+      if (done.has(key)) continue
+      if (!context) {
+        skipped.push({ path: target.path, context, reason: 'not-in-css' })
+        continue
+      }
       const block = firstBlock(sheets, (scope) => contextOfScope(scope) === context)
       if (!block) {
-        skipped.push({ path: target.path, context })
+        skipped.push({ path: target.path, context, reason: 'no-block' })
         continue
       }
       block.container.append({ prop: variable, value: target.value })

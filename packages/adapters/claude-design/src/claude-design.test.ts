@@ -155,7 +155,7 @@ describe('design-system project', () => {
 })
 
 describe('design-system project with light and dark', () => {
-  const modal = buildRegister([
+  const modalFiles: RegisterFile[] = [
     { path: 'accord.config.yaml', content: 'version: 1\n' },
     {
       path: 'tokens/all.tokens.json',
@@ -189,7 +189,8 @@ describe('design-system project with light and dark', () => {
         }),
       ),
     },
-  ])
+  ]
+  const modal = buildRegister(modalFiles)
   let dir: string
   beforeAll(async () => {
     dir = await mkdtemp(join(tmpdir(), 'accord-ds-modes-'))
@@ -241,6 +242,76 @@ describe('design-system project with light and dark', () => {
     const plan = resetPlan(mirror, modal, status)
     expect(plan.files[0]?.changes).toEqual([{ variable: '--color-muted', to: '#222222', context: 'dark' }])
     expect(plan.files[0]?.content).toMatch(/\[data-theme="dark"\] \{[^}]*--color-muted: #222222/)
+  })
+
+  it('never replaces a var() alias with a fixed value, which would cut its dark value', async () => {
+    const mirror = await mirrorWith(
+      'alias',
+      ':root { --bg: #fefefe; --color-foreground: #111111; --color-muted: #eeeeee; }\n' +
+        '.dark { --bg: #000000; --color-foreground: #fafafa; --color-muted: #222222; }\n' +
+        ':root { --color-background: var(--bg); }\n',
+    )
+    const status = designSystemStatus(mirror, modal, emptyLock())
+    expect(status.items).toMatchObject([{ op: { path: 'tokens.color.background' } }])
+    const plan = resetPlan(mirror, modal, status)
+    expect(plan.files).toEqual([])
+    expect(plan.skipped).toEqual([{ path: 'color.background', context: '', reason: 'alias' }])
+  })
+
+  it('appends a missing dark value only to a root block, never to another rule in the dark query', async () => {
+    const media = '@media (prefers-color-scheme: dark)'
+    const mirror = await mirrorWith(
+      'media',
+      ':root { --color-background: #ffffff; --color-foreground: #111111; --color-muted: #eeeeee; }\n' +
+        `${media} {\n  img { opacity: 0.8; }\n  .card { --color-muted: #333333; }\n` +
+        '  :root { --color-background: #000000; --color-foreground: #fafafa; }\n}\n',
+    )
+    const status = designSystemStatus(mirror, modal, emptyLock())
+    expect(status.selectors).toMatchObject([{ context: 'dark', selector: media }])
+    // `.card` inside the query is a component value, not the dark root value.
+    expect(status.items).toMatchObject([
+      { op: { path: 'tokens.color.muted', context: { theme: 'dark' }, fallback: 'after' } },
+    ])
+    const plan = resetPlan(mirror, modal, status)
+    const content = plan.files[0]?.content ?? ''
+    expect(content).toContain('img { opacity: 0.8; }')
+    expect(content).toContain('.card { --color-muted: #333333; }')
+    expect(content).toMatch(/:root \{[^}]*--color-muted: #222222/)
+  })
+
+  it('lists a difference it cannot reset in a stylesheet instead of reporting no differences', async () => {
+    const path = join(dir, 'html-only')
+    await mkdir(path, { recursive: true })
+    await writeFile(
+      join(path, 'colors_and_type.css'),
+      ':root { --color-background: #ffffff; --color-muted: #eeeeee; }\n',
+    )
+    await writeFile(join(path, 'card.html'), '<style>:root { --color-foreground: #123456; }</style>')
+    const mirror = await readDesignSystemMirror(path)
+    const status = designSystemStatus(mirror, modal, emptyLock())
+    expect(status.items).toMatchObject([{ op: { path: 'tokens.color.foreground' } }])
+    const plan = resetPlan(mirror, modal, status)
+    expect(plan.files).toEqual([])
+    expect(plan.skipped).toEqual([{ path: 'color.foreground', context: '', reason: 'not-in-css' }])
+  })
+
+  it('falls back to detection when the selector taken over from the code is not in the project', async () => {
+    const withCodeModes = buildRegister(
+      modalFiles.map((f) =>
+        f.path === 'accord.config.yaml'
+          ? { ...f, content: 'version: 1\nsurfaces:\n  code:\n    modes:\n      dark: "[data-theme=dark]"\n' }
+          : f,
+      ),
+    )
+    const mirror = await mirrorWith(
+      'code-modes',
+      ':root { --color-background: #ffffff; }\n.dark { --color-background: #010101; }\n',
+    )
+    const status = designSystemStatus(mirror, withCodeModes, emptyLock())
+    expect(status.selectors).toMatchObject([{ context: 'dark', selector: '.dark', how: 'detected' }])
+    expect(status.items).toMatchObject([
+      { op: { path: 'tokens.color.background', context: { theme: 'dark' } } },
+    ])
   })
 
   it('compares only the default context when the project has no dark block', async () => {

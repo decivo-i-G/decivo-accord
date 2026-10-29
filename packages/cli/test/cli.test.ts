@@ -1,4 +1,4 @@
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -196,6 +196,17 @@ describe('accord export', () => {
     expect(design.startsWith('---\nversion: alpha')).toBe(true)
     const agents = await readFile(join(dir, 'AGENTS.md'), 'utf8')
     expect(agents).toContain('<!-- accord:begin -->')
+  })
+
+  it('refuses to write a generated file through a symbolic link', async () => {
+    const target = join(dir, 'outside.md')
+    await writeFile(target, 'untouched\n')
+    await rm(join(dir, 'AGENTS.md'))
+    await symlink(target, join(dir, 'AGENTS.md'))
+    await expect(exportCommand({ root: dir, register: '.accord', check: false }, t, print)).rejects.toThrow(
+      /symbolic link/,
+    )
+    expect(await readFile(target, 'utf8')).toBe('untouched\n')
   })
 
   it('leaves the hand-written design/DESIGN.md alone (it is not at the configured path)', async () => {

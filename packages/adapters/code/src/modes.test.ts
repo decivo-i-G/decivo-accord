@@ -47,6 +47,28 @@ describe('selectors of themes', () => {
     expect(vars.map((v) => v.scope)).toEqual(['base', 'html.dark'])
   })
 
+  it('lets a selector list with :root also apply in the context it names, in cascade order', () => {
+    const vars = parseCssVariables(`.dark { --muted: #222; } :root, .dark { --muted: #eee; }`, 'a.css')
+    expect(resolveCssVariables(vars).get('--muted')?.resolved).toBe('#eee')
+    const dark = resolveCssVariables(vars, (s) => scopeMatches(s, '.dark'))
+    expect(dark.get('--muted')?.resolved).toBe('#eee')
+  })
+
+  it('takes only root rules inside a single media query as that query’s scope', () => {
+    const media = '@media (prefers-color-scheme: dark)'
+    const vars = parseCssVariables(
+      `${media} { :root { --a: 1; } :root:not(.light) { --b: 2; } .card { --c: 3; } }` +
+        `${media} { @media (min-width: 600px) { :root { --d: 4; } } }` +
+        `@media (min-width: 600px) { ${media} { :root { --e: 5; } } }`,
+      'a.css',
+    )
+    const scope = (name: string) => vars.find((v) => v.name === name)?.scope ?? ''
+    expect(scopeMatches(scope('--a'), media)).toBe(true)
+    expect(scopeMatches(scope('--b'), media)).toBe(true)
+    // A component inside the query and nested queries only apply sometimes: no context.
+    for (const name of ['--c', '--d', '--e']) expect(scopeMatches(scope(name), media), name).toBe(false)
+  })
+
   it('takes a light theme written only with [data-theme] as the base values', () => {
     const vars = parseCssVariables(
       `[data-theme='light'] { --bg: #fff; --fg: #111; } [data-theme='dark'] { --bg: #000; } :root { --fg: #222; }`,

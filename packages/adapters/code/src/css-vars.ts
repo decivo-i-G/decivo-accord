@@ -9,6 +9,8 @@ export interface CssVariable {
   value: string
   /** Where it applies: `base` for `:root`/`html`/`@theme`, otherwise the selector (`.dark`, `.admin-theme`). */
   scope: string
+  /** For a base selector list with other members (`:root, .dark`): the list, so `.dark` sees the value too. */
+  list?: string
   /** `@theme`, `@theme inline`, `:root`, … — kept for reports. */
   context: string
   file: string
@@ -85,29 +87,46 @@ export function detectSelector(
   return undefined
 }
 
-function contextOf(node: Container): { scope: string; context: string } {
+/** Whether a selector targets the root element, possibly narrowed: `:root`, `html.dark`, `:root:not(.light)`. */
+const ROOTISH = /^(?::root|html|:host)(?![\w-])/
+
+function contextOf(node: Container): { scope: string; context: string; list?: string } {
   const parts: string[] = []
-  let scope: string | undefined
+  const conditions: string[] = []
+  let selector: string | undefined
+  let theme = false
   let current: Container | undefined = node
   while (current && current.type !== 'root') {
     if (current.type === 'rule') {
-      const selector = (current as Rule).selector.trim()
-      parts.unshift(selector)
-      // A selector list that includes :root applies to the root element like :root alone.
-      if (scope === undefined)
-        scope = members(selector).some((m) => BASE_SELECTORS.has(normalizeSelector(m))) ? 'base' : selector
+      const written = (current as Rule).selector.trim()
+      parts.unshift(written)
+      // The innermost rule decides which element a variable applies to.
+      if (selector === undefined) selector = written
     } else if (current.type === 'atrule') {
       const at = current as AtRule
       const label = `@${at.name}${at.params ? ` ${at.params}` : ''}`
       parts.unshift(label)
-      if (at.name === 'theme' && scope === undefined) scope = 'base'
-      // Media queries and layers do not change which element a variable applies to, but variables
-      // inside media queries only apply sometimes; keep them out of the base scope.
-      if (at.name === 'media' || at.name === 'supports' || at.name === 'container') scope = label
+      if (at.name === 'theme') theme = true
+      // Media queries and the like do not change the element, but variables inside them only apply sometimes.
+      if (at.name === 'media' || at.name === 'supports' || at.name === 'container') conditions.unshift(label)
     }
     current = current.parent as Container | undefined
   }
-  return { scope: scope ?? 'base', context: parts.join(' › ') || '(root)' }
+  const context = parts.join(' › ') || '(root)'
+  const list = selector === undefined ? [] : members(selector).map(normalizeSelector)
+  // A selector list that includes :root applies to the root element like :root alone; its other members
+  // (`:root, .dark`) also apply in their own context, so the list is kept for that.
+  const base = selector === undefined || theme || list.some((m) => BASE_SELECTORS.has(m))
+  const mixed = selector !== undefined && base && !list.every((m) => BASE_SELECTORS.has(m))
+  const element = base ? 'base' : (selector as string)
+  if (conditions.length === 0)
+    return { scope: element, context, ...(mixed ? { list: selector as string } : {}) }
+  // One condition around the root element (`@media (prefers-color-scheme: dark) { :root { … } }`) is that
+  // condition's scope. A condition around another element (`img`, `.card`) or several nested conditions
+  // never stand for a whole context, so they get a scope no context selector matches.
+  if (conditions.length === 1 && (base || list.every((m) => ROOTISH.test(m))))
+    return { scope: conditions[0] as string, context }
+  return { scope: [...conditions, element].join(' › '), context }
 }
 
 /** Where declarations in this rule apply: `base`, a selector such as `.dark`, or a media condition. */
@@ -119,11 +138,12 @@ export function parseCssVariables(css: string, file: string): CssVariable[] {
   const out: CssVariable[] = []
   root.walkDecls(/^--/, (decl) => {
     const parent = decl.parent as Container
-    const { scope, context } = contextOf(parent)
+    const { scope, context, list } = contextOf(parent)
     out.push({
       name: decl.prop,
       value: decl.value.trim(),
       scope,
+      ...(list ? { list } : {}),
       context,
       file,
       line: decl.source?.start?.line ?? 0,
@@ -155,7 +175,9 @@ export function resolveCssVariables(
   for (const v of variables) if (isDefaultThemeScope(v.scope) && !own.has(v.name)) byName.set(v.name, v)
   const inScope = typeof scope === 'string' ? (s: string) => s === scope : scope
   if (scope !== 'base')
-    for (const v of variables) if (v.scope !== 'base' && inScope(v.scope)) byName.set(v.name, v)
+    for (const v of variables)
+      if (v.scope !== 'base' ? inScope(v.scope) : v.list !== undefined && inScope(v.list))
+        byName.set(v.name, v)
 
   const cache = new Map<string, string | undefined>()
   const resolving = new Set<string>()
