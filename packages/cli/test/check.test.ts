@@ -69,6 +69,22 @@ describe('checkChange', () => {
     expect(text).toContain('→ color.brand.$root (var(--brand-blue))')
   })
 
+  it('never reads files outside the project, from paths or from a diff', async () => {
+    const diff = `--- a/../outside.tsx
++++ b/../outside.tsx
+@@ -0,0 +1,1 @@
++const c = '#487a98'
+`
+    const result = await checkChange({
+      root: dir,
+      registerDir: '.accord',
+      paths: ['../outside.tsx', join(tmpdir(), 'elsewhere.tsx'), 'src/../../x.tsx'],
+      diff,
+    })
+    expect(result.files).toEqual([])
+    expect(result.findings).toEqual([])
+  })
+
   it('only counts added lines when a diff is given', async () => {
     const diff = `--- a/src/components/marketing/Hero.tsx
 +++ b/src/components/marketing/Hero.tsx

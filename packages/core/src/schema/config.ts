@@ -18,6 +18,18 @@ export const AllowRuleSchema = z
 
 export type AllowRule = z.infer<typeof AllowRuleSchema>
 
+/**
+ * A file Accord writes, relative to the project root. Absolute paths and `..` are refused, so a register
+ * from someone else cannot make `accord export` or `apply` write outside the project.
+ */
+const OutputPathSchema = z
+  .string()
+  .min(1)
+  .refine(
+    (p) => !/^(?:[a-zA-Z]:)?[\\/]/.test(p) && !p.split(/[\\/]/).includes('..'),
+    'a path inside the project, without a leading / or ..',
+  )
+
 const CodeSurfaceSchema = z.object({
   enabled: z.boolean().default(true),
   /** Files scanned for hard-coded values and component usage. */
@@ -52,7 +64,7 @@ const CodeSurfaceSchema = z.object({
    */
   modes: z.record(z.string(), z.string().min(1)).optional(),
   /** Generated files Accord writes from the register. */
-  outputs: z.array(z.object({ format: z.enum(['css', 'tailwind']), path: z.string() })).default([]),
+  outputs: z.array(z.object({ format: z.enum(['css', 'tailwind']), path: OutputPathSchema })).default([]),
 })
 
 const ClaudeDesignSurfaceSchema = z.object({
@@ -133,9 +145,9 @@ export const ConfigSchema = z.object({
     .prefault({}),
   outputs: z
     .object({
-      design_md: z.string().default('DESIGN.md'),
-      agents_md: z.string().default('AGENTS.md'),
-      claude_md: z.string().optional(),
+      design_md: OutputPathSchema.default('DESIGN.md'),
+      agents_md: OutputPathSchema.default('AGENTS.md'),
+      claude_md: OutputPathSchema.optional(),
     })
     .prefault({}),
 })

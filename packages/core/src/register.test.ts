@@ -43,6 +43,17 @@ describe('buildRegister', () => {
     expect(buildRegister([config('language: Deutsch und so\n')]).issues.length).toBeGreaterThan(0)
   })
 
+  it('only accepts output paths inside the project', () => {
+    expect(buildRegister([config('outputs:\n  agents_md: docs/AGENTS.md\n')]).issues).toEqual([])
+    for (const path of ['../../.bashrc', '/etc/x', 'docs/../../x.md', 'C:\\\\x.md'])
+      expect(
+        buildRegister([config(`outputs:\n  claude_md: "${path}"\n`)]).issues.length,
+        path,
+      ).toBeGreaterThan(0)
+    const css = 'surfaces:\n  code:\n    outputs:\n      - { format: css, path: ../x.css }\n'
+    expect(buildRegister([config(css)]).issues.length).toBeGreaterThan(0)
+  })
+
   it('reports a missing config', () => {
     expect(codes([])).toContain('missing-config')
   })

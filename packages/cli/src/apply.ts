@@ -23,6 +23,7 @@ import { z } from 'zod'
 import type { HandoffProposal } from './claude-design.js'
 import { git } from './git.js'
 import type { SurfaceProposal } from './surface-proposal.js'
+import { writeOutput } from './write.js'
 
 export const RESOLUTION_SCHEMA = 'accord.resolution/1'
 
@@ -307,10 +308,11 @@ export async function writeApply(
     ...plan.outputs.map((o) => ({ path: o.path, content: o.content })),
     { path: plan.proposalFile, content: plan.proposalContent },
   ]
-  for (const file of writes) {
+  for (const file of [...plan.tokenFiles, { path: plan.proposalFile, content: plan.proposalContent }]) {
     await mkdir(dirname(join(root, file.path)), { recursive: true })
     await writeFile(join(root, file.path), file.content)
   }
+  for (const output of plan.outputs) await writeOutput(root, output.path, output.content)
   const paths = writes.map((w) => w.path)
 
   if (branch) {

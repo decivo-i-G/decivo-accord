@@ -159,7 +159,14 @@ const de = {
     '{count} Datei(en) können zurückgesetzt werden: accord design reset, danach mit /design-sync hochladen.',
   'design.resetNext':
     'Diese Dateien mit /design-sync in Claude Design hochladen, danach accord design lock ausführen.',
-  'design.noBlock': '{path} ({context}) nicht zurückgesetzt: Das Projekt hat keinen Block für {context}.',
+  'design.skipped.no-block':
+    '{path}{context} nicht zurückgesetzt: Das Projekt hat keinen Block für diesen Kontext.',
+  'design.skipped.alias':
+    '{path}{context} nicht zurückgesetzt: Die Variable verweist mit var() auf eine andere. Bitte im Projekt von Hand anpassen.',
+  'design.skipped.not-in-css':
+    '{path}{context} nicht zurückgesetzt: nur außerhalb der Stylesheets definiert (z. B. in HTML). Bitte von Hand anpassen.',
+  'design.skipped.unsupported':
+    '{path}{context} nicht zurückgesetzt: kein geänderter Wert. Bitte von Hand anpassen.',
   'design.locked': 'Stand von Claude Design gespeichert ({count} Tokens).',
   'figma.title': 'decivo Accord · Figma ({files} Datei(en), {count} Tokens abgeglichen)',
   'figma.none':
@@ -464,7 +471,12 @@ const en: Record<MessageKey, string> = {
   'design.inSync': 'No differences to the register.',
   'design.resetHint': '{count} file(s) can be reset: accord design reset, then upload with /design-sync.',
   'design.resetNext': 'Upload these files to Claude Design with /design-sync, then run accord design lock.',
-  'design.noBlock': '{path} ({context}) not reset: the project has no block for {context}.',
+  'design.skipped.no-block': '{path}{context} not reset: the project has no block for this context.',
+  'design.skipped.alias':
+    '{path}{context} not reset: the variable points to another one with var(). Please adjust it in the project.',
+  'design.skipped.not-in-css':
+    '{path}{context} not reset: only defined outside the stylesheets (e.g. in HTML). Please adjust it by hand.',
+  'design.skipped.unsupported': '{path}{context} not reset: not a changed value. Please adjust it by hand.',
   'design.locked': 'Saved the Claude Design state ({count} tokens).',
   'figma.title': 'decivo Accord · Figma ({files} file(s), {count} tokens compared)',
   'figma.none':

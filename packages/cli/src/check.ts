@@ -119,11 +119,13 @@ export async function checkChange(input: CheckInput): Promise<CheckResult> {
   const registerDir = isAbsolute(input.registerDir) ? input.registerDir : join(root, input.registerDir)
   const register = input.register ?? (await loadValidRegister(registerDir))
   const added = input.diff !== undefined ? addedLines(input.diff) : undefined
+  // Only files inside the project are checked: a path from an agent or a diff (`../../.ssh/config`,
+  // `+++ b/../x`) never makes Accord read and report from elsewhere.
   const files = [
     ...new Set(
-      [...(input.paths ?? []), ...(added ? [...added.keys()] : [])].map((p) =>
-        isAbsolute(p) ? relative(root, p) : p,
-      ),
+      [...(input.paths ?? []), ...(added ? [...added.keys()] : [])]
+        .map((p) => relative(root, resolve(root, p)))
+        .filter((p) => p !== '' && !p.startsWith('..') && !isAbsolute(p)),
     ),
   ]
 

@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process'
-import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
+import { appendFile, readFile, writeFile } from 'node:fs/promises'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 import { promisify } from 'node:util'
 import type { ResetFile } from '@decivo/accord-adapter-claude-design'
 import { scanCode, type VariableSurfaceStatus } from '@decivo/accord-adapter-code'
@@ -46,6 +46,7 @@ import {
   toReportProposals,
 } from './report-payload.js'
 import { proposeFromSurface, saveSurfaceProposal } from './surface-proposal.js'
+import { writeOutput } from './write.js'
 
 const runGit = promisify(execFile)
 
@@ -351,8 +352,7 @@ export async function exportCommand(
       print(`  ${t('export.stale', { path: plan.path })}`)
       continue
     }
-    await mkdir(dirname(join(root, plan.path)), { recursive: true })
-    await writeFile(join(root, plan.path), plan.content)
+    await writeOutput(root, plan.path, plan.content)
     print(`  ${t(plan.mode === 'block' ? 'export.block' : 'export.written', { path: plan.path })}`)
   }
   if (stale === 0) print(t('export.upToDate'))
@@ -475,7 +475,10 @@ export async function designCommand(
       print(`  ${file.path}`)
       for (const c of file.changes) print(`    ${designChange(c)}`)
     }
-    for (const s of plan.skipped) print(`  ${t('design.noBlock', { path: s.path, context: s.context })}`)
+    for (const s of plan.skipped)
+      print(
+        `  ${t(`design.skipped.${s.reason}`, { path: s.path, context: s.context ? ` (${s.context})` : '' })}`,
+      )
     if (plan.files.length > 0) print(t('design.resetNext'))
     return 0
   }
