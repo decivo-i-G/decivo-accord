@@ -1,6 +1,6 @@
 {
   "name": "@decivo/accord-adapter-claude-design",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Claude Design surface for decivo Accord: reads handoff bundles and compares the design-system project with the register.",
   "license": "MIT",
   "repository": {
