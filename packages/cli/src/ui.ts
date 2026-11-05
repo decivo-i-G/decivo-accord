@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import type { T } from './messages.js'
 
@@ -11,13 +12,17 @@ import type { T } from './messages.js'
  */
 export const UI_PACKAGE = '@decivo/accord-ui'
 
-/** `dist/bin.js` of an installed `@decivo/accord-ui`, looked up from each base (a file path or URL). */
-export function findUiBin(bases: string[]): string | undefined {
+/**
+ * `dist/bin.js` of an installed `@decivo/accord-ui` in exactly this version, looked up from each base (a
+ * file path or URL): next to the CLI first, then in the project. Another version is not taken; the CLI and
+ * the app read the same register format.
+ */
+export function findUiBin(bases: string[], version: string): string | undefined {
   for (const base of bases) {
     try {
       const manifest = createRequire(base).resolve(`${UI_PACKAGE}/package.json`)
       const bin = join(dirname(manifest), 'dist', 'bin.js')
-      if (existsSync(bin)) return bin
+      if (JSON.parse(readFileSync(manifest, 'utf8')).version === version && existsSync(bin)) return bin
     } catch {
       // not installed there
     }
@@ -40,7 +45,28 @@ export function uiArgs({ root, folders, port, open }: UiOptions): string[] {
   ]
 }
 
-const quote = (arg: string) => (/[\s"&|<>^]/.test(arg) ? `"${arg.replaceAll('"', '\\"')}"` : arg)
+/**
+ * How to run npx. Through node and npm's own npx-cli.js where it sits next to node (the normal install,
+ * also on Windows): no shell, so nothing in a path is expanded (`%VAR%`) and a signal reaches npx itself.
+ */
+export function npxCommand(
+  execPath = process.execPath,
+  platform = process.platform,
+  exists: (p: string) => boolean = existsSync,
+): { cmd: string; pre: string[]; shell: boolean } {
+  const dir = dirname(execPath)
+  for (const cli of [
+    join(dir, 'node_modules', 'npm', 'bin', 'npx-cli.js'),
+    join(dir, '..', 'lib', 'node_modules', 'npm', 'bin', 'npx-cli.js'),
+  ])
+    if (exists(cli)) return { cmd: execPath, pre: [cli], shell: false }
+  // Elsewhere npx is a script on PATH; on Windows a .cmd file, which only runs through the shell.
+  return platform === 'win32'
+    ? { cmd: 'npx.cmd', pre: [], shell: true }
+    : { cmd: 'npx', pre: [], shell: false }
+}
+
+const quoteForCmd = (arg: string) => `"${arg.replaceAll('"', '""').replaceAll('%', '%%')}"`
 
 export async function uiCommand(
   o: UiOptions,
@@ -49,16 +75,18 @@ export async function uiCommand(
   print: (text: string) => void,
 ): Promise<number> {
   const args = uiArgs(o)
-  const installed = findUiBin([import.meta.url, join(resolve(o.root), 'package.json')])
+  const installed = findUiBin([import.meta.url, join(resolve(o.root), 'package.json')], version)
   const pkg = `${UI_PACKAGE}@${version}`
-  const windows = process.platform === 'win32'
   if (!installed) print(t('ui.download', { pkg }))
+  const npx = npxCommand()
+  const npxArgs = [...npx.pre, '--yes', pkg, ...args]
   const child = installed
     ? spawn(process.execPath, [installed, ...args], { stdio: 'inherit' })
-    : // npx is a .cmd file on Windows, which only runs through the shell; the arguments are quoted for it.
-      spawn(windows ? 'npx.cmd' : 'npx', ['--yes', pkg, ...args].map(windows ? quote : (a) => a), {
+    : // From a neutral folder: a repository's own .npmrc must not redirect where @decivo packages come from.
+      spawn(npx.cmd, npx.shell ? npxArgs.map(quoteForCmd) : npxArgs, {
         stdio: 'inherit',
-        shell: windows,
+        shell: npx.shell,
+        cwd: tmpdir(),
       })
   // Ctrl+C in a terminal reaches both processes; a signal sent to this process alone (kill, a closed
   // terminal, a process manager) is passed on, so the app never outlives the command.

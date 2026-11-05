@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { startUi } from './index.js'
+import { openBrowser, startUi, UiError } from './index.js'
 
 /** `accord-ui [folder …] [--port <n>] [--no-open]`; `accord ui` in the CLI starts the same. */
 const args = process.argv.slice(2)
@@ -22,22 +22,48 @@ if (port !== undefined && !(Number.isInteger(port) && port > 0 && port < 65536))
 }
 
 const de = /^de/i.test(process.env.ACCORD_LANG ?? process.env.LC_ALL ?? process.env.LANG ?? '')
+const say = (text: { de: string; en: string }) => console.log(de ? text.de : text.en)
+
+// Signals count from the first moment: a Ctrl+C while the app starts must not leave it running.
+const abort = new AbortController()
+let stopping = false
+const stopAll = () => {
+  stopping = true
+  abort.abort()
+}
+for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(signal, stopAll)
+
 try {
-  const ui = await startUi({ roots, port, open })
+  const ui = await startUi({ roots, port, open, signal: abort.signal })
+  abort.signal.addEventListener('abort', () => ui.stop(), { once: true })
+  if (stopping) ui.stop()
   const names = ui.projects.map((p) => p.name).join(', ')
-  console.log(
-    de
-      ? `decivo Accord · ${names}\n  ${ui.url}\n  Nur auf diesem Rechner. Strg+C beendet.`
-      : `decivo Accord · ${names}\n  ${ui.url}\n  Only on this machine. Ctrl+C stops it.`,
-  )
-  const stop = () => {
-    ui.stop()
-    process.exit(0)
+  say({
+    de: `decivo Accord · ${names}\n  ${ui.url}\n  Nur auf diesem Rechner. Die Adresse gilt einmal; Enter gibt eine neue aus. Strg+C beendet.`,
+    en: `decivo Accord · ${names}\n  ${ui.url}\n  Only on this machine. The address works once; Enter prints a new one. Ctrl+C stops it.`,
+  })
+  // Enter: a new one-time address (another browser, a closed tab), opened like the first one.
+  if (process.stdin.isTTY) {
+    process.stdin.setEncoding('utf8')
+    process.stdin.on('data', (chunk: string) => {
+      if (!chunk.includes('\n') && !chunk.includes('\r')) return
+      const next = ui.newUrl()
+      console.log(`  ${next}`)
+      if (open) openBrowser(next)
+    })
   }
-  for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(signal, stop)
   const code = await ui.exited
-  process.exit(code ?? 0)
+  if (!stopping) {
+    say({
+      de: `accord-ui: Die Oberfläche hat sich unerwartet beendet (Code ${code ?? '–'}).`,
+      en: `accord-ui: the web app stopped unexpectedly (code ${code ?? '–'}).`,
+    })
+    process.exit(1)
+  }
+  process.exit(0)
 } catch (error) {
-  console.error(`accord-ui: ${error instanceof Error ? error.message : String(error)}`)
-  process.exit(1)
+  if (stopping) process.exit(0)
+  const message = error instanceof Error ? error.message : String(error)
+  console.error(`accord-ui: ${message}`)
+  process.exit(error instanceof UiError ? 1 : 2)
 }
