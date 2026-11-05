@@ -5,7 +5,7 @@ import { z } from 'zod'
 /**
  * Repositories the app shows. In production they come from GitHub App installations (database);
  * for local development and the pilot they are listed in ACCORD_PROJECTS:
- *   [{ "slug": "decivo", "name": "decivo-i-G/decivo", "root": "/path/to/decivo", "register": "/path/to/.accord" }]
+ *   [{ "slug": "decivo", "name": "decivo/decivo", "root": "/path/to/decivo", "register": "/path/to/.accord" }]
  */
 const ProjectSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/),

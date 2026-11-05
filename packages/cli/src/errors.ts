@@ -2,7 +2,7 @@ import { formatIssue } from '@decivo/accord-core'
 import { RegisterError } from '@decivo/accord-core/node'
 import type { MessageKey, T } from './messages.js'
 
-export const ISSUES_URL = 'https://github.com/decivo-i-G/decivo-accord/issues'
+export const ISSUES_URL = 'https://github.com/decivo/decivo-accord/issues'
 
 /** An error the user can fix; shown as a sentence, never as a stack trace. */
 export class AccordError extends Error {
