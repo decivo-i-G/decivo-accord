@@ -45,6 +45,8 @@ interface DecisionSetup {
   adoptBlockedBy?: 'rule' | 'stale' | undefined
   /** Accord writes CSS for the project: the sentences name it only then. */
   writesCss?: boolean | undefined
+  /** Must rules the change touches that adopting decides (a new colour under "colours only from the register"). */
+  decidesRules?: string[] | undefined
   defaultBy: string
   /** Where to go after deciding: the next open proposal, or the inbox. */
   nextHref: string
@@ -519,6 +521,14 @@ export function DecisionButtons() {
                 uses: d.uses ?? 0,
               })
             : t('actions.confirmBreakingText')}
+          {d.decidesRules && d.decidesRules.length > 0 && (
+            <>
+              {' '}
+              {t('actions.confirmRules', {
+                rules: d.decidesRules.map((rule) => t('actions.ruleName', { rule })).join(', '),
+              })}
+            </>
+          )}
         </p>
         <div className={styles.buttonsStack}>
           <Button
@@ -557,8 +567,12 @@ export function DecisionButtons() {
     ? d.adoptBlockedBy === 'stale'
       ? t('actions.blockedStale')
       : t('actions.blocked', {
-          // The rules by their id (D-003), as the register and the terminal name them.
-          rules: [...new Set(d.adoptBlocked.match(/\bD-\d+\b/g) ?? [])].join(', ') || d.adoptBlocked,
+          // The rules by their name, as the sentence names rules ("tokens.x: D-003 – Text …" → "Text …").
+          rules:
+            [...new Set(d.adoptBlocked.split('; ').map((part) => part.split(' – ').slice(1).join(' – ')))]
+              .filter(Boolean)
+              .map((rule) => t('actions.ruleName', { rule }))
+              .join(', ') || d.adoptBlocked,
         })
     : d.recommendText
   const busy = d.pending !== undefined

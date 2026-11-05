@@ -706,7 +706,9 @@
       "leaveOut": "Nicht aufnehmen",
       "more": "Mehr",
       "adoptNothing": "Nichts übernehmen",
-      "blockedStale": "Übernehmen ist gesperrt, weil der Vorschlag veraltet ist."
+      "blockedStale": "Übernehmen ist gesperrt, weil der Vorschlag veraltet ist.",
+      "confirmRules": "Damit entscheidest du auch über {rules}.",
+      "ruleName": "„{rule}“"
     },
     "keys": {
       "move": "Nächste oder vorige Entscheidung",

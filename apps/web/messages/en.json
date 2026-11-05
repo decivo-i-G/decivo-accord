@@ -706,7 +706,9 @@
       "leaveOut": "Leave it out",
       "more": "More",
       "adoptNothing": "Adopt nothing",
-      "blockedStale": "Adopting is locked because the proposal is out of date."
+      "blockedStale": "Adopting is locked because the proposal is out of date.",
+      "confirmRules": "This also decides {rules}.",
+      "ruleName": "“{rule}”"
     },
     "keys": {
       "move": "Next or previous decision",

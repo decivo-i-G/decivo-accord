@@ -502,6 +502,7 @@ export default async function ProposalsPage({
           adoptBlocked={blocked}
           adoptBlockedBy={ruleBlocked ? 'rule' : stale ? 'stale' : undefined}
           writesCss={writesCss}
+          decidesRules={[...new Set(selected.rules.filter((r) => r.level === 'must').map((r) => r.rule))]}
           defaultBy={by}
           nextHref={next ? href(next.id) : base}
           selfHref={href(selected.id)}
