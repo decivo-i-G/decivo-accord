@@ -30,9 +30,9 @@ const section = (title) => console.log(`\n${title}`)
 const run = (cmd, args, opts = {}) =>
   execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts })
 
-// Nothing internal may ship: decivo's own product, local paths, credentials.
+// Nothing internal may ship: internal names, local paths, credentials.
 const FORBIDDEN = [
-  { re: /\bmind\b|decivo[ -]mind|MIND_/i, what: 'decivo Mind' },
+  { re: /\bmind\b|\bMIND_/i, what: 'an internal name' },
   { re: /\/home\/[a-z]+\/|\/tmp\/claude|\/Users\/[A-Za-z]+\//, what: 'a local path' },
   {
     re: /\b(ghp_|github_pat_|npm_)[A-Za-z0-9_]{20,}|sk-ant-[A-Za-z0-9-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY/,

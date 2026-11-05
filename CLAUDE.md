@@ -2,7 +2,7 @@
 
 Das Register für Design-Entscheidungen, gegen das Menschen und Agenten prüfen. Für Figma, Claude Design, Pencil und Code. Ein Produkt von decivo („Clarity before Code“).
 
-Der Produktname ist **decivo Accord**. Der Prototyp (interne Unterlagen, außerhalb des Repos) heißt noch „Ledger“. Er gilt als UI-Referenz für Aufbau, Texte und Abläufe, nicht für den Namen. Alle Zahlen darin sind Beispieldaten.
+Der Produktname ist **decivo Accord**.
 
 ## Kernprinzipien (nicht verhandelbar)
 
