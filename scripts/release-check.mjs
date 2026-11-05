@@ -291,7 +291,9 @@ if (existsSync(join(bin, 'accord-ui')) && existsSync(join(bin, 'accord'))) {
           const without = (await fetch(bare, { redirect: 'manual' })).status
           const opened = await fetch(url, { redirect: 'manual' })
           const cookie = (opened.headers.get('set-cookie') ?? '').split(';')[0]
+          const reused = (await fetch(url, { redirect: 'manual' })).status
           const page = await fetch(bare, { headers: { cookie } })
+          const framing = page.headers.get('x-frame-options')
           const html = await page.text()
           const decisions = (await fetch(`${bare}/decisions`, { headers: { cookie } })).status
           // fetch sets Host from the address, so a foreign Host (DNS rebinding) needs node:http.
@@ -303,7 +305,17 @@ if (existsSync(join(bin, 'accord-ui')) && existsSync(join(bin, 'accord'))) {
               })
               .on('error', () => done(0)),
           )
-          resolve({ without, opened: opened.status, page: page.status, decisions, foreign, html, out })
+          resolve({
+            without,
+            opened: opened.status,
+            reused,
+            framing,
+            page: page.status,
+            decisions,
+            foreign,
+            html,
+            out,
+          })
         } catch (error) {
           reject(error)
         } finally {
@@ -318,6 +330,8 @@ if (existsSync(join(bin, 'accord-ui')) && existsSync(join(bin, 'accord'))) {
     })
     if (result.without !== 401) fail(`accord ui answers without token: ${result.without}`)
     if (result.opened !== 303) fail(`accord ui: opening the printed address gave ${result.opened}`)
+    if (result.reused !== 401) fail(`accord ui: the printed address works twice (${result.reused})`)
+    if (result.framing !== 'DENY') fail('accord ui: pages may be framed by other pages')
     if (result.page !== 200 || result.decisions !== 200)
       fail(`accord ui pages: overview ${result.page}, decisions ${result.decisions}`)
     if (result.foreign !== 403) fail(`accord ui answers a foreign host: ${result.foreign}`)
@@ -330,7 +344,9 @@ if (existsSync(join(bin, 'accord-ui')) && existsSync(join(bin, 'accord'))) {
       () => false,
     )
     if (still) fail('accord ui: the web server keeps running after accord ui was stopped')
-    ok('accord ui: token, host check, overview and decisions offline; stops with the command')
+    ok(
+      'accord ui: one-time address, host check, no framing, overview and decisions offline; stops with the command',
+    )
   } catch (error) {
     fail(`accord ui: ${error.message}`)
   }

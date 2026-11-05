@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -23,6 +23,24 @@ describe('accord ui', () => {
     expect(projects[0]).toMatchObject({ branch: 'trunk' })
     expect(projects[0]?.root.endsWith(projects[0]?.name ?? '?')).toBe(true)
     expect(() => projectsFor([join(repo, 'missing')])).toThrow(/does not exist/)
+    writeFileSync(join(repo, 'file.json'), '{}')
+    expect(() => projectsFor([join(repo, 'file.json')])).toThrow(/not a folder/)
+  })
+
+  it('treats a symbolic link and its target as one project', () => {
+    const real = mkdtempSync(join(tmpdir(), 'accord-ui-real-'))
+    const link = join(tmpdir(), `accord-ui-link-${Date.now()}`)
+    symlinkSync(real, link)
+    expect(projectsFor([real, link])).toHaveLength(1)
+  })
+
+  it('names the commit on a detached HEAD instead of claiming main', () => {
+    const repo = mkdtempSync(join(tmpdir(), 'accord-ui-detached-'))
+    const g = (...a: string[]) => execFileSync('git', a, { cwd: repo })
+    g('init', '-q', '-b', 'main')
+    g('-c', 'user.name=T', '-c', 'user.email=t@example.com', 'commit', '-q', '--allow-empty', '-m', 'x')
+    g('checkout', '-q', '--detach')
+    expect(projectsFor([repo])[0]?.branch).toMatch(/^[0-9a-f]{7,}$/)
   })
 
   it('takes the next free port, and refuses a busy one that was asked for', async () => {
@@ -40,20 +58,24 @@ describe('accord ui', () => {
         PATH: '/bin',
         DATABASE_URL: 'postgres://x',
         GITHUB_CLIENT_SECRET: 's',
-        ACCORD_UI_TOKEN: 'old',
+        ACCORD_UI_INSTANCE: 'old',
         PORT: '1',
+        NEXT_PRIVATE_DEBUG: '1',
+        __NEXT_X: '1',
       },
-      { port: 4318, token: 'tok', projects: [{ slug: 's', name: 's', root: '/r', branch: 'main' }] },
+      { port: 4318, instance: 'inst', projects: [{ slug: 's', name: 's', root: '/r', branch: 'main' }] },
     )
     expect(env).toMatchObject({
       PATH: '/bin',
       PORT: '4318',
       HOSTNAME: '127.0.0.1',
-      ACCORD_UI_TOKEN: 'tok',
+      ACCORD_UI_INSTANCE: 'inst',
       ACCORD_UI_HOSTS: '127.0.0.1:4318,localhost:4318',
     })
     expect(env.DATABASE_URL).toBeUndefined()
     expect(env.GITHUB_CLIENT_SECRET).toBeUndefined()
+    expect(env.NEXT_PRIVATE_DEBUG).toBeUndefined()
+    expect(env.__NEXT_X).toBeUndefined()
     expect(JSON.parse(env.ACCORD_PROJECTS ?? '[]')).toHaveLength(1)
   })
 })
