@@ -1279,3 +1279,8 @@ details[open] > .disclosure .disclosureChevron {
     forced-color-adjust: none;
   }
 }
+
+.staleList {
+  margin: var(--spacing-xs) 0 0;
+  padding-left: var(--spacing-md);
+}

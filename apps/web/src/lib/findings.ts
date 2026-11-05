@@ -119,7 +119,8 @@ function surfaceFindings(surface: SurfaceHealth, proposals: readonly ProposalLik
   if (surface.id !== 'figma' && surface.id !== 'pen') return []
   const id = surface.id
   const covered = new Set(openProposals(proposals, id).flatMap((p) => p.changes.map((c) => c.token)))
-  const items = surface.items.filter((i) => !covered.has(i.token))
+  // An alias that only follows a proposed token (brand → blue.600) is covered by that proposal too.
+  const items = surface.items.filter((i) => !covered.has(i.token) && !(i.aliasOf && covered.has(i.aliasOf)))
   const out: Finding[] = []
   const group = (
     origin: ItemOrigin,

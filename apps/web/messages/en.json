@@ -21,8 +21,8 @@
     "lead": "Every repository has a register. Whatever Figma, Pencil, Claude Design or code change in it comes to you as a decision.",
     "listLabel": "Projects",
     "branch": "Branch {branch}",
-    "broken": "Accord could not read this project.",
-    "brokenHint": "Is there a register yet? Run this once in the repository:",
+    "broken": "Accord cannot read the register right now.",
+    "brokenHint": "In the terminal, this command shows what is broken:",
     "onboarding": {
       "title": "No project connected yet",
       "lead": "decivo Accord is the register for design decisions: one truth in the repository that Figma, Pencil, Claude Design, code and agents check against.",
@@ -52,12 +52,15 @@
       "decisions": "Decide",
       "review": "Review",
       "connect": "Set up",
-      "overview": "Open"
+      "overview": "Open",
+      "open": "Open project"
     },
     "surfaces": "Surfaces",
     "connected": "connected",
     "notConnected": "not connected",
-    "lastChange": "Last change {when}"
+    "lastChange": "Last change {when}",
+    "noRegister": "There is no register here yet.",
+    "noRegisterHint": "Accord creates it from what the repository already has. First see what it finds, then create it:"
   },
   "placeholder": {
     "soon": "This screen follows in the next step."
@@ -690,7 +693,7 @@
       "working": "Writing …",
       "confirmDeletionText": "{tokens} will be deleted. {scanned, select, no {Accord scanned no code. Whatever uses the token will stop working.} other {{uses, plural, =0 {Nothing in the scanned code uses the token.} one {# place in code uses it and will stop working.} other {# places in code use it and will stop working.}}}} Delete anyway?",
       "confirmBreakingText": "Existing uses will stop working. Change anyway?",
-      "blocked": "Adopt is locked because a rule would be broken.",
+      "blocked": "Adopting is locked: it would break {rules}. A rule only changes through its own decision.",
       "recommended": "Recommended:",
       "adoptValue": "Adopt {value}",
       "adoptValueRisky": "Adopt {value} …",
@@ -702,7 +705,10 @@
       "keepRegisterValue": "Keep the register value",
       "leaveOut": "Leave it out",
       "more": "More",
-      "adoptNothing": "Adopt nothing"
+      "adoptNothing": "Adopt nothing",
+      "blockedStale": "Adopting is locked because the proposal is out of date.",
+      "confirmRules": "This also decides {rules}.",
+      "ruleName": "“{rule}”"
     },
     "keys": {
       "move": "Next or previous decision",
@@ -726,7 +732,7 @@
       "reject": "Ignored. Nothing changed.",
       "undo": "Undo",
       "undone": "Undone. The decision is open again.",
-      "undoFailed": "This can no longer be undone.",
+      "undoFailed": "This can no longer be undone: the time is up, or something else was decided or one of the files changed since. Only git can take it back now.",
       "resetHandoff": "Nothing adopted. Switch the close matches over in Claude Design.",
       "keep": "Kept. {tokens} {count, plural, one {stays} other {stay}} in the register; undo the deletion in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself."
     },
@@ -782,10 +788,10 @@
     },
     "whyCode": "Why it is open",
     "effectShort": {
-      "adopt": "{token}{aliases, select, none {} other {, and with it {aliases},}} becomes {after} in the register, CSS and CHANGELOG.",
-      "adoptNew": "{token} joins the register, CSS and CHANGELOG as {after}.",
-      "adoptMany": "{count, plural, one {The change goes} other {The # changes go}} into the register, CSS and CHANGELOG.",
-      "adoptDeletion": "{tokens} is deleted from the register and CSS, and the CHANGELOG records it. Accord asks once more first.",
+      "adopt": "{token}{aliases, select, none {} other {, and with it {aliases},}} becomes {after} in the {writes, select, css {register, CSS and CHANGELOG} other {register and CHANGELOG}}.",
+      "adoptNew": "{token} joins the {writes, select, css {register, CSS and CHANGELOG} other {register and CHANGELOG}} as {after}.",
+      "adoptMany": "{count, plural, one {The change goes} other {The # changes go}} into the {writes, select, css {register, CSS and CHANGELOG} other {register and CHANGELOG}}.",
+      "adoptDeletion": "{tokens} is deleted from {writes, select, css {register and CSS} other {the register}}, and the CHANGELOG records it. Accord asks once more first.",
       "adoptWithDeletion": "The values from {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} go into the register, and {tokens} is deleted. Accord asks once more first.",
       "adoptHandoff": "Only the colours you name under “Name them yourself” join the register as new tokens.",
       "reset": "The register keeps {before}. You change {token} back in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}} yourself.",
@@ -795,7 +801,13 @@
       "resetHandoff": "The register and the draft stay as they are.{near, plural, =0 {} one { You switch the close match to its token in Claude Design.} other { You switch the # close matches to their tokens in Claude Design.}}",
       "reject": "Nothing changes, and there is no task for {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {the surface}}. As long as the difference remains, the next sync reports it again.",
       "rejectHandoff": "The draft is closed. Nothing changes, and there is no task for Claude Design.",
-      "adoptNamed": "{count, plural, one {The named colour joins} other {The # named colours join}} the register, CSS and CHANGELOG as new tokens."
+      "adoptNamed": "{count, plural, one {The named colour joins} other {The # named colours join}} the {writes, select, css {register, CSS and CHANGELOG} other {register and CHANGELOG}} as new tokens."
+    },
+    "stale": {
+      "lead": "Out of date: the register changed since this proposal. Adopting it would turn that back. Reject it; a new proposal from {tool, select, figma {Figma} pen {Pencil} other {the surface}} starts from the current state.",
+      "changed": "is {now} now; the proposal assumed {before}.",
+      "gone": "is no longer in the register.",
+      "exists": "exists by now."
     }
   },
   "connections": {
@@ -1127,6 +1139,13 @@
     "title": "Accord cannot read this project right now",
     "text": "Usually the configuration or a file in the register is broken. In the terminal, this command shows why:",
     "retry": "Try again",
+    "copy": "Copy command"
+  },
+  "registerBroken": {
+    "title": "Accord cannot read the register right now",
+    "text": "Usually the configuration or a token file is broken. Until the register reads completely, Accord checks and decides nothing.",
+    "problems": "What Accord reports",
+    "command": "In the terminal, this command shows every spot:",
     "copy": "Copy command"
   }
 }

@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve, sep } from 'node:path'
 import { promisify } from 'node:util'
 import {
@@ -78,10 +78,16 @@ function classify(path: string, plan: ApplyPlan): FileKind {
   return 'other'
 }
 
+/** Every file the decision writes, with the content it gets. */
+const writesOf = (plan: ApplyPlan): { path: string; content: string }[] => [
+  ...plan.tokenFiles,
+  ...plan.outputs.map((o) => ({ path: o.path, content: o.content })),
+  { path: plan.proposalFile, content: plan.proposalContent },
+  ...(plan.lockFile ? [plan.lockFile] : []),
+]
+
 const filesOf = (plan: ApplyPlan): FileChange[] =>
-  [...plan.tokenFiles.map((f) => f.path), ...plan.outputs.map((o) => o.path), plan.proposalFile].map(
-    (path) => ({ path, kind: classify(path, plan) }),
-  )
+  writesOf(plan).map(({ path }) => ({ path, kind: classify(path, plan) }))
 
 /** True when adopting it deletes a token or breaks existing uses: a person has to say so explicitly. */
 export function isRisky(stored: StoredProposal): boolean {
@@ -162,7 +168,8 @@ interface Snapshot {
   /** The decided proposal. */
   proposal: string
   at: number
-  files: { path: string; content: string | undefined }[]
+  /** Each file before the decision, and what the decision wrote into it. */
+  files: { path: string; content: string | undefined; written: string }[]
 }
 
 const UNDO_MS = 10 * 60_000
@@ -194,9 +201,10 @@ export async function decideProposal(
     const root = resolve(project.root)
     const files = filesOf(plan)
     const before = await Promise.all(
-      files.map(async (f) => ({
+      writesOf(plan).map(async (f) => ({
         path: f.path,
         content: await readFile(inside(root, f.path), 'utf8').catch(() => undefined),
+        written: f.content,
       })),
     )
     await writeApply(plan, { root: project.root, branch: false, push: false })
@@ -228,11 +236,20 @@ export function undoOf(project: Pick<Project, 'slug'>, proposal: string): string
 export async function undoDecision(project: Project, undo: string): Promise<boolean> {
   const snapshot = snapshots.get(undo)
   if (!snapshot || snapshot.slug !== project.slug || Date.now() - snapshot.at > UNDO_MS) return false
+  // Only while the files still hold what the decision wrote: a later decision (here or on the command
+  // line) or a hand edit would otherwise be overwritten with the old content.
+  for (const file of snapshot.files) {
+    const now = await readFile(inside(snapshot.root, file.path), 'utf8').catch(() => undefined)
+    if (now !== file.written) return false
+  }
   snapshots.delete(undo)
   for (const file of snapshot.files) {
     const full = inside(snapshot.root, file.path)
-    if (file.content === undefined) await rm(full, { force: true })
-    else {
+    if (file.content === undefined) {
+      await rm(full, { force: true })
+      // A folder the decision created (`.accord/generated/`) goes with its last file.
+      await rmdir(dirname(full)).catch(() => {})
+    } else {
       await mkdir(dirname(full), { recursive: true })
       await writeFile(full, file.content)
     }

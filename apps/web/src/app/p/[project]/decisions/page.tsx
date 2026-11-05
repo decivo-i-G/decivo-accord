@@ -183,7 +183,11 @@ export default async function ProposalsPage({
     const openDecision = selected.decidable && !selected.decision
     const preview =
       openDecision && selected.kind === 'surface' ? await adoptPreview(project, selected.id) : undefined
-    const blocked = preview && !preview.ok && preview.code === 'must_violation' ? preview.detail : undefined
+    const stale = openDecision && selected.stale && selected.stale.length > 0 ? selected.stale : undefined
+    const ruleBlocked =
+      preview && !preview.ok && preview.code === 'must_violation' ? preview.detail : undefined
+    // An outdated proposal cannot be adopted either: it would undo what was decided since.
+    const blocked = ruleBlocked ?? (stale ? 'stale' : undefined)
     const at = selected.id ? open.findIndex((p) => p.id === selected.id) : -1
     const after = open.filter((p, i) => p.decidable && p.id !== selected.id && i > at)
     // After the last one, back to the top: the quickest decision that is still open.
@@ -219,7 +223,8 @@ export default async function ProposalsPage({
     // One changed token: its aliases move with it, and the adopt consequence says so.
     const onlyChange = selected.changes.length === 1 ? selected.changes[0] : undefined
     const onlyImpact = onlyChange && impacts.find((i) => i.token === onlyChange.token)?.impact
-    const copy = decisionCopyOf(selected, onlyImpact?.aliases ?? [])
+    const writesCss = (register?.config.surfaces.code.outputs.length ?? 0) > 0
+    const copy = decisionCopyOf(selected, onlyImpact?.aliases ?? [], writesCss)
     const OPTIONS: Option[] = ['adopt', 'reset', 'reject']
     // Handoffs adopt only named colours (from "Name them yourself") and have no Ignore: it would end
     // like "Adopt nothing".
@@ -336,7 +341,7 @@ export default async function ProposalsPage({
                   ))}
                 </ul>
               )}
-              {blocked && <Notice tone="warning">{t('effect.blocked', { detail: blocked })}</Notice>}
+              {ruleBlocked && <Notice tone="warning">{t('effect.blocked', { detail: ruleBlocked })}</Notice>}
               {preview && !preview.ok && !blocked && (
                 <Notice tone="warning">{t(`error.${preview.code}`, { detail: preview.detail ?? '' })}</Notice>
               )}
@@ -374,6 +379,20 @@ export default async function ProposalsPage({
             </Notice>
             {undo && <UndoDecision project={project.slug} id={selected.id} />}
           </div>
+        )}
+
+        {stale && (
+          <Notice tone="warning">
+            <p>{t('stale.lead', { tool: selected.tool })}</p>
+            <ul className={styles.staleList}>
+              {stale.map((c) => (
+                <li key={`${c.token}-${c.context ?? ''}`}>
+                  <code>{c.context ? `${c.token} (${c.context})` : c.token}</code>{' '}
+                  {t(`stale.${c.reason}`, { before: c.before ?? '', now: c.now ?? '' })}
+                </li>
+              ))}
+            </ul>
+          </Notice>
         )}
 
         {selected.kind === 'surface' && (
@@ -481,6 +500,9 @@ export default async function ProposalsPage({
           deletes={removed}
           breaking={selected.risk.breaking}
           adoptBlocked={blocked}
+          adoptBlockedBy={ruleBlocked ? 'rule' : stale ? 'stale' : undefined}
+          writesCss={writesCss}
+          decidesRules={[...new Set(selected.rules.filter((r) => r.level === 'must').map((r) => r.rule))]}
           defaultBy={by}
           nextHref={next ? href(next.id) : base}
           selfHref={href(selected.id)}

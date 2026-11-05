@@ -29,6 +29,9 @@ import styles from './proposals.module.css'
 import { Swatch } from './swatch'
 import { useToast } from './toast'
 
+/** Separator in Accord's rule details ("D-003 \u2013 Text"); written as an escape, the interface shows none. */
+const EN_DASH = ' \u2013 '
+
 interface DecisionSetup {
   project: string
   id: string
@@ -41,6 +44,12 @@ interface DecisionSetup {
   breaking: boolean
   /** Why adopting is impossible as it stands (a must rule), if it is. */
   adoptBlocked?: string | undefined
+  /** Why adopting is locked: a must rule, or the proposal is out of date. */
+  adoptBlockedBy?: 'rule' | 'stale' | undefined
+  /** Accord writes CSS for the project: the sentences name it only then. */
+  writesCss?: boolean | undefined
+  /** Must rules the change touches that adopting decides (a new colour under "colours only from the register"). */
+  decidesRules?: string[] | undefined
   defaultBy: string
   /** Where to go after deciding: the next open proposal, or the inbox. */
   nextHref: string
@@ -515,6 +524,14 @@ export function DecisionButtons() {
                 uses: d.uses ?? 0,
               })
             : t('actions.confirmBreakingText')}
+          {d.decidesRules && d.decidesRules.length > 0 && (
+            <>
+              {' '}
+              {t('actions.confirmRules', {
+                rules: d.decidesRules.map((rule) => t('actions.ruleName', { rule })).join(', '),
+              })}
+            </>
+          )}
         </p>
         <div className={styles.buttonsStack}>
           <Button
@@ -541,8 +558,26 @@ export function DecisionButtons() {
   // becomes the one primary button and "Adopt nothing" the quiet alternative.
   const named = handoff && d.namedCount > 0
   // A locked adoption is no option at all: the suggestion is to keep the register, and Adopt is not offered.
-  const primary: Option = named ? 'adopt' : d.adoptBlocked ? 'reset' : d.recommend
-  const reason = d.adoptBlocked ? t('actions.blocked') : d.recommendText
+  // An outdated proposal is rejected and made again; a rule-locked one keeps the register.
+  const primary: Option = named
+    ? 'adopt'
+    : d.adoptBlockedBy === 'stale'
+      ? 'reject'
+      : d.adoptBlocked
+        ? 'reset'
+        : d.recommend
+  const reason = d.adoptBlocked
+    ? d.adoptBlockedBy === 'stale'
+      ? t('actions.blockedStale')
+      : t('actions.blocked', {
+          // The rules by their name, as sentences name rules: Accord's detail is "tokens.x: D-003 <en dash> Text".
+          rules:
+            [...new Set(d.adoptBlocked.split('; ').map((part) => part.split(EN_DASH).slice(1).join(EN_DASH)))]
+              .filter(Boolean)
+              .map((rule) => t('actions.ruleName', { rule }))
+              .join(', ') || d.adoptBlocked,
+        })
+    : d.recommendText
   const busy = d.pending !== undefined
   // The one alternative that is the opposite of the suggestion. Ignoring waits under "More"; a
   // handoff has no Ignore (it would end like "Adopt nothing"), and adopts only from named colours.
@@ -552,7 +587,13 @@ export function DecisionButtons() {
     ? { ...d.labels, adopt: t('form.adoptNamed', { count: d.namedCount }) }
     : d.labels
   const effects: Record<Option, ReactNode> = named
-    ? { ...d.effects, adopt: t('effectShort.adoptNamed', { count: d.namedCount }) }
+    ? {
+        ...d.effects,
+        adopt: t('effectShort.adoptNamed', {
+          count: d.namedCount,
+          writes: d.writesCss === false ? 'none' : 'css',
+        }),
+      }
     : d.effects
   const icon = (option: Option): ReactNode => {
     // The kept or adopted colour as a small swatch on the quiet button only: on the filled primary

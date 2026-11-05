@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type Evaluation, evaluate, type LiteralUse } from '@decivo/accord-checks'
+import { type StaleChange, staleChanges } from '@decivo/accord-cli'
 import {
   type ColorValue,
   colorToCss,
@@ -100,6 +101,11 @@ export interface ProposalView {
   decidable: boolean
   /** Hard values in code: the file and the tokens that replace them. */
   code?: { file: string; count: number; replacements: string[] } | undefined
+  /**
+   * Open proposals whose tokens moved on since (another decision, a hand edit): adopting would undo that, so
+   * Accord refuses it; the proposal is rejected and made again from the current state.
+   */
+  stale?: StaleChange[] | undefined
 }
 
 // --- Reading stored proposals -------------------------------------------------------------------
@@ -525,9 +531,14 @@ export interface Inbox {
 export async function loadInbox(project: Project): Promise<Inbox> {
   const register = await loadRegister(registerDirOf(project))
   const { proposals: stored, unreadable } = await readStoredProposals(project)
-  const views = stored.map(({ data }) =>
-    data.source === 'claude-design' ? handoffView(data, register) : surfaceView(data),
-  )
+  const views = stored.map(({ data, raw }) => {
+    if (data.source === 'claude-design') return handoffView(data, register)
+    const view = surfaceView(data)
+    if (view.decision) return view
+    const stale = staleChanges(raw as Parameters<typeof staleChanges>[0], register)
+    // Never in the "adopt in one go" group: a person sees why it cannot be adopted any more.
+    return stale.length > 0 ? { ...view, stale, group: 'needsYou' as const } : view
+  })
   const derived = await fromHardValues(project, register, 5).catch(() => [] as ProposalView[])
   const time = (p: ProposalView) => (p.decision?.at ?? p.createdAt ?? '').toString()
   // Open decisions go from quick to weighty, so the first one the inbox opens is a quick one.
@@ -709,7 +720,10 @@ export function decisionCopyOf(
   p: ProposalView,
   /** Tokens that follow a single changed token (its aliases), named in the adopt consequence. */
   aliases: string[] = [],
+  /** Whether Accord writes CSS for this project (`surfaces.code.outputs`): only then the sentences name it. */
+  css = true,
 ): DecisionCopy {
+  const writes = css ? 'css' : 'none'
   const tool = selectArg(p.tool)
   const reject: Message = { key: 'actions.reject' }
   if (p.kind === 'handoff') {
@@ -743,7 +757,7 @@ export function decisionCopyOf(
       effect: {
         adopt:
           removed.length === p.changes.length
-            ? { key: 'effectShort.adoptDeletion', values: { tokens } }
+            ? { key: 'effectShort.adoptDeletion', values: { tokens, writes } }
             : { key: 'effectShort.adoptWithDeletion', values: { tokens, tool } },
         reset: { key: 'effectShort.keepDeleted', values: { tokens, tool } },
         reject: rejectEffect,
@@ -770,6 +784,7 @@ export function decisionCopyOf(
             token,
             after: after ?? '',
             aliases: aliases.length > 0 ? plural(aliases.slice(0, 2)) : 'none',
+            writes,
           },
         },
         reset: { key: 'effectShort.reset', values: { token, before: before ?? '', tool } },
@@ -785,7 +800,10 @@ export function decisionCopyOf(
         reject,
       },
       effect: {
-        adopt: { key: 'effectShort.adoptNew', values: { token: single.token, after: single.after ?? '' } },
+        adopt: {
+          key: 'effectShort.adoptNew',
+          values: { token: single.token, after: single.after ?? '', writes },
+        },
         reset: { key: 'effectShort.leaveOut', values: { token: single.token, tool } },
         reject: rejectEffect,
       },
@@ -797,7 +815,7 @@ export function decisionCopyOf(
       reject,
     },
     effect: {
-      adopt: { key: 'effectShort.adoptMany', values: { count: p.changes.length } },
+      adopt: { key: 'effectShort.adoptMany', values: { count: p.changes.length, writes } },
       reset: { key: 'effectShort.resetMany', values: { tool } },
       reject: rejectEffect,
     },

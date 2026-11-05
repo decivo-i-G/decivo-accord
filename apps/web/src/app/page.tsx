@@ -15,6 +15,7 @@ import { lastChangeOf, type PaletteColour, paletteOf } from '@/lib/home'
 import { loadOverview, type ProjectOverview } from '@/lib/overview-load'
 import { loadRegisterOnce } from '@/lib/page-meta'
 import { listProjects, type Project, registerDirOf } from '@/lib/projects'
+import { type RegisterState, registerState } from '@/lib/register-state'
 import { visibleTokens } from '@/lib/register-view'
 import { projectHref } from '@/lib/routes'
 
@@ -40,18 +41,22 @@ interface Row {
   palette: PaletteColour[]
   /** The register's size, so two projects are told apart at a glance (111 tokens vs 9). */
   size?: { tokens: number; components: number } | undefined
+  /** No register yet, or one Accord cannot read: the row says so instead of an overview. */
+  register: RegisterState['state']
 }
 
 /** The usual default branches: the row names a branch only when it is another one. */
 const DEFAULT_BRANCHES = new Set(['main', 'master'])
 
 async function rowOf(project: Project): Promise<Row> {
-  const [data, register] = await Promise.all([
+  const [data, register, state] = await Promise.all([
     loadOverview(project),
     loadRegisterOnce(registerDirOf(project)).catch(() => undefined),
+    registerState(project),
   ])
   return {
     project,
+    register: state.state,
     data,
     palette: register ? paletteOf(register) : [],
     size: register
@@ -118,6 +123,8 @@ function ProjectRow({
   // Code in folders Accord does not look in: the row only leads to the overview, which offers the
   // one click next to the sentence that says what it changes. The list itself never writes config.
   const href = step.kind === 'connect' && data.missed ? projectHref(project.slug) : step.href
+  // Without a readable register the row only opens the project, which says what to do.
+  const ready = Boolean(data.overview) && row.register === 'ok'
   return (
     <li className={styles.row}>
       <div className={styles.who}>
@@ -145,25 +152,37 @@ function ProjectRow({
       </div>
 
       <div className={styles.state}>
-        <p className={styles.sentence}>{overviewSentence(data, to, tc)}</p>
-        <SurfacesLine data={data} t={t} th={th} format={format} />
-        {!data.overview && (
-          <div className={styles.raised}>
-            <p className={styles.muted}>{to('brokenHint')}</p>
-            <CommandLine command="accord init" label={to('step.copy')} />
-          </div>
+        {row.register === 'none' ? (
+          <>
+            <p className={styles.sentence}>{t('noRegister')}</p>
+            <div className={styles.raised}>
+              <p className={styles.muted}>{t('noRegisterHint')}</p>
+              <CommandLine command="accord init --dry-run" label={to('step.copy')} />
+            </div>
+          </>
+        ) : row.register === 'broken' || !data.overview ? (
+          <>
+            <p className={styles.sentence}>{t('broken')}</p>
+            <div className={styles.raised}>
+              <p className={styles.muted}>{t('brokenHint')}</p>
+              <CommandLine command="accord diff" label={to('step.copy')} />
+            </div>
+          </>
+        ) : (
+          <>
+            <p className={styles.sentence}>{overviewSentence(data, to, tc)}</p>
+            <SurfacesLine data={data} t={t} th={th} format={format} />
+          </>
         )}
       </div>
 
-      {data.overview && (
-        <div className={styles.side}>
-          <Link href={href} className={styles.go}>
-            {t(`go.${step.kind}`)}
-            <span className="visually-hidden">{` (${project.name})`}</span>
-            <ArrowRight aria-hidden="true" />
-          </Link>
-        </div>
-      )}
+      <div className={styles.side}>
+        <Link href={ready ? href : projectHref(project.slug)} className={styles.go}>
+          {ready ? <>{t(`go.${step.kind}`)}</> : t('go.open')}
+          <span className="visually-hidden">{` (${project.name})`}</span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+      </div>
     </li>
   )
 }
