@@ -738,6 +738,8 @@
       "must_violation": "Adopting would break a rule: {detail}",
       "needs_confirmation": "Please confirm the deletion or breaking change.",
       "needs_names": "Give at least one colour a token name.",
+      "stale": "The proposal is out of date: the register changed since ({detail}). Make a new one from the current state (figma propose, pen propose).",
+      "dirty": "The register has uncommitted changes: {detail}",
       "invalid_input": "The input is incomplete: {detail}",
       "unknown": "That did not work. Please try again."
     },

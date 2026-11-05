@@ -30,6 +30,8 @@ export type DecideErrorCode =
   | 'invalid_value'
   | 'invalid_edit'
   | 'must_violation'
+  | 'stale'
+  | 'dirty'
   | 'needs_confirmation'
   | 'needs_names'
   | 'invalid_input'

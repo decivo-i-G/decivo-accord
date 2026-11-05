@@ -241,6 +241,7 @@ const de = {
   'help.apply.by': 'wer entscheidet (Standard: git user.name)',
   'help.apply.note': 'Notiz zur Entscheidung (steht im CHANGELOG)',
   'apply.removed': '{path}: gelöscht (war {before})',
+  'apply.renamed': '{path} → {to}: umbenannt ({value})',
   'apply.registerUnchanged': 'Das Register bleibt unverändert.',
   'apply.output': 'erzeugt: {path}',
   'apply.dryRun': 'Probelauf, nichts geschrieben.',
@@ -255,6 +256,10 @@ const de = {
   'apply.error.must_violation':
     'Die Übernahme verletzt eine Muss-Regel und wird nicht geschrieben: {detail}. Eine Regel ändert sich nur über einen eigenen Vorschlag.',
   'apply.error.invalid_resolution': 'Die Entscheidung ist ungültig: {detail}',
+  'apply.error.stale':
+    'Der Vorschlag ist veraltet, das Register hat sich seitdem geändert ({detail}). Mach einen neuen aus dem aktuellen Stand (figma propose, pen propose).',
+  'apply.error.dirty':
+    'Nicht committete Änderungen im Register landeten sonst im Commit der Entscheidung: {detail}. Bitte erst committen oder stashen.',
   'help.accord':
     'decivo Accord – das Register für Design-Entscheidungen, gegen das Menschen und Agenten prüfen',
   'help.version': 'Version anzeigen',
@@ -557,6 +562,7 @@ const en: Record<MessageKey, string> = {
   'help.apply.by': 'who decides (default: git user.name)',
   'help.apply.note': 'note on the decision (goes into the CHANGELOG)',
   'apply.removed': '{path}: removed (was {before})',
+  'apply.renamed': '{path} → {to}: renamed ({value})',
   'apply.registerUnchanged': 'The register stays unchanged.',
   'apply.output': 'generated: {path}',
   'apply.dryRun': 'Dry run, nothing written.',
@@ -571,6 +577,10 @@ const en: Record<MessageKey, string> = {
   'apply.error.must_violation':
     'Adopting breaks a must rule and is not written: {detail}. A rule only changes through its own proposal.',
   'apply.error.invalid_resolution': 'The decision is invalid: {detail}',
+  'apply.error.stale':
+    'The proposal is out of date; the register changed since ({detail}). Make a new one from the current state (figma propose, pen propose).',
+  'apply.error.dirty':
+    "Uncommitted changes in the register would end up in the decision's commit: {detail}. Commit or stash them first.",
   'help.accord': 'decivo Accord – the register for design decisions that people and agents check against',
   'help.version': 'show the version',
   'help.help': 'show help',

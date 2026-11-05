@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { cssToTokenValue } from '@decivo/accord-adapter-code'
 import { type Evaluation, evaluate } from '@decivo/accord-checks'
 import {
@@ -12,10 +12,16 @@ import {
   cssToColor,
   type EditResult,
   formatValue,
+  LOCK_FILE,
+  lockedSnapshot,
+  parseLock,
   type Register,
+  serializeLock,
   TOKEN_TYPES,
   type TokenEdit,
   type TokenType,
+  tokensInContext,
+  withLockedSnapshot,
 } from '@decivo/accord-core'
 import { readValidRegister } from '@decivo/accord-core/node'
 import { type PlannedOutput, planExport } from '@decivo/accord-generators'
@@ -88,7 +94,14 @@ export type ProposalResolution = Omit<Resolution, 'schema' | 'proposal'>
 
 export class ApplyError extends Error {
   constructor(
-    readonly code: 'not_found' | 'already_resolved' | 'invalid_value' | 'invalid_edit' | 'must_violation',
+    readonly code:
+      | 'not_found'
+      | 'already_resolved'
+      | 'invalid_value'
+      | 'invalid_edit'
+      | 'must_violation'
+      | 'stale'
+      | 'dirty',
     message: string,
   ) {
     super(message)
@@ -109,12 +122,32 @@ export interface ApplyPlan {
   outputs: PlannedOutput[]
   /** The proposal file with its resolution. */
   proposalContent: string
+  /**
+   * `surfaces.lock.json` with the adopted values recorded for the proposal's surface (Figma, Pencil): the
+   * tool and the register agree on them now, so the next change there is the tool's own, not a conflict.
+   */
+  lockFile?: { path: string; content: string } | undefined
 }
 
 const posix = (path: string) => path.split('\\').join('/')
 
 /** Turn the resolution's items into token edits; values are stored the way the register stores them. */
-function toEdits(resolution: Resolution, register: Register): TokenEdit[] {
+function toEdits(
+  resolution: Resolution,
+  register: Register,
+  /** The tool's name for a new token's variable (Figma, Pencil), to keep its link after a rename. */
+  variable?: { source: string; of: (token: string) => string | undefined },
+): TokenEdit[] {
+  // A removed token and a new one with the same type and value are a rename (Figma renamed the variable):
+  // the new token keeps the old one's description and links (CSS variable, Figma id) instead of losing them.
+  const removed = resolution.items
+    .filter((i) => i.kind === 'remove' && (i.context === undefined || i.context === register.modes?.default))
+    .map((i) => register.tokens.get(i.token))
+    .filter((t): t is NonNullable<typeof t> => t !== undefined && t.value !== undefined)
+  const renamedFrom = (type: TokenType, css: string) => {
+    const match = removed.filter((t) => t.type === type && show(t.type, t.value) === css)
+    return match.length === 1 ? match[0] : undefined
+  }
   return resolution.items.map((item): TokenEdit => {
     if (item.kind === 'remove' && item.context !== undefined && item.context !== register.modes?.default)
       return { kind: 'unset', path: item.token, context: item.context }
@@ -128,9 +161,42 @@ function toEdits(resolution: Resolution, register: Register): TokenEdit[] {
         'invalid_value',
         `${item.token}: "${css}" is not ${type === 'color' ? 'a colour' : `a ${type} value`}`,
       )
+    const aliasOf =
+      item.kind === 'change' && !item.context ? register.tokens.get(item.token)?.aliasOf : undefined
+    if (aliasOf !== undefined) {
+      // An alias gets no value of its own: it points at the one token that holds the new value.
+      const holders = [...register.tokens.values()].filter(
+        (t) =>
+          t.aliasOf === undefined &&
+          t.type === type &&
+          t.value !== undefined &&
+          show(t.type, t.value) === show(type, value),
+      )
+      if (holders.length !== 1)
+        throw new ApplyError(
+          'invalid_edit',
+          `${item.token} points to ${aliasOf}; ${holders.length === 0 ? `no token in the register is ${css}` : `${holders.map((h) => h.path).join(', ')} are all ${css}`}. Change ${aliasOf}, or point ${item.token} at one token by hand.`,
+        )
+      return { kind: 'retarget', path: item.token, to: (holders[0] as { path: string }).path }
+    }
     return item.kind === 'change'
       ? { kind: 'set', path: item.token, value, ...(item.context ? { context: item.context } : {}) }
-      : { kind: 'add', path: item.token, type, value, description: item.description }
+      : (() => {
+          const from = renamedFrom(type, show(type, value))
+          const name = variable?.of(item.token)
+          const extensions = from?.extensions ? structuredClone(from.extensions) : undefined
+          const ids = (extensions?.['de.decivo.accord'] as { ids?: Record<string, string> } | undefined)?.ids
+          // The renamed variable is the tool's link now; the CSS variable keeps its name.
+          if (ids && name && variable && variable.source in ids) ids[variable.source] = name
+          return {
+            kind: 'add',
+            path: item.token,
+            type,
+            value,
+            description: item.description ?? from?.description,
+            extensions,
+          }
+        })()
   })
 }
 
@@ -168,6 +234,72 @@ export function resolutionFor(
   })
 }
 
+/** The surface's lock after an adoption: the adopted values are what the tool and the register share now. */
+async function lockAfterAdopt(
+  proposal: ApplyPlan['proposal'],
+  resolution: Resolution,
+  register: Register,
+  registerDir: string,
+  root: string,
+): Promise<ApplyPlan['lockFile']> {
+  const surface = proposal.source === 'figma' || proposal.source === 'pen' ? proposal.source : undefined
+  if (!surface || resolution.option !== 'adopt') return undefined
+  const path = join(registerDir, LOCK_FILE)
+  const raw = await readFile(path, 'utf8').catch(() => undefined)
+  if (raw === undefined) return undefined
+  const lock = parseLock(raw)
+  const snapshot = lockedSnapshot(lock, surface)
+  if (!snapshot) return undefined
+  const modifier = register.modes?.modifier
+  for (const item of resolution.items) {
+    const own = item.context !== undefined && item.context !== register.modes?.default
+    const key = own && modifier ? `${modifier}=${item.context}` : undefined
+    let tokens = snapshot.tokens
+    if (key) {
+      snapshot.contexts ??= new Map()
+      tokens = snapshot.contexts.get(key) ?? new Map()
+      snapshot.contexts.set(key, tokens)
+    }
+    if (item.kind === 'remove') {
+      tokens.delete(item.token)
+      continue
+    }
+    const type: TokenType =
+      item.kind === 'change' ? (register.tokens.get(item.token)?.type ?? 'color') : (item.type ?? 'color')
+    const css = item.value as string
+    const value = type === 'color' ? cssToColor(css) : cssToTokenValue(type, css)
+    if (value !== undefined) tokens.set(item.token, { type, value })
+  }
+  const at = lock.surfaces[surface]?.synced_at
+  const next = withLockedSnapshot(lock, surface, snapshot, at ? new Date(at) : new Date())
+  return { path: posix(relative(root, path)), content: serializeLock(next) }
+}
+
+/**
+ * A proposal was made against the register as it was then. If a token it changes has moved on since
+ * (another decision, a hand edit), adopting it would silently undo that: the proposal is outdated and a
+ * new one has to be made from the current state (`figma propose`, `pen propose`).
+ */
+export function assertCurrent(proposal: ApplyPlan['proposal'], register: Register): void {
+  const changes = 'changes' in proposal ? proposal.changes : []
+  const stale: string[] = []
+  for (const c of changes) {
+    const token = tokensInContext(register, c.context).get(c.token)
+    const where = `${c.token}${c.context ? ` (${c.context})` : ''}`
+    if (c.kind === 'new') {
+      if (token) stale.push(`${where} exists now`)
+      continue
+    }
+    if (!token) {
+      stale.push(`${where} is no longer in the register`)
+      continue
+    }
+    const now = token.value === undefined ? undefined : show(token.type, token.value)
+    if (c.before !== undefined && now !== c.before) stale.push(`${where} is ${now} now, not ${c.before}`)
+  }
+  if (stale.length > 0) throw new ApplyError('stale', stale.join('; '))
+}
+
 /**
  * Everything `accord apply` would change, without changing it. Refuses an unknown or already decided
  * proposal, and an adoption that breaks a `must` rule: a person may decide a breaking change or a new
@@ -191,12 +323,20 @@ export async function planApply(input: {
     )
 
   const { files, register } = await readValidRegister(input.registerDir)
+  if (resolution.option === 'adopt') assertCurrent(proposal, register)
 
   let edited: EditResult = { files: [], register, ops: [] }
   let evaluation: Evaluation | undefined
   if (resolution.option === 'adopt') {
     try {
-      edited = applyTokenEdits(files, register, toEdits(resolution, register))
+      const variable =
+        'changes' in proposal
+          ? {
+              source: proposal.source,
+              of: (token: string) => proposal.changes.find((c) => c.token === token)?.variable,
+            }
+          : undefined
+      edited = applyTokenEdits(files, register, toEdits(resolution, register, variable))
     } catch (error) {
       if (error instanceof ApplyError) throw error
       throw new ApplyError('invalid_edit', (error as Error).message)
@@ -241,9 +381,12 @@ export async function planApply(input: {
     })
   ).filter((o) => o.changed)
 
+  const lockFile = await lockAfterAdopt(proposal, resolution, register, input.registerDir, root)
+
   return {
     proposal,
     resolution,
+    lockFile,
     proposalFile: posix(relative(root, proposalPath)),
     tokenFiles: edited.files.map((f) => ({ path: `${registerRel}/${f.path}`, content: f.content })),
     ops: edited.ops,
@@ -264,6 +407,8 @@ export interface ChangeLine {
   before?: string | undefined
   /** Value after, absent for a removed token. */
   after?: string | undefined
+  /** New path of a renamed token (without `tokens.`). */
+  to?: string | undefined
 }
 
 const show = (type: Parameters<typeof formatValue>[0], value: unknown) =>
@@ -287,6 +432,18 @@ export function changeLines(ops: readonly ChangeOp[]): ChangeLine[] {
       return [{ path, before: show(op.type, op.before), after: show(op.type, op.after) }]
     if (op.kind === 'token.added') return [{ path, after: show(op.after.type, op.after.value) }]
     if (op.kind === 'token.removed') return [{ path, before: show(op.before.type, op.before.value) }]
+    if (op.kind === 'token.alias_changed')
+      return [
+        {
+          path,
+          before: op.before ? `{${op.before}}` : '(value)',
+          after: op.after ? `{${op.after}}` : '(value)',
+        },
+      ]
+    if (op.kind === 'token.renamed') {
+      const value = show(op.token.type, op.token.value)
+      return [{ path, to: op.to.replace(/^tokens\./, ''), before: value, after: value }]
+    }
     return []
   })
 }
@@ -301,14 +458,30 @@ export async function writeApply(
 ): Promise<{ files: string[]; branch?: string | undefined }> {
   const root = resolve(input.root)
   const branch = input.branch ? `accord/apply-${plan.proposal.id.toLowerCase()}` : undefined
-  if (branch) await git(root, ['checkout', '-b', branch])
+  if (branch) {
+    // The commit says "decided by …": it may only hold that decision. The plan was made from the register
+    // in the working tree, so uncommitted edits there would ride along unreviewed (and show up in the
+    // generated files). Proposals and generated files are fine: they are written from the plan anyway.
+    const registerRel = posix(dirname(dirname(plan.proposalFile)))
+    const own = (path: string) =>
+      path.startsWith(`${registerRel}/proposals/`) || path.startsWith(`${registerRel}/generated/`)
+    const inRepo = !registerRel.startsWith('..') && !isAbsolute(registerRel)
+    const dirty = (
+      inRepo ? await git(root, ['status', '--porcelain', '--untracked-files=all', '--', registerRel]) : ''
+    )
+      .split('\n')
+      .filter((line) => line.trim() && !own(line.slice(3)))
+    if (dirty.length > 0) throw new ApplyError('dirty', dirty.map((l) => l.slice(3)).join(', '))
+    await git(root, ['checkout', '-b', branch])
+  }
 
-  const writes = [
+  const own = [
     ...plan.tokenFiles,
-    ...plan.outputs.map((o) => ({ path: o.path, content: o.content })),
     { path: plan.proposalFile, content: plan.proposalContent },
+    ...(plan.lockFile ? [plan.lockFile] : []),
   ]
-  for (const file of [...plan.tokenFiles, { path: plan.proposalFile, content: plan.proposalContent }]) {
+  const writes = [...own, ...plan.outputs.map((o) => ({ path: o.path, content: o.content }))]
+  for (const file of own) {
     await mkdir(dirname(join(root, file.path)), { recursive: true })
     await writeFile(join(root, file.path), file.content)
   }
@@ -320,9 +493,10 @@ export async function writeApply(
     const subject = `accord: ${r.option} ${plan.proposal.id} – decided by ${r.by}${r.ref ? ` (${r.ref})` : ''}`
     const body = [
       ...(r.note ? [r.note, ''] : []),
-      ...changeLines(plan.ops).map(
-        (c) =>
-          `${c.path}${c.context ? ` (${c.context})` : ''}: ${c.before ?? '(new)'} -> ${c.unset ? '(own value removed)' : (c.after ?? '(removed)')}`,
+      ...changeLines(plan.ops).map((c) =>
+        c.to
+          ? `${c.path} -> ${c.to} (renamed, ${c.after})`
+          : `${c.path}${c.context ? ` (${c.context})` : ''}: ${c.before ?? '(new)'} -> ${c.unset ? '(own value removed)' : (c.after ?? '(removed)')}`,
       ),
     ].join('\n')
     await git(root, ['add', '--', ...paths])

@@ -206,7 +206,8 @@ export function DecisionProvider({ children, ...props }: DecisionSetup & { child
           gate.current.fail()
           setPending(undefined)
           show({ message: t(`error.${result.code}`, { detail: result.detail ?? '' }), tone: 'danger' })
-          if (result.code === 'not_found' || result.code === 'already_resolved') router.refresh()
+          if (result.code === 'not_found' || result.code === 'already_resolved' || result.code === 'stale')
+            router.refresh()
           return
         }
         // Written. The buttons stay busy and the row fades out until the next proposal is here.
