@@ -19,6 +19,7 @@ import { explainError } from './errors.js'
 import type { InitSource } from './init.js'
 import { detectLang, translator } from './messages.js'
 import { accordVersion } from './report-payload.js'
+import { uiCommand } from './ui.js'
 
 const t = translator(detectLang())
 const print = (text: string) => process.stdout.write(`${text}\n`)
@@ -195,5 +196,17 @@ program
   .description(t('help.explainOwner'))
   .argument('<path>', t('help.explainOwner.path'))
   .action((path: string) => run(() => explainOwnerCommand({ ...common(), path }, print))())
+
+program
+  .command('ui')
+  .description(t('help.ui'))
+  .argument('[folders...]', t('help.ui.folders'))
+  .option('--port <n>', t('help.ui.port'), (v) => Number.parseInt(v, 10))
+  .option('--no-open', t('help.ui.noOpen'))
+  .action((folders: string[], o: { port?: number; open: boolean }) =>
+    run(() =>
+      uiCommand({ root: common().root, folders, port: o.port, open: o.open }, accordVersion(), t, print),
+    )(),
+  )
 
 await program.parseAsync()

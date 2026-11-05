@@ -11,7 +11,8 @@
       "!**/drizzle/meta",
       "!**/.accord",
       "!apps/web/src/app/tokens.css",
-      "!**/next-env.d.ts"
+      "!**/next-env.d.ts",
+      "!packages/ui/app"
     ]
   },
   "formatter": {
