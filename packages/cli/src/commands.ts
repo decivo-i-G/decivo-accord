@@ -616,13 +616,15 @@ export async function applyCommand(
       const path = c.context ? `${c.path} (${c.context})` : c.path
       print(
         `  ${
-          c.unset
-            ? t('apply.unset', { path, before: c.before ?? '' })
-            : c.before === undefined
-              ? t('apply.added', { path, after: c.after ?? '' })
-              : c.after === undefined
-                ? t('apply.removed', { path, before: c.before })
-                : t('apply.changed', { path, before: c.before, after: c.after })
+          c.to
+            ? t('apply.renamed', { path, to: c.to, value: c.after ?? '' })
+            : c.unset
+              ? t('apply.unset', { path, before: c.before ?? '' })
+              : c.before === undefined
+                ? t('apply.added', { path, after: c.after ?? '' })
+                : c.after === undefined
+                  ? t('apply.removed', { path, before: c.before })
+                  : t('apply.changed', { path, before: c.before, after: c.after })
         }`,
       )
     }
@@ -632,11 +634,18 @@ export async function applyCommand(
     if (!opts.json) print(t('apply.dryRun'))
     return 0
   }
-  const written = await writeApply(plan, {
-    root: opts.root,
-    branch: opts.branch || opts.push,
-    push: opts.push,
-  })
+  let written: Awaited<ReturnType<typeof writeApply>>
+  try {
+    written = await writeApply(plan, {
+      root: opts.root,
+      branch: opts.branch || opts.push,
+      push: opts.push,
+    })
+  } catch (error) {
+    if (!(error instanceof ApplyError)) throw error
+    print(t(`apply.error.${error.code}`, { detail: error.message }))
+    return 1
+  }
   if (!opts.json) {
     print(t('apply.written', { count: written.files.length }))
     if (written.branch) print(t(opts.push ? 'apply.pushed' : 'apply.branch', { branch: written.branch }))

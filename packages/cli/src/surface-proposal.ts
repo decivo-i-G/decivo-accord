@@ -209,6 +209,20 @@ export async function proposeFromSurface(input: {
     grouped.set(key, entry)
   }
 
+  // A change on an alias in the default context means pointing it elsewhere: the register's structure, not a
+  // value the tool owns. Never automatic, even when the evaluation found nothing else.
+  const repointed = changes.filter(
+    (c) => c.kind === 'change' && !c.context && register.tokens.get(c.token)?.aliasOf !== undefined,
+  )
+  let route = evaluation.route
+  let decider = evaluation.decider
+  const reasons = evaluation.reasons.map((r) => ({ code: r.code, at: r.at }))
+  if (repointed.length > 0 && route === 'auto') {
+    route = 'owner'
+    decider = 'register'
+    reasons.unshift(...repointed.map((c) => ({ code: 'register_owned' as const, at: `tokens.${c.token}` })))
+  }
+
   const now = input.now ?? new Date()
   // The same changes give the same id, so proposing twice does not pile up proposals.
   const hash = createHash('sha256').update(JSON.stringify(changes)).digest('hex').slice(0, 8)
@@ -216,9 +230,9 @@ export async function proposeFromSurface(input: {
     id: `P-${now.toISOString().slice(0, 10).replaceAll('-', '')}-${source}-${hash}`,
     source,
     createdAt: now.toISOString(),
-    route: evaluation.route,
-    decider: evaluation.decider,
-    reasons: evaluation.reasons.map((r) => ({ code: r.code, at: r.at })),
+    route,
+    decider,
+    reasons: reasons.filter((r) => r.code !== 'safe' || route === 'auto'),
     changes,
     violations: [...grouped.values()],
   }

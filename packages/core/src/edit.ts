@@ -33,10 +33,14 @@ export type TokenEdit =
       type: TokenType
       value: unknown
       description?: string | undefined
+      /** `$extensions` to keep, e.g. a renamed token's links to its CSS variable and Figma variable. */
+      extensions?: Record<string, unknown> | undefined
       file?: string | undefined
     }
   /** Delete a token. Always a person's decision; refused while other tokens point to it. */
   | { kind: 'remove'; path: string }
+  /** Point an alias at another token of the same type (`{color.brand}` → `{blue.700}`). */
+  | { kind: 'retarget'; path: string; to: string }
 
 export interface EditResult {
   /** Register files whose content changed, with the new content. */
@@ -227,6 +231,23 @@ export function applyTokenEdits(
       }
       continue
     }
+    if (edit.kind === 'retarget') {
+      const token = register.tokens.get(edit.path)
+      const target = register.tokens.get(edit.to)
+      if (!token) throw new EditError(`token ${edit.path} does not exist`, edit.path)
+      if (token.aliasOf === undefined) throw new EditError(`token ${edit.path} is not an alias`, edit.path)
+      if (token.inheritedFrom !== undefined)
+        throw new EditError(`token ${edit.path} is inherited from ${token.inheritedFrom}`, edit.path)
+      if (!target || target.type !== token.type)
+        throw new EditError(`${edit.to} is no ${token.type} token to point ${edit.path} at`, edit.path)
+      const current = text(token.file, edit.path)
+      const at = [...splitPath(edit.path), '$value']
+      texts.set(
+        token.file,
+        applyEdits(current, modify(current, at, `{${edit.to}}`, { formattingOptions: formatting(current) })),
+      )
+      continue
+    }
     if (edit.kind === 'set') {
       const token = register.tokens.get(edit.path)
       if (!token) throw new EditError(`token ${edit.path} does not exist`, edit.path)
@@ -263,6 +284,8 @@ export function applyTokenEdits(
     if (inheritedType(register, segs.slice(0, -1)) !== edit.type) token.$type = edit.type
     token.$value = edit.value
     if (edit.description !== undefined) token.$description = edit.description
+    if (edit.extensions !== undefined && Object.keys(edit.extensions).length > 0)
+      token.$extensions = edit.extensions
     texts.set(
       file,
       applyEdits(current, modify(current, segs, token, { formattingOptions: formatting(current) })),

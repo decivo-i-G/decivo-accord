@@ -738,6 +738,8 @@
       "must_violation": "Übernehmen würde eine Regel verletzen: {detail}",
       "needs_confirmation": "Bitte bestätige die Löschung oder den Breaking Change.",
       "needs_names": "Gib mindestens einer Farbe einen Token-Namen.",
+      "stale": "Der Vorschlag ist veraltet: Das Register hat sich seitdem geändert ({detail}). Mach einen neuen aus dem aktuellen Stand (figma propose, pen propose).",
+      "dirty": "Im Register gibt es nicht committete Änderungen: {detail}",
       "invalid_input": "Die Eingabe ist unvollständig: {detail}",
       "unknown": "Das hat nicht geklappt. Versuch es noch einmal."
     },
