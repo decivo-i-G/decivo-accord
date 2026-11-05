@@ -29,6 +29,9 @@ import styles from './proposals.module.css'
 import { Swatch } from './swatch'
 import { useToast } from './toast'
 
+/** Separator in Accord's rule details ("D-003 \u2013 Text"); written as an escape, the interface shows none. */
+const EN_DASH = ' \u2013 '
+
 interface DecisionSetup {
   project: string
   id: string
@@ -567,9 +570,9 @@ export function DecisionButtons() {
     ? d.adoptBlockedBy === 'stale'
       ? t('actions.blockedStale')
       : t('actions.blocked', {
-          // The rules by their name, as the sentence names rules ("tokens.x: D-003 – Text …" → "Text …").
+          // The rules by their name, as sentences name rules: Accord's detail is "tokens.x: D-003 <en dash> Text".
           rules:
-            [...new Set(d.adoptBlocked.split('; ').map((part) => part.split(' – ').slice(1).join(' – ')))]
+            [...new Set(d.adoptBlocked.split('; ').map((part) => part.split(EN_DASH).slice(1).join(EN_DASH)))]
               .filter(Boolean)
               .map((rule) => t('actions.ruleName', { rule }))
               .join(', ') || d.adoptBlocked,
