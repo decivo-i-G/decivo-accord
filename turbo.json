@@ -8,6 +8,10 @@
     "typecheck": {},
     "test": {
       "outputs": []
+    },
+    "@decivo/accord-ui#build": {
+      "dependsOn": ["^build", "@decivo/accord-web#build"],
+      "outputs": ["dist/**", "app/**"]
     }
   }
 }

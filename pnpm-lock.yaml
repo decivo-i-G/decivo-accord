@@ -288,6 +288,33 @@ importers:
         specifier: 4.0.3
         version: 4.0.3
 
+  packages/ui:
+    dependencies:
+      '@decivo/accord-adapter-claude-design':
+        specifier: workspace:*
+        version: link:../adapters/claude-design
+      '@decivo/accord-adapter-code':
+        specifier: workspace:*
+        version: link:../adapters/code
+      '@decivo/accord-adapter-figma':
+        specifier: workspace:*
+        version: link:../adapters/figma
+      '@decivo/accord-adapter-pen':
+        specifier: workspace:*
+        version: link:../adapters/pen
+      '@decivo/accord-checks':
+        specifier: workspace:*
+        version: link:../checks
+      '@decivo/accord-cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@decivo/accord-core':
+        specifier: workspace:*
+        version: link:../core
+      '@decivo/accord-generators':
+        specifier: workspace:*
+        version: link:../generators
+
 packages:
 
   '@anthropic-ai/sdk@0.133.0':

@@ -15,6 +15,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
+import http from 'node:http'
 import { tmpdir } from 'node:os'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -38,7 +39,8 @@ const FORBIDDEN = [
     what: 'a credential',
   },
 ]
-const ALLOWED_FILE = /^package\/(package\.json|README(\.de)?\.md|LICENSE|CHANGELOG\.md|dist\/.+)$/
+// app/: the bundled web app of @decivo/accord-ui (server build and its runtime packages).
+const ALLOWED_FILE = /^package\/(package\.json|README(\.de)?\.md|LICENSE|CHANGELOG\.md|dist\/.+|app\/.+)$/
 
 section('1. Packages')
 const workspaces = ['packages', 'packages/adapters']
@@ -111,14 +113,18 @@ for (const p of packages) {
   for (const f of files) {
     size += statSync(f).size
     const text = readFileSync(f, 'utf8')
+    // Third-party runtime code bundled by @decivo/accord-ui is checked for credentials only: its comments
+    // say "keep in mind" and show example paths, which is not ours to change.
+    const vendored = relative(extract, f).startsWith('package/app/node_modules/')
     for (const { re, what } of FORBIDDEN) {
+      if (vendored && what !== 'a credential') continue
       const m = text.match(re)
       if (m && !/^mind(est|\.)/i.test(text.slice(m.index, m.index + 7)))
         fail(
           `${p.json.name}: ${what} in ${relative(extract, f)}: "${text.slice(Math.max(0, m.index - 30), m.index + 40).replace(/\s+/g, ' ')}"`,
         )
     }
-    if (!f.endsWith('.js')) continue
+    if (!f.endsWith('.js') || !relative(extract, f).startsWith('package/dist/')) continue
     for (const m of text.matchAll(/(?:from\s+|import\s*\(\s*|import\s+)['"]([^'"./][^'"]*)['"]/g)) {
       const spec = m[1]
       if (spec.startsWith('node:')) continue
@@ -162,9 +168,26 @@ const offline = {
 writeFileSync(
   join(work, 'no-network.mjs'),
   `import net from 'node:net'
+// Loopback stays open: accord ui talks to its own server on 127.0.0.1.
+const local = (h) => h === undefined || h === '127.0.0.1' || h === 'localhost' || h === '::1'
 const block = () => { throw new Error('release-check: network access attempted') }
-net.Socket.prototype.connect = block
-globalThis.fetch = async () => block()
+const connect = net.Socket.prototype.connect
+net.Socket.prototype.connect = function (...args) {
+  const o = args[0]
+  const opts = Array.isArray(o) ? o[0] : o
+  const host =
+    typeof opts === 'object' && opts !== null ? (opts.path ? undefined : opts.host)
+    : typeof opts === 'number' ? (typeof args[1] === 'string' ? args[1] : undefined)
+    : undefined // a socket path
+  if (!local(host)) block()
+  return connect.apply(this, args)
+}
+const realFetch = globalThis.fetch
+globalThis.fetch = async (input, init) => {
+  const url = new URL(typeof input === 'string' || input instanceof URL ? input : input.url)
+  if (!local(url.hostname.replace(/^\\[|\\]$/g, ''))) block()
+  return realFetch(input, init)
+}
 `,
 )
 const bin = join(app, 'node_modules', '.bin')
@@ -243,7 +266,67 @@ if (existsSync(join(bin, 'accord-mcp'))) {
   else ok(`accord-mcp lists ${tools.join(', ')}`)
 } else fail('no accord-mcp binary after install')
 
-section('6. Public repository files')
+section('6. accord ui without network')
+if (existsSync(join(bin, 'accord-ui'))) {
+  const project = join(work, 'examples', 'demo', 'project')
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const child = spawn(join(bin, 'accord-ui'), [project, '--no-open', '--port', '4399'], { env: offline })
+      let out = ''
+      const timer = setTimeout(() => {
+        child.kill()
+        reject(new Error(`no address within 30 s: ${out}`))
+      }, 30000)
+      const onData = async (d) => {
+        out += d
+        const url = out.match(/http:\/\/127\.0\.0\.1:4399\S+/)?.[0]
+        if (!url) return
+        clearTimeout(timer)
+        child.stdout.off('data', onData)
+        try {
+          const bare = url.replace(/\?t=.*/, '')
+          const without = (await fetch(bare, { redirect: 'manual' })).status
+          const opened = await fetch(url, { redirect: 'manual' })
+          const cookie = (opened.headers.get('set-cookie') ?? '').split(';')[0]
+          const page = await fetch(bare, { headers: { cookie } })
+          const html = await page.text()
+          const decisions = (await fetch(`${bare}/decisions`, { headers: { cookie } })).status
+          // fetch sets Host from the address, so a foreign Host (DNS rebinding) needs node:http.
+          const foreign = await new Promise((done) =>
+            http
+              .get(bare, { headers: { cookie, host: 'evil.example:4399' } }, (r) => {
+                r.resume()
+                done(r.statusCode)
+              })
+              .on('error', () => done(0)),
+          )
+          resolve({ without, opened: opened.status, page: page.status, decisions, foreign, html, out })
+        } catch (error) {
+          reject(error)
+        } finally {
+          child.kill()
+        }
+      }
+      child.stdout.on('data', onData)
+      child.stderr.on('data', (d) => {
+        out += d
+      })
+      child.on('exit', (code) => code && reject(new Error(`accord-ui exited with ${code}: ${out}`)))
+    })
+    if (result.without !== 401) fail(`accord ui answers without token: ${result.without}`)
+    if (result.opened !== 303) fail(`accord ui: opening the printed address gave ${result.opened}`)
+    if (result.page !== 200 || result.decisions !== 200)
+      fail(`accord ui pages: overview ${result.page}, decisions ${result.decisions}`)
+    if (result.foreign !== 403) fail(`accord ui answers a foreign host: ${result.foreign}`)
+    if (!result.html.includes('decivo')) fail('accord ui overview does not render')
+    if (/network access attempted/.test(result.out)) fail('accord ui tried to reach the network')
+    ok('accord ui: token, host check, overview and decisions offline')
+  } catch (error) {
+    fail(`accord ui: ${error.message}`)
+  }
+} else fail('no accord-ui binary after install')
+
+section('7. Public repository files')
 const tracked = run('git', ['ls-files'], { cwd: root }).split('\n').filter(Boolean)
 const publicDocs = tracked.filter(
   (f) => /\.(md|ya?ml|json|ts|tsx|mjs|js|sh|css)$/.test(f) && f !== 'scripts/release-check.mjs',
