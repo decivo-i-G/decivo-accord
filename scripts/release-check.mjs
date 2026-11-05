@@ -267,11 +267,14 @@ if (existsSync(join(bin, 'accord-mcp'))) {
 } else fail('no accord-mcp binary after install')
 
 section('6. accord ui without network')
-if (existsSync(join(bin, 'accord-ui'))) {
+if (existsSync(join(bin, 'accord-ui')) && existsSync(join(bin, 'accord'))) {
   const project = join(work, 'examples', 'demo', 'project')
   try {
     const result = await new Promise((resolve, reject) => {
-      const child = spawn(join(bin, 'accord-ui'), [project, '--no-open', '--port', '4399'], { env: offline })
+      // Through the CLI, which finds the installed @decivo/accord-ui next to it.
+      const child = spawn(join(bin, 'accord'), ['ui', project, '--no-open', '--port', '4399'], {
+        env: offline,
+      })
       let out = ''
       const timer = setTimeout(() => {
         child.kill()
@@ -320,7 +323,14 @@ if (existsSync(join(bin, 'accord-ui'))) {
     if (result.foreign !== 403) fail(`accord ui answers a foreign host: ${result.foreign}`)
     if (!result.html.includes('decivo')) fail('accord ui overview does not render')
     if (/network access attempted/.test(result.out)) fail('accord ui tried to reach the network')
-    ok('accord ui: token, host check, overview and decisions offline')
+    // Stopping `accord ui` must stop the web server it started.
+    await new Promise((r) => setTimeout(r, 1500))
+    const still = await fetch('http://127.0.0.1:4399/', { redirect: 'manual' }).then(
+      () => true,
+      () => false,
+    )
+    if (still) fail('accord ui: the web server keeps running after accord ui was stopped')
+    ok('accord ui: token, host check, overview and decisions offline; stops with the command')
   } catch (error) {
     fail(`accord ui: ${error.message}`)
   }

@@ -34,8 +34,7 @@ try {
     ui.stop()
     process.exit(0)
   }
-  process.on('SIGINT', stop)
-  process.on('SIGTERM', stop)
+  for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'] as const) process.on(signal, stop)
   const code = await ui.exited
   process.exit(code ?? 0)
 } catch (error) {

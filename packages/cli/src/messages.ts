@@ -302,6 +302,12 @@ const de = {
   'help.report.source': 'Herkunft',
   'help.explainOwner': 'Zeigt, wem ein Register-Pfad gehört und warum',
   'help.explainOwner.path': 'z. B. tokens.color.brand.700',
+  'help.ui': 'Öffnet die Oberfläche im Browser, nur auf diesem Rechner',
+  'help.ui.folders': 'Repositories (Standard: --root)',
+  'help.ui.port': 'Port (Standard: 4317 oder der nächste freie)',
+  'help.ui.noOpen': 'Browser nicht öffnen, nur die Adresse ausgeben',
+  'ui.download': 'Die Oberfläche wird einmalig geladen ({pkg}, etwa 25 MB) …',
+  'ui.noNpx': 'npx fehlt. Installiere die Oberfläche mit: npm install -g {pkg}',
   'error.noRegister':
     'Kein Register gefunden ({dir}). Zuerst „accord init“ ausführen oder mit --register/-C auf das Register zeigen.',
   'error.invalidRegister':
@@ -610,6 +616,12 @@ const en: Record<MessageKey, string> = {
   'help.report.source': 'origin of the run',
   'help.explainOwner': 'show who owns a register path and why',
   'help.explainOwner.path': 'e.g. tokens.color.brand.700',
+  'help.ui': 'open the web app in the browser, on this machine only',
+  'help.ui.folders': 'repositories (default: --root)',
+  'help.ui.port': 'port (default: 4317 or the next free one)',
+  'help.ui.noOpen': 'do not open the browser, only print the address',
+  'ui.download': 'Loading the web app once ({pkg}, about 25 MB) …',
+  'ui.noNpx': 'npx is missing. Install the web app with: npm install -g {pkg}',
   'error.noRegister':
     'No register found ({dir}). Run "accord init" first, or point to the register with --register/-C.',
   'error.invalidRegister':
