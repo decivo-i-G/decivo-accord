@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { z } from 'zod'
 
 /**
@@ -29,3 +31,7 @@ export function findProject(slug: string, env?: Record<string, string | undefine
 
 /** Register directory of a project: explicit, else `<root>/.accord`. */
 export const registerDirOf = (project: Project) => project.register ?? `${project.root}/.accord`
+
+/** Whether the project has a register yet (`accord init` writes `accord.config.yaml` into it). */
+export const hasRegister = (project: Project) =>
+  existsSync(join(registerDirOf(project), 'accord.config.yaml'))

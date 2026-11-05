@@ -1113,5 +1113,18 @@
       "copyCss": "Copy CSS"
     },
     "itemsTitle": "Still open"
+  },
+  "noRegister": {
+    "title": "There is no register here yet",
+    "text": "Accord creates it from what the repository already has: code, token files, Figma or Pencil. First see what Accord finds, then create it. Reload this page afterwards.",
+    "preview": "See it without writing anything",
+    "create": "Create the register",
+    "copy": "Copy command"
+  },
+  "projectError": {
+    "title": "Accord cannot read this project right now",
+    "text": "Usually the configuration or a file in the register is broken. In the terminal, this command shows why:",
+    "retry": "Try again",
+    "copy": "Copy command"
   }
 }
