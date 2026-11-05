@@ -142,7 +142,7 @@ It opens in the browser and runs on your machine only: no account, no database, 
 - Without a register, the app says how to create one (`accord init --dry-run`, then `accord init`).
 - Several repositories: `accord ui ../shop ../website`. Options: `--port <n>` (default 4317 or the next free one), `--no-open`.
 - The app ships as its own package, [`@decivo/accord-ui`](packages/ui/README.md) (about 25 MB), so the CLI stays small for agents and CI. `accord ui` uses an installed copy, otherwise it loads the same version once through npx.
-- Security: it listens on `127.0.0.1` only. A random token per start is part of the printed address; without it, from another host name or from another page, the app answers nothing.
+- Security: it listens on `127.0.0.1` only. The printed address carries a one-time code; opening it starts a session in that browser, and the address is worth nothing afterwards (press Enter in the terminal for a new one). Without a session, from another host name or from another page, the app answers nothing, and other pages cannot embed it. Stopping `accord ui` always stops the app.
 
 From source, for development: `pnpm install && pnpm build`, then `pnpm --filter @decivo/accord-web dev` with `ACCORD_PROJECTS` in `apps/web/.env.local` (see `apps/web/.env.example`).
 
