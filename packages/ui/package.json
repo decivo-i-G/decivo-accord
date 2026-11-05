@@ -1,0 +1,58 @@
+{
+  "name": "@decivo/accord-ui",
+  "version": "0.1.1",
+  "description": "The decivo Accord web app on your machine: accord ui opens the register, proposals and decisions of a repository in the browser, with no account and no server.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "directory": "packages/ui"
+  },
+  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "dtcg",
+    "figma",
+    "governance"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "bin": {
+    "accord-ui": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "@decivo/accord-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "app"
+  ],
+  "scripts": {
+    "build": "node scripts/bundle.mjs && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@decivo/accord-adapter-claude-design": "workspace:*",
+    "@decivo/accord-adapter-code": "workspace:*",
+    "@decivo/accord-adapter-figma": "workspace:*",
+    "@decivo/accord-adapter-pen": "workspace:*",
+    "@decivo/accord-checks": "workspace:*",
+    "@decivo/accord-cli": "workspace:*",
+    "@decivo/accord-core": "workspace:*",
+    "@decivo/accord-generators": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
