@@ -276,6 +276,19 @@ export function scanScript(code: string, file: string): HardValue[] {
     .map((v) => ({ ...v, column: v.column + 1, ...(inlineOnly ? { inlineOnly: true as const } : {}) }))
 }
 
+/** The syntax error of a stylesheet, or undefined when it parses. */
+export function stylesheetError(css: string, file: string): string | undefined {
+  try {
+    postcss.parse(css, { from: file })
+    return undefined
+  } catch (error) {
+    const e = error as { reason?: string; line?: number; column?: number; message?: string }
+    return e.reason
+      ? `${e.reason}${e.line ? ` at ${e.line}:${e.column ?? 1}` : ''}`
+      : (e.message ?? 'unreadable')
+  }
+}
+
 /** Fallback for files Babel cannot parse: unambiguous colours anywhere in the text. */
 function scanText(code: string, file: string): HardValue[] {
   const out: HardValue[] = []
@@ -299,7 +312,14 @@ function scanText(code: string, file: string): HardValue[] {
 
 /** Find literal colours in stylesheets, outside custom property definitions. `/* accord-ignore *\/` skips the next declaration. */
 export function scanStylesheet(css: string, file: string): HardValue[] {
-  const root = postcss.parse(css, { from: file })
+  let root: postcss.Root
+  try {
+    root = postcss.parse(css, { from: file })
+  } catch {
+    // A stylesheet with a syntax error (an unclosed block): the unambiguous colours in it still count.
+    // `stylesheetError` names the problem for the report.
+    return scanText(css, file)
+  }
   const out: HardValue[] = []
   const ignored = new Set<number>()
   root.walkComments((c) => {
@@ -312,21 +332,37 @@ export function scanStylesheet(css: string, file: string): HardValue[] {
     if (decl.prop.startsWith('--')) return
     const start = decl.source?.start
     if (!start || ignored.has(start.line)) return
-    const valueOffset = decl.prop.length + (decl.raws.between?.length ?? 1)
+    const lead = decl.prop + (decl.raws.between ?? ':')
+    const text = lead + decl.value
+    // Named colours (`red`, `RebeccaPurple`) only where a colour is expected; elsewhere words are keywords.
+    const colorProp = COLOR_STYLE_PROPS.test(decl.prop)
     valueParser(decl.value).walk((node) => {
-      let text: string | undefined
-      if (node.type === 'word' && HEX.test(node.value)) text = node.value
+      let found: string | undefined
+      if (node.type === 'word' && HEX.test(node.value)) found = node.value
       else if (node.type === 'function' && COLOR_FUNCTION.test(`${node.value}(`))
-        text = valueParser.stringify(node)
-      if (!text) return
-      const color = cssToColor(text)
+        found = valueParser.stringify(node)
+      else if (
+        colorProp &&
+        node.type === 'word' &&
+        /^[a-z]+$/i.test(node.value) &&
+        !NON_COLOR_KEYWORDS.has(node.value.toLowerCase())
+      )
+        found = node.value
+      if (!found) return
+      const color = cssToColor(found)
       if (color) {
-        // postcss columns are 1-based already.
+        // A value may span lines: the position is counted from the declaration's start (1-based columns).
+        const before = text.slice(0, lead.length + node.sourceIndex).split('\n')
+        const line = start.line + before.length - 1
+        const column =
+          before.length === 1
+            ? start.column + (before[0] as string).length
+            : (before.at(-1) as string).length + 1
         out.push({
           file,
-          line: start.line,
-          column: start.column + valueOffset + node.sourceIndex,
-          raw: text,
+          line,
+          column,
+          raw: found,
           kind: 'color',
           value: color,
           context: 'css',

@@ -59,6 +59,8 @@ export function formatDriftReport(
         ` · ${code.adoption.tokenUses} ${t('diff.tokenUses')} · ${code.adoption.hardColours} ${t('diff.hardColours')}`,
       ),
   )
+  for (const u of code.unparsable ?? [])
+    out.push(`  ${t('diff.unparsable', { file: u.file, detail: u.detail })}`)
   for (const m of code.modes ?? []) {
     if (m.selector && m.found)
       out.push(

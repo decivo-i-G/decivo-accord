@@ -27,7 +27,7 @@ import { readValidRegister } from '@decivo/accord-core/node'
 import { type PlannedOutput, planExport } from '@decivo/accord-generators'
 import { z } from 'zod'
 import type { HandoffProposal } from './claude-design.js'
-import { git } from './git.js'
+import { createBranch, git } from './git.js'
 import type { SurfaceProposal } from './surface-proposal.js'
 import { writeOutput } from './write.js'
 
@@ -472,7 +472,7 @@ export async function writeApply(
       .split('\n')
       .filter((line) => line.trim() && !own(line.slice(3)))
     if (dirty.length > 0) throw new ApplyError('dirty', dirty.map((l) => l.slice(3)).join(', '))
-    await git(root, ['checkout', '-b', branch])
+    await createBranch(root, branch)
   }
 
   const own = [

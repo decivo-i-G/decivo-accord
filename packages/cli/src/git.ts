@@ -19,3 +19,13 @@ export async function git(cwd: string, args: string[]): Promise<string> {
     })
   }
 }
+
+/**
+ * Create and switch to a new branch. An existing branch (the same proposal made twice) is named plainly
+ * instead of git's own error: its commit is already there.
+ */
+export async function createBranch(cwd: string, branch: string): Promise<void> {
+  const exists = await git(cwd, ['branch', '--list', branch]).catch(() => '')
+  if (exists.trim()) throw new AccordError('error.branchExists', { branch })
+  await git(cwd, ['checkout', '-b', branch])
+}

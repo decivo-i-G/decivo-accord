@@ -385,7 +385,13 @@ export async function checkCommand(
   if (format === 'json') {
     print(
       JSON.stringify(
-        { ok: result.ok, files: result.files, findings: result.findings, route: result.evaluation.route },
+        {
+          ok: result.ok,
+          files: result.files,
+          findings: result.findings,
+          ownership: result.ownership,
+          route: result.evaluation.route,
+        },
         null,
         2,
       ),

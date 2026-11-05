@@ -14,7 +14,7 @@ import {
 } from '@decivo/accord-core'
 import { glob } from 'tinyglobby'
 import { type CssVariable, linkedVariables, type ResolvedVariable, resolveCssVariables } from './css-vars.js'
-import { type HardValue, scanScript, scanStylesheet } from './hard-values.js'
+import { type HardValue, scanScript, scanStylesheet, stylesheetError } from './hard-values.js'
 import { buildTokenIndex, matchColor, matchDimension, type TokenIndex, type TokenMatch } from './match.js'
 import {
   type CodeModeSelector,
@@ -55,6 +55,8 @@ export interface CodeScan extends CodeSnapshot {
   stylesheets: string[]
   /** `@import`s that were not followed. */
   skippedImports: SkippedImport[]
+  /** Stylesheets with a syntax error: their variables are not read, their plain colours still count. */
+  unparsable: { file: string; detail: string }[]
 }
 
 const SCRIPT = /\.(?:[cm]?[jt]sx?)$/
@@ -217,6 +219,16 @@ export async function scanCode(options: ScanOptions): Promise<CodeScan> {
     modes,
     stylesheets: ctx.stylesheets,
     skippedImports: ctx.skippedImports,
+    unparsable: [
+      ...ctx.skippedImports
+        .filter((s) => s.reason === 'unparsable')
+        .map((s) => ({ file: s.import, detail: s.detail ?? '' })),
+      ...ctx.files.flatMap((f) => {
+        if (!STYLE.test(f.path) || ctx.skippedImports.some((s) => s.import === f.path)) return []
+        const detail = stylesheetError(f.content, f.path)
+        return detail ? [{ file: f.path, detail }] : []
+      }),
+    ],
   }
 }
 

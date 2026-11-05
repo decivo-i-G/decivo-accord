@@ -18,12 +18,16 @@ import {
 } from '@decivo/accord-checks'
 import {
   type ColorValue,
+  colorToCss,
   contextLabel,
   type DimensionValue,
+  formatValue,
+  type Owner,
   type Register,
   restrictTo,
   snapshotFromRegister,
   THEME_MODIFIER,
+  type TokenType,
   threeWayDiff,
 } from '@decivo/accord-core'
 import { loadValidRegister } from '@decivo/accord-core/node'
@@ -87,8 +91,27 @@ export interface CheckWarning {
   context: string
 }
 
+/**
+ * A token change made in code that code does not own (a design value, a register name), or the removal
+ * of a token's CSS variable. Code proposes these; the owner decides. Not a rule violation, but not
+ * something to commit as it is either: `ok` is false.
+ */
+export interface OwnershipFinding {
+  /** Register path without `tokens.`. */
+  token: string
+  context?: string | undefined
+  kind: 'changed' | 'removed'
+  owner: Owner
+  before?: string | undefined
+  after?: string | undefined
+  /** CSS variable of the token in code. */
+  variable?: string | undefined
+}
+
 export interface CheckResult {
   ok: boolean
+  /** Token changes code may not make on its own (see OwnershipFinding). */
+  ownership: OwnershipFinding[]
   evaluation: Evaluation
   findings: CheckFinding[]
   files: string[]
@@ -108,6 +131,18 @@ const toLiteral = (h: HardValueFinding): LiteralUse => ({
   allowed: h.allowed,
   inlineOnly: h.inlineOnly,
 })
+
+const show = (type: TokenType, value: unknown) =>
+  type === 'color' ? colorToCss(value as ColorValue) : formatValue(type, value)
+
+/** The CSS variable a token is linked to in code (`ids.css`), if any. */
+const linkedVariable = (register: Register, path: string) =>
+  register.tokens.get(path.replace(/^tokens\./, ''))?.accord?.ids?.css
+
+const cssVar = (register: Register, token: string) => {
+  const t = register.tokens.get(token)
+  return t ? cssVariableName(t) : undefined
+}
 
 /**
  * Check a change before it is committed or merged: hard-coded values in the touched files
@@ -152,7 +187,11 @@ export async function checkChange(input: CheckInput): Promise<CheckResult> {
     ? threeWayDiff({
         register: restrictTo(snapshotFromRegister(register), code.snapshot.coverage),
         surface: code.snapshot,
-      }).filter((i) => i.op.kind !== 'token.removed')
+      }).filter(
+        // A token without a variable in code is no removal: most tokens are never written as CSS. Only a
+        // linked variable that is gone (`ids.css`) means code deleted it.
+        (i) => i.op.kind !== 'token.removed' || linkedVariable(register, i.op.path) !== undefined,
+      )
     : []
 
   const evaluation = await evaluate({
@@ -185,7 +224,8 @@ export async function checkChange(input: CheckInput): Promise<CheckResult> {
       at: v.at,
       value,
       replacement: v.replacement,
-      replacementVar: token ? cssVariableName(token) : undefined,
+      // Only a variable code really defines: a name from the naming convention would not resolve.
+      replacementVar: token && ctx.resolved.has(cssVariableName(token)) ? cssVariableName(token) : undefined,
       ...(typeof v.detail.context === 'string' ? { context: v.detail.context } : {}),
     }
   }
@@ -216,8 +256,33 @@ export async function checkChange(input: CheckInput): Promise<CheckResult> {
         }))
       : []),
   ].filter((w, i, all) => all.findIndex((x) => x.token === w.token && x.context === w.context) === i)
+  const ownership: OwnershipFinding[] = evaluation.items.flatMap((e): OwnershipFinding[] => {
+    const op = e.item.op
+    const token = op.path.replace(/^tokens\./, '')
+    const variable =
+      linkedVariable(register, op.path) ??
+      ((v) => (v && ctx.resolved.has(v) ? v : undefined))(cssVar(register, token))
+    if (op.kind === 'token.removed')
+      return [
+        { token, kind: 'removed', owner: e.owner, before: show(op.before.type, op.before.value), variable },
+      ]
+    if (op.kind === 'token.value_changed' && !e.ownerAllowed)
+      return [
+        {
+          token,
+          kind: 'changed',
+          owner: e.owner,
+          before: show(op.type, op.before),
+          after: show(op.type, op.after),
+          variable,
+          ...(op.context ? { context: contextLabel(op.context) } : {}),
+        },
+      ]
+    return []
+  })
   return {
-    ok: !findings.some((f) => f.level === 'must'),
+    ownership,
+    ok: !findings.some((f) => f.level === 'must') && ownership.length === 0,
     evaluation,
     findings,
     files,
@@ -233,11 +298,35 @@ const warningLines = (result: CheckResult) =>
   )
 
 /** Plain-text report for agents and terminals, grouped by decision. */
+/** Lines for token changes code may not make on its own: who owns them, and what to do instead. */
+export function ownershipLines(result: CheckResult): string[] {
+  if (result.ownership.length === 0) return []
+  const lines = [
+    '',
+    'Ownership: code changed what it does not own. Revert it and ask the owner to change it in the register.',
+  ]
+  for (const o of result.ownership) {
+    const where = `tokens.${o.token}${o.context ? ` (${o.context})` : ''}${o.variable ? ` [${o.variable}]` : ''}`
+    lines.push(
+      o.kind === 'removed'
+        ? `  ${where}  removed in code (was ${o.before}); a deletion always needs a person (owner: ${o.owner})`
+        : `  ${where}  ${o.before} → ${o.after}; owned by ${o.owner}`,
+    )
+  }
+  return lines
+}
+
 export function formatCheck(result: CheckResult): string {
-  if (result.findings.length === 0)
+  if (result.findings.length === 0 && result.ownership.length === 0)
     return [`check_change: no violations in ${result.files.length} file(s).`, ...warningLines(result)].join(
       '\n',
     )
+  if (result.findings.length === 0)
+    return [
+      `check_change: ${result.ownership.length} change(s) for the owner to decide – do not commit them as they are.`,
+      ...ownershipLines(result),
+      ...warningLines(result),
+    ].join('\n')
   const lines: string[] = []
   const must = result.findings.filter((f) => f.level === 'must').length
   lines.push(
@@ -256,6 +345,7 @@ export function formatCheck(result: CheckResult): string {
       lines.push(`  ${f.at}${f.context ? ` (${f.context})` : ''}${f.value ? `  ${f.value}` : ''}${fix}`)
     }
   }
+  lines.push(...ownershipLines(result))
   const notes = warningLines(result)
   if (notes.length > 0) lines.push('', ...notes)
   return lines.join('\n')
@@ -270,8 +360,17 @@ const escapeProperty = (s: string) => escapeData(s).replace(/:/g, '%3A').replace
  * inside the repository (e.g. `apps/web`).
  */
 export function formatGithubAnnotations(result: CheckResult, pathPrefix = ''): string {
-  return result.findings
-    .map((f) => {
+  const ownership = result.ownership.map(
+    (o) =>
+      `::error title=${escapeProperty(`Owner: ${o.owner}`)}::${escapeData(
+        o.kind === 'removed'
+          ? `tokens.${o.token} was removed in code (was ${o.before}). A deletion always needs a person.`
+          : `tokens.${o.token}${o.context ? ` (${o.context})` : ''}: ${o.before} → ${o.after} in code, but ${o.owner} owns it. Revert it and ask ${o.owner} to change it in the register.`,
+      )}`,
+  )
+  return [
+    ...ownership,
+    ...result.findings.map((f) => {
       const [file, line, col] = f.at.split(':')
       // GitHub places annotations by path from the repository root.
       const path = pathPrefix ? `${pathPrefix.replace(/\/$/, '')}/${file}` : (file as string)
@@ -281,12 +380,25 @@ export function formatGithubAnnotations(result: CheckResult, pathPrefix = ''): s
         : ''
       const message = `${f.rule}${f.value ? `: ${f.value}` : ''}.${fix} Why: ${f.why}`
       return `::${f.level === 'must' ? 'error' : 'warning'} ${where}title=${escapeProperty(`${f.decision} (${f.level})`)}::${escapeData(message)}`
-    })
-    .join('\n')
+    }),
+  ].join('\n')
 }
 
 /** Markdown summary for the job page (`$GITHUB_STEP_SUMMARY`) or a pull request comment. */
 export function formatMarkdownSummary(result: CheckResult): string {
+  const owners = result.ownership.length
+    ? [
+        '',
+        '**Ownership:** code changed what it does not own. Revert it and ask the owner to change it in the register.',
+        '',
+        ...result.ownership.map((o) =>
+          o.kind === 'removed'
+            ? `- \`tokens.${o.token}\` removed in code (was \`${o.before}\`); a deletion always needs a person`
+            : `- \`tokens.${o.token}\`${o.context ? ` (${o.context})` : ''}: \`${o.before}\` → \`${o.after}\`, owned by ${o.owner}`,
+        ),
+      ].join('\n')
+    : ''
+  if (result.findings.length === 0 && owners) return `### ❌ decivo Accord\n${owners}\n`
   if (result.findings.length === 0)
     return `### ✅ decivo Accord\n\nNo violations in ${result.files.length} changed file(s).\n`
   const must = result.findings.filter((f) => f.level === 'must').length
@@ -309,5 +421,6 @@ export function formatMarkdownSummary(result: CheckResult): string {
   const decisions = new Map(result.findings.map((f) => [f.decision, f]))
   lines.push('')
   for (const [id, f] of decisions) lines.push(`- **${id}** ${f.rule} – ${f.why}`)
+  if (owners) lines.push(owners)
   return `${lines.join('\n')}\n`
 }
