@@ -16,7 +16,7 @@ describe('database schema', () => {
   it('stores a proposal with its evaluation', async () => {
     const [repo] = await db
       .insert(repository)
-      .values({ slug: 'decivo', fullName: 'decivo/decivo' })
+      .values({ slug: 'decivo', fullName: 'decivo-ug/decivo' })
       .returning()
     if (!repo) throw new Error('no repository')
     await db.insert(proposal).values({

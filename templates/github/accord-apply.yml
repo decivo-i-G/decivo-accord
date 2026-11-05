@@ -34,7 +34,7 @@ jobs:
       - name: Accord bereitstellen
         run: |
           if [ "$ACCORD_VERSION" = "source" ]; then
-            git clone --depth 1 https://github.com/decivo/decivo-accord "$RUNNER_TEMP/accord"
+            git clone --depth 1 https://github.com/decivo-ug/decivo-accord "$RUNNER_TEMP/accord"
             (cd "$RUNNER_TEMP/accord" && pnpm install --frozen-lockfile --filter "@decivo/accord-cli..." && pnpm turbo run build --filter "@decivo/accord-cli...")
             echo "ACCORD_BIN=node $RUNNER_TEMP/accord/packages/cli/dist/bin.js" >> "$GITHUB_ENV"
           else
