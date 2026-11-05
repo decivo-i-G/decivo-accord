@@ -15,7 +15,9 @@ export interface SkippedImport {
    * remote: a URL (fonts, CDNs). package: a dependency outside the repository (e.g. `tailwindcss`), whose
    * defaults are not the product's design decisions. missing: nothing found. cycle: already being read.
    */
-  reason: 'remote' | 'package' | 'missing' | 'cycle'
+  reason: 'remote' | 'package' | 'missing' | 'cycle' | 'unparsable'
+  /** For `unparsable`: the syntax error. */
+  detail?: string | undefined
 }
 
 export interface Stylesheets {
@@ -174,8 +176,21 @@ export async function readStylesheets(root: string, entries: readonly string[]):
     done.add(file)
     const css = await readFile(join(root, file), 'utf8').catch(() => undefined)
     if (css === undefined) return
+    let parsed: postcss.Root
+    try {
+      parsed = postcss.parse(css, { from: file })
+    } catch (error) {
+      // One broken stylesheet must not stop the whole report: it is named, its variables are not read.
+      const e = error as { reason?: string; line?: number; column?: number }
+      skipped.push({
+        from: stack.at(-1) ?? file,
+        import: file,
+        reason: 'unparsable',
+        detail: e.reason ? `${e.reason}${e.line ? ` at ${e.line}:${e.column ?? 1}` : ''}` : undefined,
+      })
+      return
+    }
     files.push(file)
-    const parsed = postcss.parse(css, { from: file })
     for (const node of parsed.nodes) {
       if (node.type !== 'atrule' || node.name !== 'import') continue
       const { url, condition } = parseImport(node.params)

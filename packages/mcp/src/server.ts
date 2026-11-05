@@ -192,6 +192,7 @@ export function createAccordServer(options: AccordServerOptions): McpServer {
         ok: result.ok,
         files: result.files,
         findings: result.findings,
+        ownership: result.ownership,
       })
     },
   )

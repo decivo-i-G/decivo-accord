@@ -24,7 +24,7 @@ import {
   tokensInContext,
   validateValue,
 } from '@decivo/accord-core'
-import { git } from './git.js'
+import { createBranch, git } from './git.js'
 
 /** One change a design tool made, as the register would take it over. */
 export interface SurfaceChange {
@@ -247,7 +247,7 @@ export async function saveSurfaceProposal(
   let branch: string | undefined
   if (input.branch) {
     branch = `accord/${proposal.id.toLowerCase()}`
-    await git(input.root, ['checkout', '-b', branch])
+    await createBranch(input.root, branch)
   }
   await mkdir(dirname(file), { recursive: true })
   await writeFile(file, `${JSON.stringify(proposal, null, 2)}\n`)

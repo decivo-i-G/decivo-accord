@@ -19,7 +19,7 @@ import {
   withLockedSnapshot,
 } from '@decivo/accord-core'
 import { loadValidRegister } from '@decivo/accord-core/node'
-import { git } from './git.js'
+import { createBranch, git } from './git.js'
 
 export interface HandoffProposal {
   id: string
@@ -131,7 +131,7 @@ export async function saveProposal(
   let branch: string | undefined
   if (input.branch) {
     branch = `accord/handoff-${proposal.id.toLowerCase()}`
-    await git(input.root, ['checkout', '-b', branch])
+    await createBranch(input.root, branch)
   }
   await mkdir(dirname(file), { recursive: true })
   await writeFile(file, `${JSON.stringify(proposal, null, 2)}\n`)

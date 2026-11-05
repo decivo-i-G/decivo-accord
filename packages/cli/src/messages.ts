@@ -94,6 +94,7 @@ const de = {
   'diff.drifting': 'abweichend',
   'diff.missing': 'ohne CSS-Variable',
   'diff.unreadable': 'nicht lesbar',
+  'diff.unparsable': '✗ {file} hat einen Syntaxfehler ({detail}); Variablen daraus nicht gelesen',
   'diff.hardValues': 'Harte Werte',
   'diff.withToken': 'mit exaktem Token',
   'diff.nearMiss': 'knapp daneben',
@@ -318,6 +319,8 @@ const de = {
   'error.invalidRegister':
     'Das Register {dir} hat {count} Fehler. Accord prüft nichts gegen ein halb geladenes Register:',
   'error.git': '{command} ist fehlgeschlagen: {message}',
+  'error.branchExists':
+    'Den Branch {branch} gibt es schon: Dieser Vorschlag liegt dort bereits. Wechsle mit git switch {branch} dorthin oder lösche den Branch, um ihn neu anzulegen.',
   'error.gitMissing':
     'git ist nicht installiert oder nicht im PATH. Für --branch und --push braucht Accord git.',
   'error.notFound': 'Nicht gefunden: {path}',
@@ -419,6 +422,7 @@ const en: Record<MessageKey, string> = {
   'diff.drifting': 'drifting',
   'diff.missing': 'without CSS variable',
   'diff.unreadable': 'unreadable',
+  'diff.unparsable': '✗ {file} has a syntax error ({detail}); its variables were not read',
   'diff.hardValues': 'Hard-coded values',
   'diff.withToken': 'with an exact token',
   'diff.nearMiss': 'near misses',
@@ -637,6 +641,8 @@ const en: Record<MessageKey, string> = {
   'error.invalidRegister':
     'The register {dir} has {count} error(s). Accord checks nothing against a half-loaded register:',
   'error.git': '{command} failed: {message}',
+  'error.branchExists':
+    'The branch {branch} exists already: this proposal is on it. Switch to it with git switch {branch}, or delete the branch to make it again.',
   'error.gitMissing': 'git is not installed or not on PATH. Accord needs git for --branch and --push.',
   'error.notFound': 'Not found: {path}',
   'error.noAccess': 'No access to {path}',

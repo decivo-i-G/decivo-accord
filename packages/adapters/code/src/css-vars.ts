@@ -15,6 +15,8 @@ export interface CssVariable {
   context: string
   file: string
   line: number
+  /** Declared with `!important`: a later declaration without it does not override it. */
+  important?: true
 }
 
 const BASE_SELECTORS = new Set([':root', 'html', ':host'])
@@ -147,6 +149,7 @@ export function parseCssVariables(css: string, file: string): CssVariable[] {
       context,
       file,
       line: decl.source?.start?.line ?? 0,
+      ...(decl.important ? { important: true as const } : {}),
     })
   })
   return out
@@ -170,14 +173,18 @@ export function resolveCssVariables(
   scope: string | ((scope: string) => boolean) = 'base',
 ): Map<string, ResolvedVariable> {
   const byName = new Map<string, CssVariable>()
-  for (const v of variables) if (v.scope === 'base') byName.set(v.name, v)
+  // Later declarations win, as in the cascade, except over one marked `!important`.
+  const set = (v: CssVariable) => {
+    if (byName.get(v.name)?.important && !v.important) return
+    byName.set(v.name, v)
+  }
+  for (const v of variables) if (v.scope === 'base') set(v)
   const own = new Set(byName.keys())
-  for (const v of variables) if (isDefaultThemeScope(v.scope) && !own.has(v.name)) byName.set(v.name, v)
+  for (const v of variables) if (isDefaultThemeScope(v.scope) && !own.has(v.name)) set(v)
   const inScope = typeof scope === 'string' ? (s: string) => s === scope : scope
   if (scope !== 'base')
     for (const v of variables)
-      if (v.scope !== 'base' ? inScope(v.scope) : v.list !== undefined && inScope(v.list))
-        byName.set(v.name, v)
+      if (v.scope !== 'base' ? inScope(v.scope) : v.list !== undefined && inScope(v.list)) set(v)
 
   const cache = new Map<string, string | undefined>()
   const resolving = new Set<string>()

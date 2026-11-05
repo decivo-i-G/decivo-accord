@@ -58,6 +58,8 @@ export interface DriftReport {
     /** How often each token's CSS variable is referenced in the scanned code (token path → count). */
     tokenUsage?: Record<string, number> | undefined
     filesScanned: number
+    /** Stylesheets with a syntax error; absent when there is none. */
+    unparsable?: { file: string; detail: string }[] | undefined
     /** How code expresses each non-default context (light/dark); absent for a register without modes. */
     modes?: CodeModeSelector[] | undefined
   }
@@ -232,6 +234,7 @@ export function buildDriftReport(
       adoption: adoption(scan, hardColours),
       tokenUsage: Object.fromEntries(scan.tokenUsage),
       filesScanned: scan.filesScanned,
+      ...(scan.unparsable.length > 0 ? { unparsable: scan.unparsable } : {}),
       ...(scan.modes.length > 0 ? { modes: scan.modes } : {}),
     },
   }
