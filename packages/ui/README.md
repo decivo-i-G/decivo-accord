@@ -1,6 +1,6 @@
 # @decivo/accord-ui
 
-The web app of [decivo Accord](https://github.com/decivo-i-G/decivo-accord#readme) on your machine: overview, decisions and register of a repository in the browser. No account, no database, no server on the internet.
+The web app of [decivo Accord](https://github.com/decivo-ug/decivo-accord#readme) on your machine: overview, decisions and register of a repository in the browser. No account, no database, no server on the internet.
 
 Usually you start it through the CLI, inside the repository:
 

@@ -5,11 +5,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decivo-i-G/decivo-accord.git",
+    "url": "git+https://github.com/decivo-ug/decivo-accord.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/decivo-i-G/decivo-accord#readme",
-  "bugs": "https://github.com/decivo-i-G/decivo-accord/issues",
+  "homepage": "https://github.com/decivo-ug/decivo-accord#readme",
+  "bugs": "https://github.com/decivo-ug/decivo-accord/issues",
   "keywords": [
     "design-tokens",
     "design-system",

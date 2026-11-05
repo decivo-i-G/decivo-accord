@@ -81,7 +81,7 @@ Demo data: `acme` (Figma export, proposals of every route, two Claude Design han
 
 ## decivo v6 style and no AI slop (binding, 20.10.2026)
 
-Accord is a decivo product and must be recognisable as one: the same style as decivo.de v6 (repo `decivo-i-G/decivo`: `src/app/[locale]/layout.tsx`, `src/components/site/brand-dots.tsx`, the test `src/app/[locale]/rescue/__tests__/v6-style.test.tsx`). These rules **override** anything above that contradicts them.
+Accord is a decivo product and must be recognisable as one: the same style as decivo.de v6 (repo `decivo-ug/decivo`: `src/app/[locale]/layout.tsx`, `src/components/site/brand-dots.tsx`, the test `src/app/[locale]/rescue/__tests__/v6-style.test.tsx`). These rules **override** anything above that contradicts them.
 
 **Brand**
 - **White background** everywhere (`#ffffff`) in the default light scheme. No grey canvas.

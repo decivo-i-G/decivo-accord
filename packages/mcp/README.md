@@ -1,6 +1,6 @@
 # @decivo/accord-mcp
 
-MCP server for [decivo Accord](https://github.com/decivo-i-G/decivo-accord#readme). Agents read tokens, component contracts and decisions (with their reasons) and check their changes before every commit.
+MCP server for [decivo Accord](https://github.com/decivo-ug/decivo-accord#readme). Agents read tokens, component contracts and decisions (with their reasons) and check their changes before every commit.
 
 | Tool | Purpose |
 | --- | --- |

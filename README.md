@@ -174,7 +174,7 @@ jobs:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       - uses: pnpm/action-setup@v6
-      - uses: decivo-i-G/decivo-accord/packages/action@main
+      - uses: decivo-ug/decivo-accord/packages/action@main
 ```
 
 The Action fails on `must` violations in the lines a pull request adds, annotates the line with the fix, and writes a summary. `accord export --check` fails when generated files are out of date. More in [`packages/action`](packages/action/README.md) and [`templates/`](templates/).

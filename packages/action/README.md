@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v6
-      - uses: decivo-i-G/decivo-accord/packages/action@main
+      - uses: decivo-ug/decivo-accord/packages/action@main
 ```
 
 Inputs: `register` (default `.accord`), `root`, `version` (default `source`), `node-version`, and optionally `report-url`, `report-token`.
@@ -38,13 +38,13 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: decivo-i-G/decivo-accord/packages/action@main
+      - uses: decivo-ug/decivo-accord/packages/action@main
 ```
 
 Eingaben: `register` (Standard `.accord`), `root`, `version` (Standard `source`), `node-version`, optional `report-url`, `report-token`.
 
 **Bericht an einen Webhook senden (optional):** Mit `report-url` schickt die Action nach jedem Lauf den Drift-Bericht per POST an genau diese https-Adresse (`accord report`), auch wenn der Check rot ist. Ohne `report-url` wird nichts gesendet. `report-token` ist optional und geht als `Authorization: Bearer <token>` hinaus; aus einem Secret übergeben, z. B. `secrets.ACCORD_REPORT_TOKEN`, die Adresse in der Variable `ACCORD_REPORT_URL`. Gesendet werden nur Zahlen, Pfade, Zeilennummern, Werte und Token-Namen, nie Quellcode-Zeilen; das Format steht in [docs/report-format.md](../../docs/report-format.md). Damit auch der Hauptbranch gemeldet wird, die Action auch bei `push` auf `main` laufen lassen (siehe `templates/github/accord.yml`). Lokal: `ACCORD_REPORT_TOKEN=… accord report --url https://…` oder `accord report --json` zum Ansehen.
 
-**Quellmodus (Standard):** Die Action baut Accord aus ihrem eigenen Repo, kein npm nötig. Für private Nutzung muss im Repo `decivo-i-G/decivo-accord` unter *Settings → Actions → Access* der Zugriff aus anderen Repositories der Organisation erlaubt sein. Vor der Action `pnpm/action-setup@v6` ausführen. Sobald `@decivo/accord-cli` auf npm liegt, `version: latest` setzen.
+**Quellmodus (Standard):** Die Action baut Accord aus ihrem eigenen Repo, kein npm nötig. Für private Nutzung muss im Repo `decivo-ug/decivo-accord` unter *Settings → Actions → Access* der Zugriff aus anderen Repositories der Organisation erlaubt sein. Vor der Action `pnpm/action-setup@v6` ausführen. Sobald `@decivo/accord-cli` auf npm liegt, `version: latest` setzen.
 
 </details>
