@@ -280,23 +280,48 @@ async function lockAfterAdopt(
  * (another decision, a hand edit), adopting it would silently undo that: the proposal is outdated and a
  * new one has to be made from the current state (`figma propose`, `pen propose`).
  */
-export function assertCurrent(proposal: ApplyPlan['proposal'], register: Register): void {
+/** One token a proposal changes that has moved on since it was made. */
+export interface StaleChange {
+  token: string
+  context?: string | undefined
+  /** `changed`: another value now; `gone`: no longer in the register; `exists`: a new token that exists now. */
+  reason: 'changed' | 'gone' | 'exists'
+  /** The register value the proposal was made against, and the one now. */
+  before?: string | undefined
+  now?: string | undefined
+}
+
+/** The tokens of a proposal that no longer hold the value it was made against (empty: still current). */
+export function staleChanges(proposal: ApplyPlan['proposal'], register: Register): StaleChange[] {
   const changes = 'changes' in proposal ? proposal.changes : []
-  const stale: string[] = []
+  const stale: StaleChange[] = []
   for (const c of changes) {
     const token = tokensInContext(register, c.context).get(c.token)
-    const where = `${c.token}${c.context ? ` (${c.context})` : ''}`
+    const where = { token: c.token, ...(c.context ? { context: c.context } : {}) }
     if (c.kind === 'new') {
-      if (token) stale.push(`${where} exists now`)
+      if (token) stale.push({ ...where, reason: 'exists' })
       continue
     }
     if (!token) {
-      stale.push(`${where} is no longer in the register`)
+      stale.push({ ...where, reason: 'gone', before: c.before })
       continue
     }
     const now = token.value === undefined ? undefined : show(token.type, token.value)
-    if (c.before !== undefined && now !== c.before) stale.push(`${where} is ${now} now, not ${c.before}`)
+    if (c.before !== undefined && now !== c.before)
+      stale.push({ ...where, reason: 'changed', before: c.before, now })
   }
+  return stale
+}
+
+export function assertCurrent(proposal: ApplyPlan['proposal'], register: Register): void {
+  const stale = staleChanges(proposal, register).map((c) => {
+    const where = `${c.token}${c.context ? ` (${c.context})` : ''}`
+    return c.reason === 'exists'
+      ? `${where} exists now`
+      : c.reason === 'gone'
+        ? `${where} is no longer in the register`
+        : `${where} is ${c.now} now, not ${c.before}`
+  })
   if (stale.length > 0) throw new ApplyError('stale', stale.join('; '))
 }
 

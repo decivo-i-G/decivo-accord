@@ -12,3 +12,14 @@
   color: var(--color-ink-body);
   font-size: var(--font-size-sm);
 }
+
+.problems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding-left: var(--spacing-md);
+  color: var(--color-ink-body);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}

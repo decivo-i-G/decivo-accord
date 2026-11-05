@@ -37,7 +37,8 @@ export async function paletteItems(slug: string): Promise<PaletteItem[]> {
       detail: needsYou ? tp(`tool.${p.tool}`) : `${tp(`tool.${p.tool}`)} · ${state}`,
       href: decisionHref(slug, p.id),
       badge: needsYou ? tp('group.needsYou') : undefined,
-      keywords: p.id.toLowerCase(),
+      // The tokens it changes, so searching "spacing" finds the proposal that deletes spacing.4 too.
+      keywords: [p.id, ...p.changes.map((c) => c.token)].join(' ').toLowerCase(),
     })
   }
   return [...items, ...register]

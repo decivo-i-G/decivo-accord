@@ -33,6 +33,8 @@ export interface SurfaceItem {
   breaking: boolean
   before?: string | undefined
   after?: string | undefined
+  /** The token this one is an alias of: it follows that one's change and needs no proposal of its own. */
+  aliasOf?: string | undefined
 }
 
 /** One workspace (Code, Figma, Pencil, Claude Design) compared with the register and its last sync. */
@@ -83,9 +85,15 @@ const ORIGIN: Record<DriftOrigin, ItemOrigin> = {
 const shortPath = (path: string) => path.replace(/^tokens\./, '')
 
 /** Drift items of a variable surface (Figma, Pencil) as Health items, with readable values. */
-export function surfaceItems(items: readonly DriftItem[]): SurfaceItem[] {
+export function surfaceItems(
+  items: readonly DriftItem[],
+  register?: Pick<Register, 'tokens'> | undefined,
+): SurfaceItem[] {
   return items.map(({ op, origin, classification }) => ({
     token: shortPath(op.path),
+    ...(register?.tokens.get(shortPath(op.path))?.aliasOf
+      ? { aliasOf: register.tokens.get(shortPath(op.path))?.aliasOf }
+      : {}),
     origin: op.kind === 'token.removed' ? 'deleted' : ORIGIN[origin],
     breaking: classification.breaking || op.kind === 'token.removed',
     before:
@@ -128,7 +136,7 @@ async function figmaHealth(project: Project, register: Register, lock: Lock): Pr
   try {
     const exports = await readFigmaExports(project.root, config.include)
     const status = figmaStatus(exports, register, lock, { defaultMode: config.default_mode })
-    const items = surfaceItems(status.items)
+    const items = surfaceItems(status.items, register)
     return {
       ...base,
       files: exports.map((e) => e.path),
@@ -150,7 +158,7 @@ async function penHealth(project: Project, register: Register, lock: Lock): Prom
   try {
     const docs = await readPenFiles(project.root, config.include)
     const status = penStatus(docs, register, lock)
-    const items = surfaceItems(status.items)
+    const items = surfaceItems(status.items, register)
     return {
       ...base,
       files: docs.map((d) => d.path),

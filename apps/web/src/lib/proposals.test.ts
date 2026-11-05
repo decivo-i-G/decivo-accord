@@ -377,7 +377,8 @@ describe('proposals inbox', () => {
         for (const scanned of ['yes', 'no'])
           for (const uses of [0, 1, 4])
             say('actions.confirmDeletionText', { tokens: 'spacing.4', scanned, uses })
-        say('effectShort.adoptDeletion', { tokens: 'spacing.4' })
+        for (const writes of ['css', 'none'])
+          say('effectShort.adoptDeletion', { tokens: 'spacing.4', writes })
         say('effectShort.adoptWithDeletion', {
           tokens: 'spacing.4',
           tool: p.tool === 'claude-design' ? 'claude' : p.tool,
@@ -446,6 +447,41 @@ describe('proposals inbox', () => {
     expect((await loadRegister(join(dir, '.accord'))).tokens.has('color.brand.700')).toBe(false)
     if (result.ok) await undoDecision(project, result.undo)
     expect((await loadRegister(join(dir, '.accord'))).tokens.has('color.brand.700')).toBe(true)
+  })
+
+  it('does not undo over a later change to the files a decision wrote', async () => {
+    const result = await decideProposal(project, { id: radius.id, option: 'adopt', by: 'Jana' })
+    expect(result).toMatchObject({ ok: true })
+    if (!result.ok) return
+    const token = result.files.find((f) => f.kind === 'register')?.path as string
+    const written = await readFile(join(dir, token), 'utf8')
+    // Something else changes the file afterwards (another decision, a hand edit).
+    await writeFile(join(dir, token), `${written}\n`)
+    expect(await undoDecision(project, result.undo)).toBe(false)
+    expect(await readFile(join(dir, token), 'utf8')).toBe(`${written}\n`)
+    // Back to what the decision wrote, the undo works again.
+    await writeFile(join(dir, token), written)
+    expect(await undoDecision(project, result.undo)).toBe(true)
+  })
+
+  it('marks a proposal made against an older register value as out of date', async () => {
+    const id = 'P-20261013-figma-old'
+    const old: SurfaceProposal = {
+      ...radius,
+      id,
+      changes: [{ ...(radius.changes[0] as SurfaceProposal['changes'][number]), before: '0.25rem' }],
+    }
+    await writeFile(join(proposalsDir(), `${id}.json`), JSON.stringify(old))
+    const view = (await loadInbox(project)).proposals.find((p) => p.id === id)
+    expect(view?.group).toBe('needsYou')
+    expect(view?.stale).toEqual([
+      expect.objectContaining({ token: 'radius.md', reason: 'changed', before: '0.25rem' }),
+    ])
+    expect(await decideProposal(project, { id, option: 'adopt', by: 'Jana' })).toMatchObject({
+      ok: false,
+      code: 'stale',
+    })
+    await rm(join(proposalsDir(), `${id}.json`))
   })
 
   it('adopts a handoff only with named colours from the handoff itself', async () => {

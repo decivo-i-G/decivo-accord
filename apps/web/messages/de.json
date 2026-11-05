@@ -21,8 +21,8 @@
     "lead": "Jedes Repository hat ein Register. Was Figma, Pencil, Claude Design oder Code daran ändern, landet als Entscheidung bei dir.",
     "listLabel": "Projekte",
     "branch": "Branch {branch}",
-    "broken": "Accord konnte dieses Projekt nicht lesen.",
-    "brokenHint": "Gibt es schon ein Register? Im Repository einmal ausführen:",
+    "broken": "Accord kann das Register gerade nicht lesen.",
+    "brokenHint": "Im Terminal zeigt dieser Befehl, was fehlerhaft ist:",
     "onboarding": {
       "title": "Noch kein Projekt verbunden",
       "lead": "decivo Accord ist das Register für Design-Entscheidungen: eine Wahrheit im Repository, gegen die Figma, Pencil, Claude Design, Code und Agenten prüfen.",
@@ -52,12 +52,15 @@
       "decisions": "Entscheiden",
       "review": "Ansehen",
       "connect": "Einrichten",
-      "overview": "Öffnen"
+      "overview": "Öffnen",
+      "open": "Projekt öffnen"
     },
     "surfaces": "Arbeitsflächen",
     "connected": "verbunden",
     "notConnected": "nicht verbunden",
-    "lastChange": "Letzte Änderung {when}"
+    "lastChange": "Letzte Änderung {when}",
+    "noRegister": "Hier gibt es noch kein Register.",
+    "noRegisterHint": "Accord legt es aus dem an, was im Repository schon da ist. Erst ansehen, dann anlegen:"
   },
   "placeholder": {
     "soon": "Dieser Bildschirm folgt im nächsten Schritt."
@@ -690,7 +693,7 @@
       "working": "Wird geschrieben …",
       "confirmDeletionText": "{tokens} wird gelöscht. {scanned, select, no {Accord hat keinen Code geprüft. Was den Token nutzt, funktioniert danach nicht mehr.} other {{uses, plural, =0 {Nichts im geprüften Code nutzt den Token.} one {# Stelle im Code nutzt ihn und funktioniert danach nicht mehr.} other {# Stellen im Code nutzen ihn und funktionieren danach nicht mehr.}}}} Wirklich löschen?",
       "confirmBreakingText": "Bestehende Verwendungen funktionieren danach nicht mehr. Wirklich ändern?",
-      "blocked": "Übernehmen ist gesperrt, weil eine Regel verletzt würde.",
+      "blocked": "Übernehmen ist gesperrt: Es würde {rules} verletzen. Eine Regel ändert sich nur über eine eigene Entscheidung.",
       "recommended": "Empfohlen:",
       "adoptValue": "{value} übernehmen",
       "adoptValueRisky": "{value} übernehmen …",
@@ -702,7 +705,8 @@
       "keepRegisterValue": "Registerwert behalten",
       "leaveOut": "Nicht aufnehmen",
       "more": "Mehr",
-      "adoptNothing": "Nichts übernehmen"
+      "adoptNothing": "Nichts übernehmen",
+      "blockedStale": "Übernehmen ist gesperrt, weil der Vorschlag veraltet ist."
     },
     "keys": {
       "move": "Nächste oder vorige Entscheidung",
@@ -726,7 +730,7 @@
       "reject": "Ignoriert. Nichts hat sich geändert.",
       "undo": "Rückgängig",
       "undone": "Rückgängig gemacht. Die Entscheidung ist wieder offen.",
-      "undoFailed": "Das lässt sich nicht mehr rückgängig machen.",
+      "undoFailed": "Das lässt sich nicht mehr rückgängig machen: Die Frist ist vorbei, oder seitdem wurde etwas anderes entschieden oder eine der Dateien geändert. Zurück geht es dann nur über git.",
       "resetHandoff": "Nichts übernommen. Die fast passenden Farben stellst du in Claude Design um.",
       "keep": "Behalten. {tokens} {count, plural, one {bleibt} other {bleiben}} im Register; in {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {der Arbeitsfläche}} stellst du die Löschung selbst zurück."
     },
@@ -782,10 +786,10 @@
     },
     "whyCode": "Warum es offen ist",
     "effectShort": {
-      "adopt": "{token}{aliases, select, none {} other { und damit {aliases}}} {aliases, select, none {wird} other {werden}} {after} in Register, CSS und CHANGELOG.",
-      "adoptNew": "{token} kommt mit {after} in Register, CSS und CHANGELOG.",
-      "adoptMany": "{count, plural, one {Die Änderung kommt} other {Die # Änderungen kommen}} in Register, CSS und CHANGELOG.",
-      "adoptDeletion": "{tokens} wird aus Register und CSS gelöscht, der CHANGELOG hält es fest. Accord fragt vorher noch einmal.",
+      "adopt": "{token}{aliases, select, none {} other { und damit {aliases}}} {aliases, select, none {wird} other {werden}} {after} in {writes, select, css {Register, CSS und CHANGELOG} other {Register und CHANGELOG}}.",
+      "adoptNew": "{token} kommt mit {after} in {writes, select, css {Register, CSS und CHANGELOG} other {Register und CHANGELOG}}.",
+      "adoptMany": "{count, plural, one {Die Änderung kommt} other {Die # Änderungen kommen}} in {writes, select, css {Register, CSS und CHANGELOG} other {Register und CHANGELOG}}.",
+      "adoptDeletion": "{tokens} wird aus {writes, select, css {Register und CSS} other {dem Register}} gelöscht, der CHANGELOG hält es fest. Accord fragt vorher noch einmal.",
       "adoptWithDeletion": "Die Werte aus {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {der Arbeitsfläche}} kommen ins Register, {tokens} wird gelöscht. Accord fragt vorher noch einmal.",
       "adoptHandoff": "Nur die Farben, die du unter „Selbst benennen“ benennst, kommen als neue Tokens ins Register.",
       "reset": "Das Register bleibt bei {before}. In {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {der Arbeitsfläche}} stellst du {token} selbst zurück.",
@@ -795,7 +799,13 @@
       "resetHandoff": "Register und Entwurf bleiben, wie sie sind.{near, plural, =0 {} one { Die fast passende Farbe stellst du in Claude Design auf ihren Token um.} other { Die # fast passenden Farben stellst du in Claude Design auf ihre Tokens um.}}",
       "reject": "Nichts ändert sich, keine Aufgabe für {tool, select, figma {Figma} pen {Pencil} claude {Claude Design} other {der Arbeitsfläche}}. Solange die Abweichung bleibt, meldet der nächste Abgleich sie wieder.",
       "rejectHandoff": "Der Entwurf wird geschlossen. Nichts ändert sich, keine Aufgabe für Claude Design.",
-      "adoptNamed": "{count, plural, one {Die benannte Farbe kommt als neuer Token} other {Die # benannten Farben kommen als neue Tokens}} in Register, CSS und CHANGELOG."
+      "adoptNamed": "{count, plural, one {Die benannte Farbe kommt als neuer Token} other {Die # benannten Farben kommen als neue Tokens}} in {writes, select, css {Register, CSS und CHANGELOG} other {Register und CHANGELOG}}."
+    },
+    "stale": {
+      "lead": "Veraltet: Das Register hat sich seit diesem Vorschlag geändert. Übernehmen würde das zurückdrehen. Verwirf ihn; ein neuer Vorschlag aus {tool, select, figma {Figma} pen {Pencil} other {der Arbeitsfläche}} geht vom aktuellen Stand aus.",
+      "changed": "ist jetzt {now}, der Vorschlag ging von {before} aus.",
+      "gone": "ist nicht mehr im Register.",
+      "exists": "gibt es inzwischen schon."
     }
   },
   "connections": {
@@ -1127,6 +1137,13 @@
     "title": "Accord kann dieses Projekt gerade nicht lesen",
     "text": "Meist ist die Konfiguration oder eine Datei im Register fehlerhaft. Im Terminal zeigt dieser Befehl den Grund:",
     "retry": "Erneut versuchen",
+    "copy": "Befehl kopieren"
+  },
+  "registerBroken": {
+    "title": "Accord kann das Register gerade nicht lesen",
+    "text": "Meist ist die Konfiguration oder eine Token-Datei fehlerhaft. Solange das Register nicht vollständig gelesen ist, prüft und entscheidet Accord nichts.",
+    "problems": "Was Accord meldet",
+    "command": "Im Terminal zeigt dieser Befehl jede Stelle:",
     "copy": "Befehl kopieren"
   }
 }
