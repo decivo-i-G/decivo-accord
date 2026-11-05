@@ -69,6 +69,7 @@ accord init --dry-run   # see what Accord finds and would write
 accord init             # create .accord/ from code, token files, Figma or Pencil
 accord diff             # drift between the register and the code
 accord export           # DESIGN.md, AGENTS.md, CLAUDE.md block, CSS, CHANGELOG.md
+accord ui               # the web app in the browser, for the people who decide
 ```
 
 `accord init` takes what is there. The start source decides which side wins where today's sources disagree:
@@ -124,35 +125,26 @@ Ownership lives in `accord.config.yaml`: a default per group, with exceptions pe
 
 ## Web app
 
-`apps/web` is a Next.js app for the people who decide. Each project has:
+The web app is for the people who decide. Start it inside the repository:
+
+```sh
+accord ui        # or: npx @decivo/accord-cli ui
+```
+
+It opens in the browser and runs on your machine only: no account, no database, no server on the internet. Each project has:
 
 - **Overview:** the state in one sentence and the next step.
 - **Decisions:** the open proposals as an inbox. Adopt, reset and reject run the same code as `accord apply`, so the register, CSS, DESIGN.md, AGENTS.md and CHANGELOG.md change exactly as they do on the command line.
 - **Register:** tokens, components and rules to look up, with their CSS variables.
 - **Connections:** which surfaces (code, Figma, Pencil, Claude Design) Accord reads, and from where.
 
-Run it locally:
+- A decision changes files in the working tree and does not commit them; that stays with you.
+- Without a register, the app says how to create one (`accord init --dry-run`, then `accord init`).
+- Several repositories: `accord ui ../shop ../website`. Options: `--port <n>` (default 4317 or the next free one), `--no-open`.
+- The app ships as its own package, [`@decivo/accord-ui`](packages/ui/README.md) (about 25 MB), so the CLI stays small for agents and CI. `accord ui` uses an installed copy, otherwise it loads the same version once through npx.
+- Security: it listens on `127.0.0.1` only. A random token per start is part of the printed address; without it, from another host name or from another page, the app answers nothing.
 
-```sh
-pnpm install && pnpm build
-cp apps/web/.env.example apps/web/.env.local
-# set ACCORD_PROJECTS in apps/web/.env.local, see below
-pnpm --filter @decivo/accord-web dev    # http://localhost:3000
-```
-
-`ACCORD_PROJECTS` is a JSON list with one entry per repository. The repository needs a register first (`accord init`).
-
-```sh
-ACCORD_PROJECTS=[{"slug":"shop","name":"acme/shop","root":"/path/to/shop"}]
-```
-
-- `slug`: the project's part of the URL, lowercase letters, digits and hyphens.
-- `name`: the name shown in the app.
-- `root`: the repository. Relative paths are resolved from `apps/web`.
-- `register` (optional): the register folder, default `<root>/.accord`.
-- `branch` (optional): default `main`.
-
-The web app is local for now. It reads and writes the repositories on your machine: a decision changes files in the working tree and does not commit them. There is no hosting and there are no accounts yet; leave the database and GitHub variables in `.env.example` empty.
+From source, for development: `pnpm install && pnpm build`, then `pnpm --filter @decivo/accord-web dev` with `ACCORD_PROJECTS` in `apps/web/.env.local` (see `apps/web/.env.example`).
 
 ## For agents
 
@@ -205,6 +197,7 @@ All commands take `-C, --root <dir>` (repository) and `-r, --register <dir>` (de
 | `accord design status\|reset\|lock --mirror <dir>` | the Claude Design design-system project against the register |
 | `accord apply --proposal <id> --option adopt\|reset\|reject --by <name>` or `--resolution <file>` | apply a person's decision |
 | `accord explain-owner <path>` | who owns a register path, and why |
+| `accord ui [folders...] [--port <n>] [--no-open]` | open the web app for the repository, on this machine only |
 | `accord report [--url <url>] [--token-env <name>] [--json]` | print the drift report as JSON, or POST it to `--url` / `ACCORD_REPORT_URL` with the token from `ACCORD_REPORT_TOKEN` (metadata only, never source lines; [format](docs/report-format.md)) |
 
 ## Principles
@@ -232,6 +225,7 @@ Light and dark work: the register keeps them with the DTCG resolver module (`res
 | [`packages/adapters/*`](packages/adapters) | code, Figma (`.fig` reader included), Pencil, Claude Design |
 | [`packages/generators`](packages/generators) | DESIGN.md, AGENTS.md, CLAUDE.md block, CSS, CHANGELOG.md |
 | [`packages/cli`](packages/cli) · [`packages/mcp`](packages/mcp) · [`packages/action`](packages/action) | command line, MCP server, GitHub Action |
+| [`packages/ui`](packages/ui) · [`apps/web`](apps/web) | the web app as an npm package (`accord ui`), and its source |
 
 ## Contributing
 

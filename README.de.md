@@ -41,6 +41,7 @@ accord init --dry-run   # zeigt, was Accord findet und schreiben würde
 accord init             # legt .accord/ aus Code, Token-Dateien, Figma oder Pencil an
 accord diff             # Drift zwischen Register und Code
 accord export           # DESIGN.md, AGENTS.md, CLAUDE.md-Block, CSS, CHANGELOG.md
+accord ui               # die Oberfläche im Browser, für die Menschen, die entscheiden
 ```
 
 `accord init` übernimmt, was da ist. Die Startquelle entscheidet, wer gewinnt, wo sich die heutigen Quellen widersprechen:
@@ -92,35 +93,26 @@ Der Besitz steht in `accord.config.yaml`: ein Standard pro Gruppe, mit Ausnahmen
 
 ## Web-App
 
-`apps/web` ist eine Next.js-App für die Menschen, die entscheiden. Jedes Projekt hat:
+Die Web-App ist für die Menschen, die entscheiden. Gestartet wird sie im Repository:
+
+```sh
+accord ui        # oder: npx @decivo/accord-cli ui
+```
+
+Sie öffnet sich im Browser und läuft nur auf deinem Rechner: kein Konto, keine Datenbank, kein Server im Internet. Jedes Projekt hat:
 
 - **Überblick:** der Stand in einem Satz und der nächste Schritt.
 - **Entscheidungen:** die offenen Vorschläge als Eingang. Übernehmen, Zurücksetzen und Verwerfen laufen über denselben Code wie `accord apply`. Register, CSS, DESIGN.md, AGENTS.md und CHANGELOG.md ändern sich also genau wie auf der Kommandozeile.
 - **Register:** Tokens, Komponenten und Regeln zum Nachschlagen, mit ihren CSS-Variablen.
 - **Verbindungen:** welche Arbeitsflächen (Code, Figma, Pencil, Claude Design) Accord liest, und woher.
 
-Lokal starten:
+- Eine Entscheidung ändert Dateien im Arbeitsverzeichnis und committet sie nicht; das bleibt bei dir.
+- Ohne Register sagt die App, wie es entsteht (`accord init --dry-run`, dann `accord init`).
+- Mehrere Repositories: `accord ui ../shop ../website`. Optionen: `--port <n>` (Standard 4317 oder der nächste freie), `--no-open`.
+- Die App ist ein eigenes Paket, [`@decivo/accord-ui`](packages/ui/README.md) (etwa 25 MB), damit die CLI für Agenten und CI klein bleibt. `accord ui` nimmt eine installierte Kopie, sonst lädt es dieselbe Version einmalig über npx.
+- Sicherheit: Sie hört nur auf `127.0.0.1`. Ein zufälliges Token pro Start steckt in der ausgegebenen Adresse; ohne es, unter einem anderen Hostnamen oder von einer anderen Seite aus antwortet die App nicht.
 
-```sh
-pnpm install && pnpm build
-cp apps/web/.env.example apps/web/.env.local
-# ACCORD_PROJECTS in apps/web/.env.local eintragen, siehe unten
-pnpm --filter @decivo/accord-web dev    # http://localhost:3000
-```
-
-`ACCORD_PROJECTS` ist eine JSON-Liste mit einem Eintrag pro Repository. Das Repository braucht vorher ein Register (`accord init`).
-
-```sh
-ACCORD_PROJECTS=[{"slug":"shop","name":"acme/shop","root":"/pfad/zu/shop"}]
-```
-
-- `slug`: der Teil der URL für das Projekt, Kleinbuchstaben, Ziffern und Bindestriche.
-- `name`: der Name in der App.
-- `root`: das Repository. Relative Pfade gelten ab `apps/web`.
-- `register` (optional): der Register-Ordner, Standard `<root>/.accord`.
-- `branch` (optional): Standard `main`.
-
-Die Web-App läuft vorerst nur lokal. Sie liest und schreibt die Repositories auf deinem Rechner: Eine Entscheidung ändert Dateien im Arbeitsverzeichnis und committet sie nicht. Hosting und Konten gibt es noch nicht; die Datenbank- und GitHub-Variablen aus `.env.example` bleiben leer.
+Aus dem Quellcode, für die Entwicklung: `pnpm install && pnpm build`, dann `pnpm --filter @decivo/accord-web dev` mit `ACCORD_PROJECTS` in `apps/web/.env.local` (siehe `apps/web/.env.example`).
 
 ## Für Agenten
 
