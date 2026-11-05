@@ -1113,5 +1113,18 @@
       "copyCss": "CSS kopieren"
     },
     "itemsTitle": "Noch offen"
+  },
+  "noRegister": {
+    "title": "Hier gibt es noch kein Register",
+    "text": "Accord legt es aus dem an, was im Repository schon da ist: Code, Token-Dateien, Figma oder Pencil. Erst ansehen, was Accord findet, dann anlegen. Danach diese Seite neu laden.",
+    "preview": "Ansehen, ohne etwas zu schreiben",
+    "create": "Register anlegen",
+    "copy": "Befehl kopieren"
+  },
+  "projectError": {
+    "title": "Accord kann dieses Projekt gerade nicht lesen",
+    "text": "Meist ist die Konfiguration oder eine Datei im Register fehlerhaft. Im Terminal zeigt dieser Befehl den Grund:",
+    "retry": "Erneut versuchen",
+    "copy": "Befehl kopieren"
   }
 }
